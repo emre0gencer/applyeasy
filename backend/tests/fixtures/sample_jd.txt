@@ -1,0 +1,35 @@
+Senior Backend Engineer — Data Platform
+TechCorp | San Francisco, CA (Hybrid)
+
+About TechCorp
+TechCorp builds real-time analytics infrastructure for enterprise customers. We process over 10 billion events per day across our distributed platform.
+
+Role Overview
+We are looking for a Senior Backend Engineer to join our Data Platform team. You will design and build the systems that ingest, process, and serve large-scale streaming data to our analytics products.
+
+Required Qualifications
+• 4+ years of professional software engineering experience
+• Strong proficiency in Python or Go
+• Experience building and operating distributed systems at scale
+• Hands-on experience with stream processing systems (Kafka, Kinesis, or similar)
+• Proficiency with PostgreSQL or other relational databases
+• Experience with containerization (Docker, Kubernetes)
+• Track record of building reliable, production-grade services
+
+Preferred Qualifications
+• Experience with AWS or GCP cloud infrastructure
+• Familiarity with data pipeline frameworks (Airflow, Spark)
+• Prior experience in a fast-paced startup environment
+
+Responsibilities
+• Design and implement data ingestion pipelines capable of handling millions of events per second
+• Own the reliability and performance of core platform services
+• Collaborate with data science and product teams to ship new analytics features
+• Drive technical architecture decisions and mentor junior engineers
+• Participate in on-call rotation
+
+What We Offer
+• Competitive salary ($180K-$220K)
+• Remote-friendly with SF hub
+• Equity package
+• Collaborative, low-ego culture

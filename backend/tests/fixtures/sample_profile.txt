@@ -1,0 +1,40 @@
+Jane Smith
+jane.smith@email.com | (555) 123-4567 | linkedin.com/in/janesmith | San Francisco, CA
+
+Summary
+Software engineer with 4 years of experience building scalable backend services in Python and Go. Focused on distributed systems and data pipelines.
+
+Experience
+
+Senior Software Engineer | Acme Corp | Jan 2022 – Present | San Francisco, CA
+• Designed and implemented a real-time data ingestion pipeline processing 2M events/day using Apache Kafka and Python
+• Reduced API latency by 40% by introducing Redis caching layer and optimizing database query patterns
+• Led migration of monolithic service to microservices architecture, improving deployment frequency from monthly to daily
+• Mentored 3 junior engineers through code reviews and weekly 1:1 sessions
+
+Software Engineer | Beta Systems | Jun 2020 – Dec 2021 | Remote
+• Built REST APIs using FastAPI and PostgreSQL serving 50K daily active users
+• Implemented automated testing suite (pytest) achieving 85% code coverage
+• Collaborated with data science team to deploy ML models via Flask endpoints
+
+Education
+
+B.S. Computer Science | University of California, Berkeley | May 2020
+GPA: 3.7 | Dean's List (all semesters)
+
+Projects
+
+ResumeRanker (github.com/janesmith/resumeranker)
+• Built NLP pipeline using sentence-transformers and scikit-learn to rank resumes against job descriptions
+• Technologies: Python, FastAPI, sentence-transformers, React
+
+Skills
+
+Languages: Python, Go, JavaScript, SQL
+Frameworks: FastAPI, Flask, React, Next.js
+Tools: Docker, Kubernetes, Kafka, Redis, PostgreSQL, Git
+Cloud: AWS (EC2, S3, Lambda, RDS)
+
+Awards
+
+AWS Certified Solutions Architect – Associate | Amazon Web Services | 2023

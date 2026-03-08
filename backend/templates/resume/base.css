@@ -1,0 +1,136 @@
+/* ATS-safe single-column resume template */
+@page {
+    size: letter;
+    margin: 0.65in 0.7in 0.65in 0.7in;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Liberation Serif", "Times New Roman", serif;
+    font-size: 10.5pt;
+    line-height: 1.35;
+    color: #111;
+    background: white;
+}
+
+/* ── Header ── */
+.header {
+    text-align: center;
+    margin-bottom: 10pt;
+    padding-bottom: 6pt;
+    border-bottom: 1.5pt solid #111;
+}
+
+.header .name {
+    font-size: 20pt;
+    font-weight: bold;
+    letter-spacing: 0.5pt;
+    margin-bottom: 3pt;
+}
+
+.header .contact {
+    font-size: 9.5pt;
+    color: #333;
+}
+
+.header .contact span + span::before {
+    content: " | ";
+    color: #888;
+}
+
+/* ── Section headings ── */
+.section-heading {
+    font-size: 10.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.8pt;
+    border-bottom: 0.75pt solid #111;
+    margin-top: 9pt;
+    margin-bottom: 4pt;
+    padding-bottom: 1pt;
+}
+
+/* ── Summary ── */
+.summary {
+    font-size: 10pt;
+    margin-bottom: 4pt;
+}
+
+/* ── Experience / Projects ── */
+.entry {
+    margin-bottom: 6pt;
+}
+
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1pt;
+}
+
+.entry-title {
+    font-weight: bold;
+    font-size: 10.5pt;
+}
+
+.entry-dates {
+    font-size: 9.5pt;
+    color: #444;
+    white-space: nowrap;
+}
+
+.entry-subtitle {
+    font-size: 10pt;
+    color: #333;
+    margin-bottom: 2pt;
+}
+
+.entry-location {
+    font-size: 9.5pt;
+    color: #555;
+}
+
+ul.bullets {
+    margin-left: 14pt;
+    margin-top: 2pt;
+}
+
+ul.bullets li {
+    font-size: 10pt;
+    margin-bottom: 1.5pt;
+    list-style-type: disc;
+}
+
+/* ── Education ── */
+.edu-entry {
+    margin-bottom: 4pt;
+}
+
+.edu-entry .entry-header {
+    margin-bottom: 0;
+}
+
+/* ── Skills ── */
+.skills-section {
+    margin-top: 2pt;
+}
+
+.skill-group {
+    margin-bottom: 2pt;
+    font-size: 10pt;
+}
+
+.skill-group .category {
+    font-weight: bold;
+}
+
+/* ── Awards ── */
+.award-entry {
+    margin-bottom: 3pt;
+    font-size: 10pt;
+}
