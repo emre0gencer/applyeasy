@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>{{ css }}</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="name">{{ resume.name }}</div>
+  <div class="contact">
+    {% if resume.email %}<span>{{ resume.email }}</span>{% endif %}
+    {% if resume.phone %}<span>{{ resume.phone }}</span>{% endif %}
+    {% if resume.linkedin %}<span>{{ resume.linkedin }}</span>{% endif %}
+    {% if resume.location %}<span>{{ resume.location }}</span>{% endif %}
+  </div>
+</div>
+
+<!-- ── Summary ── -->
+{% if resume.summary %}
+<div class="section-heading">Summary</div>
+<div class="summary">{{ resume.summary }}</div>
+{% endif %}
+
+<!-- ── Experience ── -->
+{% if resume.experiences %}
+<div class="section-heading">Experience</div>
+{% for exp in resume.experiences %}
+<div class="entry">
+  <div class="entry-header">
+    <span class="entry-title">{{ exp.role_title }}</span>
+    <span class="entry-dates">{{ exp.start_date }}{% if exp.end_date %} – {{ exp.end_date }}{% endif %}</span>
+  </div>
+  <div class="entry-subtitle">
+    {{ exp.company }}{% if exp.location %}, {{ exp.location }}{% endif %}
+  </div>
+  {% if exp.bullets %}
+  <ul class="bullets">
+    {% for tb in exp.bullets %}
+    <li>{{ tb.text }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ── Projects ── -->
+{% if resume.projects %}
+<div class="section-heading">Projects</div>
+{% for proj in resume.projects %}
+<div class="entry">
+  <div class="entry-header">
+    <span class="entry-title">{{ proj.name }}</span>
+    {% if proj.url %}<span class="entry-dates">{{ proj.url }}</span>{% endif %}
+  </div>
+  {% if proj.technologies %}
+  <div class="entry-subtitle">{{ proj.technologies | join(', ') }}</div>
+  {% endif %}
+  {% if proj.bullets %}
+  <ul class="bullets">
+    {% for b in proj.bullets %}
+    <li>{{ b.text }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="entry-subtitle" style="margin-top:2pt;">{{ proj.description }}</div>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ── Education ── -->
+{% if resume.education %}
+<div class="section-heading">Education</div>
+{% for edu in resume.education %}
+<div class="edu-entry">
+  <div class="entry-header">
+    <span class="entry-title">
+      {% if edu.degree %}{{ edu.degree }}{% if edu.field_of_study %} in {{ edu.field_of_study }}{% endif %}{% else %}{{ edu.institution }}{% endif %}
+    </span>
+    {% if edu.graduation_date %}<span class="entry-dates">{{ edu.graduation_date }}</span>{% endif %}
+  </div>
+  {% if edu.degree %}<div class="entry-subtitle">{{ edu.institution }}</div>{% endif %}
+  {% if edu.gpa %}<div class="entry-subtitle">GPA: {{ edu.gpa }}</div>{% endif %}
+  {% if edu.honors %}
+  <div class="entry-subtitle">{{ edu.honors | join(', ') }}</div>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ── Skills ── -->
+{% if grouped_skills %}
+<div class="section-heading">Skills</div>
+<div class="skills-section">
+{% for cat, names in grouped_skills.items() %}
+<div class="skill-group">
+  <span class="category">{{ cat }}:</span> {{ names | join(', ') }}
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<!-- ── Awards ── -->
+{% if resume.awards %}
+<div class="section-heading">Awards & Certifications</div>
+{% for award in resume.awards %}
+<div class="award-entry">
+  <strong>{{ award.title }}</strong>
+  {% if award.issuer %} — {{ award.issuer }}{% endif %}
+  {% if award.date %} ({{ award.date }}){% endif %}
+  {% if award.description %}<br><span style="color:#444;">{{ award.description }}</span>{% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+</body>
+</html>

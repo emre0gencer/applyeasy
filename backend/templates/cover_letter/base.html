@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>{{ css }}</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="name">{{ resume.name }}</div>
+  <div class="contact">
+    {% if resume.email %}<div>{{ resume.email }}</div>{% endif %}
+    {% if resume.phone %}<div>{{ resume.phone }}</div>{% endif %}
+    {% if resume.linkedin %}<div>{{ resume.linkedin }}</div>{% endif %}
+    {% if resume.location %}<div>{{ resume.location }}</div>{% endif %}
+  </div>
+</div>
+
+<div class="date-line">{{ date }}</div>
+
+<div class="salutation">
+  {% if jd.company_name %}
+  Hiring Team at {{ jd.company_name }}
+  {% else %}
+  Hiring Manager
+  {% endif %}
+</div>
+
+<div class="body-text">
+  {% for paragraph in paragraphs %}
+  <p>{{ paragraph }}</p>
+  {% endfor %}
+</div>
+
+<div class="closing">
+  <div class="sign-off">Sincerely,</div>
+  <div>{{ resume.name }}</div>
+</div>
+
+</body>
+</html>

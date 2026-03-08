@@ -1,0 +1,61 @@
+/* Cover letter template */
+@page {
+    size: letter;
+    margin: 1in 1in 1in 1in;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Liberation Serif", "Times New Roman", serif;
+    font-size: 11pt;
+    line-height: 1.55;
+    color: #111;
+    background: white;
+}
+
+.header {
+    margin-bottom: 24pt;
+}
+
+.header .name {
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: 4pt;
+}
+
+.header .contact {
+    font-size: 10pt;
+    color: #444;
+}
+
+.header .contact div {
+    margin-bottom: 1pt;
+}
+
+.date-line {
+    margin-bottom: 18pt;
+    font-size: 10.5pt;
+    color: #444;
+}
+
+.salutation {
+    margin-bottom: 12pt;
+}
+
+.body-text p {
+    margin-bottom: 12pt;
+    text-indent: 0;
+}
+
+.closing {
+    margin-top: 24pt;
+}
+
+.closing .sign-off {
+    margin-bottom: 36pt;
+}
