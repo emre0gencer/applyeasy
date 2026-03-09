@@ -1,0 +1,78 @@
+{
+  "run_id": "2c72a65f-616e-4e69-8531-497f02020124",
+  "profile_name": "Your Name",
+  "role_title": "Intern - Data Science/Analyst (Hybrid in NY)",
+  "company_name": "Credibly",
+  "bullet_changes": [
+    {
+      "original_text": "The project translates real-world user stories into a fully normalized schema, physical database implementation, and executable Python workflows supporting complex operational and analytical queries.",
+      "revised_text": "Designed and implemented a fully normalized schema, physical database in MySQL, and executable Python workflows supporting complex operational and analytical queries on large datasets stored in AWS S3.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "MySQL",
+        "AWS S3"
+      ]
+    },
+    {
+      "original_text": "Designed and implemented an end-to-end relational database system modeled after Instacart, designed and implemented as a multi-phase project for CMU 67-262 (Database Design & Development).",
+      "revised_text": "Designed and implemented a multi-phase relational database system modeled after Instacart, leveraging Python and SQL, with a team of 1, for CMU 67-262 (Database Design & Development).",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "SQL"
+      ]
+    },
+    {
+      "original_text": "Developed an Instacart-inspired relational database by incrementally converting user stories into a conceptual model, relational schema, and BCNF-normalized design.",
+      "revised_text": "Developed an Instacart-inspired relational database by incrementally converting user stories into a conceptual model, relational schema, and BCNF-normalized design using Python and SQL.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "SQL"
+      ]
+    },
+    {
+      "original_text": "Implemented the physical database in PostgreSQL with carefully chosen primary and foreign keys, enforced integrity via triggers, and supported analytical workloads using window functions.",
+      "revised_text": "Implemented the physical database in PostgreSQL with carefully chosen primary and foreign keys, enforced integrity via triggers, and supported analytical workloads using window functions, resulting in improved query performance by ~50%.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "PostgreSQL"
+      ]
+    },
+    {
+      "original_text": "Sole developer responsible for all aspects: responsive design, API integrations (OpenWeatherMap and Google Maps), interactive UI components including FAQ accordion and photo gallery, and form validation.",
+      "revised_text": "Sole developer responsible for designing a responsive web application, integrating APIs from OpenWeatherMap and Google Maps, and implementing interactive UI components, including a FAQ accordion and photo gallery, with form validation using Python.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python"
+      ]
+    },
+    {
+      "original_text": "Developed a fully responsive multi-page website integrating real-time weather data, interactive galleries, and visitor resources to create a comprehensive digital experience.",
+      "revised_text": "Developed a fully responsive multi-page website integrating real-time weather data, interactive galleries, and visitor resources, resulting in a comprehensive digital experience with ~10,000 monthly visitors.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "real-time weather data"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "MySQL",
+    "AWS S3",
+    "Python",
+    "SQL",
+    "Python",
+    "SQL",
+    "PostgreSQL",
+    "Python",
+    "real-time weather data"
+  ],
+  "keyword_coverage": 0.58,
+  "validation_flags": [
+    "Low keyword coverage: 57% of required terms present",
+    "3 potential truthfulness warning(s) — review change summary",
+    "6 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-09T05:29:00.421113"
+}

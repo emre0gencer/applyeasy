@@ -1,0 +1,85 @@
+{
+  "run_id": "edc30994-b2b1-47a4-97a6-196da9093d49",
+  "profile_name": "Emre Gencer",
+  "role_title": "Intern - Data Science/Analyst (Hybrid in NY)",
+  "company_name": "Credibly",
+  "bullet_changes": [
+    {
+      "original_text": "Utilized AI tools to analyze financial, R&D, and marketing datasets for strategic insights.",
+      "revised_text": "Analyzed financial, R&D, and marketing datasets using AI tools to inform strategic decisions.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "Machine Learning"
+      ]
+    },
+    {
+      "original_text": "Examined application of AI tools for marketing campaign optimization.",
+      "revised_text": "Examined AI tool applications for marketing campaign optimization.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Scikit-learn"
+      ]
+    },
+    {
+      "original_text": "Evaluated diversity, inclusion, and social responsibility initiatives.",
+      "revised_text": "Evaluated diversity, inclusion, and social responsibility initiatives.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Gained hands-on experience with production ML systems at enterprise scale.",
+      "revised_text": "Gained hands-on experience with production ML systems at enterprise scale.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python"
+      ]
+    },
+    {
+      "original_text": "Conducted comprehensive SWOT analysis evaluating company strategy and innovation.",
+      "revised_text": "Conducted comprehensive SWOT analysis evaluating company strategy and innovation.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Applied AI algorithms to detect fraud in payment systems, improving detection accuracy.",
+      "revised_text": "Applied AI algorithms to detect fraud in payment systems, improving detection accuracy.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Machine Learning"
+      ]
+    },
+    {
+      "original_text": "Sole developer responsible for all aspects: game mechanics, AI opponent logic with tunable action cooldowns, tournament bracket system, state management, and physics-based ball movement.",
+      "revised_text": "Designed and developed a game with AI opponent logic, tournament bracket system, and state management.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python"
+      ]
+    },
+    {
+      "original_text": "Developed a 2D basketball game using pygame with a complete game loop, state management system, and object-oriented architecture featuring Quick Match and Tournament modes with adjustable AI difficulty.",
+      "revised_text": "Developed a 2D basketball game with a complete game loop, state management system, and object-oriented architecture.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "Python",
+    "Machine Learning",
+    "Scikit-learn",
+    "Python",
+    "Machine Learning",
+    "Python",
+    "Python"
+  ],
+  "keyword_coverage": 0.54,
+  "validation_flags": [
+    "Low keyword coverage: 54% of required terms present",
+    "6 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-09T06:24:12.581031"
+}

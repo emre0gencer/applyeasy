@@ -1,13 +1,16 @@
 """
 CoverLetterGenerator — evidence-first LLM narrative generation.
-Two-call chain: alignment identification (Sonnet, temp=0) → generation (Sonnet, temp=0.4).
+Two-call chain: alignment identification (llama-3.1-8b-instant, JSON mode) →
+generation (llama-3.3-70b-versatile, temp=0.4).
 """
 
 from __future__ import annotations
 
+import json
+import os
 import re
 
-import anthropic
+from groq import Groq
 
 from backend.src.models.schemas import (
     CandidateProfile,
@@ -16,7 +19,18 @@ from backend.src.models.schemas import (
     TailoredResume,
 )
 
-_client = anthropic.Anthropic()
+_client: "Groq | None" = None
+
+_FAST_MODEL = "llama-3.1-8b-instant"
+_QUALITY_MODEL = "llama-3.3-70b-versatile"
+
+
+def _get_client() -> "Groq":
+    global _client
+    if _client is None:
+        _client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    return _client
+
 
 _PROHIBITED_PHRASES = [
     "excited to apply",
@@ -34,45 +48,10 @@ _PROHIBITED_PHRASES = [
     "hit the ground running",
 ]
 
-_ALIGNMENT_TOOL = {
-    "name": "identify_alignment",
-    "description": "Identify strong genuine connections between candidate background and job requirements.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "alignment_points": {
-                "type": "array",
-                "description": "2-4 strongest genuine connections. Each must cite specific evidence from candidate background.",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "candidate_evidence": {
-                            "type": "string",
-                            "description": "Specific experience, project, or achievement from candidate background",
-                        },
-                        "job_requirement": {
-                            "type": "string",
-                            "description": "The specific job requirement or responsibility this connects to",
-                        },
-                        "connection_explanation": {
-                            "type": "string",
-                            "description": "Why this is a genuine connection (1 sentence)",
-                        },
-                    },
-                    "required": ["candidate_evidence", "job_requirement", "connection_explanation"],
-                },
-                "minItems": 2,
-                "maxItems": 4,
-            },
-            "evidence_texts": {
-                "type": "array",
-                "items": {"type": "string"},
-                "description": "Verbatim source_text values from candidate profile used as evidence",
-            },
-        },
-        "required": ["alignment_points", "evidence_texts"],
-    },
-}
+_ALIGNMENT_SCHEMA_HINT = (
+    '{"alignment_points": [{"candidate_evidence": str, "job_requirement": str, "connection_explanation": str}], '
+    '"evidence_texts": [str]}'
+)
 
 
 def _build_candidate_snapshot(profile: CandidateProfile, resume: TailoredResume) -> str:
@@ -133,29 +112,29 @@ def _identify_alignment(
         "1. ONLY include connections where candidate_evidence cites something SPECIFIC from their background.\n"
         "2. Reject vague connections ('has relevant experience', 'demonstrates skills').\n"
         "3. Each point must cite a specific project, role, achievement, or quantified result.\n"
-        "4. Find 2-4 points — quality over quantity. Stop at 2 if fewer strong connections exist."
+        "4. Find 2-4 points — quality over quantity. Stop at 2 if fewer strong connections exist.\n"
+        "Respond ONLY with valid JSON matching: " + _ALIGNMENT_SCHEMA_HINT
     )
     user_msg = (
         f"CANDIDATE BACKGROUND:\n{candidate_snapshot}\n\n"
         f"JOB REQUIREMENTS:\n{jd_snapshot}"
     )
 
-    response = _client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
+    resp = _get_client().chat.completions.create(
+        model=_FAST_MODEL,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user_msg},
+        ],
+        response_format={"type": "json_object"},
         temperature=0,
-        system=system,
-        tools=[_ALIGNMENT_TOOL],
-        tool_choice={"type": "tool", "name": "identify_alignment"},
-        messages=[{"role": "user", "content": user_msg}],
     )
 
-    for block in response.content:
-        if block.type == "tool_use" and block.name == "identify_alignment":
-            data = block.input
-            return data.get("alignment_points", []), data.get("evidence_texts", [])
-
-    return [], []
+    try:
+        data = json.loads(resp.choices[0].message.content)
+        return data.get("alignment_points", []), data.get("evidence_texts", [])
+    except (json.JSONDecodeError, AttributeError):
+        return [], []
 
 
 def _generate_letter(
@@ -194,14 +173,15 @@ def _generate_letter(
         f"EVIDENCE (verbatim from profile):\n{evidence_summary}"
     )
 
-    response = _client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=1024,
+    resp = _get_client().chat.completions.create(
+        model=_QUALITY_MODEL,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user_msg},
+        ],
         temperature=0.4,
-        system=system,
-        messages=[{"role": "user", "content": user_msg}],
     )
-    return response.content[0].text.strip()
+    return resp.choices[0].message.content.strip()
 
 
 def _check_prohibited_phrases(text: str) -> list[str]:

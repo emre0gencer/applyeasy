@@ -7,10 +7,33 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from markupsafe import Markup
+
+
+def _strip_bullet(text: str) -> str:
+    """Strip leading bullet chars, then hard-cap at ~280 chars (≤2 lines) at a word boundary."""
+    text = re.sub(r'^[\s•\-\*·–○]+', '', text).strip()
+    if len(text) > 280:
+        cut = text[:280]
+        last_space = cut.rfind(' ')
+        text = (cut[:last_space] if last_space > 180 else cut) + '…'
+    return text
+
+
+def _short_url(url: str) -> str:
+    """Strip protocol and www: https://www.linkedin.com/... → linkedin.com/..."""
+    return re.sub(r'^https?://(www\.)?', '', url).rstrip('/')
+
+
+def _url_handle(url: str) -> str:
+    """Extract last path component: linkedin.com/in/john-doe → john-doe, github.com/jdoe → jdoe."""
+    clean = re.sub(r'^https?://(www\.)?', '', url).rstrip('/')
+    return clean.split('/')[-1]
 
 from backend.src.models.schemas import (
     BulletChange,
@@ -26,10 +49,14 @@ _OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "outputs"))
 
 
 def _get_jinja_env(template_subdir: str) -> Environment:
-    return Environment(
+    env = Environment(
         loader=FileSystemLoader(str(_TEMPLATE_DIR / template_subdir)),
         autoescape=select_autoescape(["html"]),
     )
+    env.filters['strip_bullet'] = _strip_bullet
+    env.filters['short_url'] = _short_url
+    env.filters['url_handle'] = _url_handle
+    return env
 
 
 def _load_css(template_subdir: str) -> str:
@@ -40,18 +67,16 @@ def _load_css(template_subdir: str) -> str:
 def _render_html(template_subdir: str, context: dict) -> str:
     env = _get_jinja_env(template_subdir)
     template = env.get_template("base.html")
-    context["css"] = _load_css(template_subdir)
+    context["css"] = Markup(_load_css(template_subdir))
     return template.render(**context)
 
 
 def _html_to_pdf(html: str, output_path: Path) -> None:
-    try:
-        from weasyprint import HTML  # type: ignore
-        HTML(string=html).write_pdf(str(output_path))
-    except ImportError:
-        raise RuntimeError(
-            "WeasyPrint is not installed. Install it with: pip install weasyprint"
-        )
+    from xhtml2pdf import pisa  # type: ignore
+    with open(output_path, "wb") as f:
+        result = pisa.CreatePDF(html, dest=f, encoding="utf-8")
+    if result.err:
+        raise RuntimeError(f"PDF generation failed with {result.err} errors")
 
 
 def _group_skills(resume: TailoredResume) -> dict[str, list[str]]:

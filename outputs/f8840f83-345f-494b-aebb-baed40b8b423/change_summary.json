@@ -1,0 +1,57 @@
+{
+  "run_id": "f8840f83-345f-494b-aebb-baed40b8b423",
+  "profile_name": "Emre Gencer",
+  "role_title": "Intern - Data Science/Analyst (Hybrid in NY)",
+  "company_name": "Credibly",
+  "bullet_changes": [
+    {
+      "original_text": "Co-designed the conceptual and relational models, performed functional dependency analysis and BCNF normalization, implemented PostgreSQL tables and constraints via generated DDL, authored SQL triggers and analytical queries, and built Python scripts using psycopg2 to execute and demonstrate all 10 user stories with traceable output.",
+      "revised_text": "Co-designed conceptual and relational models, performed functional dependency analysis and BCNF normalization, implemented PostgreSQL tables and constraints via generated DDL, authored SQL triggers and analytical queries, and built Python scripts using psycopg2 to execute and demonstrate all 10 user stories with traceable output.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Learned about end-to-end database design lifecycle (conceptual → logical → physical), functional dependencies and BCNF normalization in practice, designing triggers for automatic state maintenance, using window functions for analytical queries, bridging SQL systems with Python application logic, and incremental system growth driven by user stories.",
+      "revised_text": "Learned about end-to-end database design lifecycle (conceptual → logical → physical), functional dependencies and BCNF normalization in practice, designing triggers for automatic state maintenance, using window functions for analytical queries, bridging SQL systems with Python application logic, and incremental system growth driven by user stories.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Designed and implemented an end-to-end relational database system modeled after Instacart, designed and implemented as a multi-phase project for CMU 67-262 (Database Design & Development).",
+      "revised_text": "Designed and implemented an end-to-end relational database system modeled after Instacart, a multi-phase project for CMU 67-262 (Database Design & Development).",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Learned about virtual machine and interpreter architecture, call stack and activation record management, low-level memory modeling for arrays and structs, runtime safety checks and error signaling, and bridging compiler output (bytecode) with execution semantics.",
+      "revised_text": "Learned about virtual machine and interpreter architecture, call stack and activation record management, low-level memory modeling for arrays and structs, runtime safety checks and error signaling, and bridging compiler output (bytecode) with execution semantics.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Individually implemented the VM execution engine, instruction dispatch loop, arithmetic and control-flow opcodes, call stack and frame management, heap allocation for arrays and structs, memory access instructions, and runtime error handling.",
+      "revised_text": "Implemented the VM execution engine, instruction dispatch loop, arithmetic and control-flow opcodes, call stack and frame management, heap allocation for arrays and structs, memory access instructions, and runtime error handling.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Implemented a stack-based abstract machine inspired by the JVM and LLVM, including an operand stack, program counter, call stack with activation records, local variable environments, constant pools, and a dynamically allocated heap for arrays and structs.",
+      "revised_text": "Implemented a stack-based abstract machine inspired by the JVM and LLVM, including an operand stack, program counter, call stack with activation records, local variable environments, constant pools, and a dynamically allocated heap for arrays and structs.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Developed a fully responsive multi-page website integrating real-time weather data, interactive galleries, and visitor resources to create a comprehensive digital experience.",
+      "revised_text": "Developed a fully responsive multi-page website integrating real-time weather data, interactive galleries, and visitor resources to create a comprehensive digital experience.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    }
+  ],
+  "keywords_integrated": [],
+  "keyword_coverage": 0.46,
+  "validation_flags": [
+    "Low keyword coverage: 46% of required terms present"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-09T06:07:16.803832"
+}

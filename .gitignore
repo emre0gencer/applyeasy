@@ -18,6 +18,9 @@ venv/
 # Generated outputs
 backend/outputs/
 
+# Reference file
+example/example_resume.pdf
+
 # Node
 node_modules/
 frontend/dist/
