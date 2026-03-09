@@ -1,7 +1,7 @@
-/* ATS-safe single-column resume template */
+/* Resume template — matches example format, strict 1 page */
 @page {
     size: letter;
-    margin: 0.65in 0.7in 0.65in 0.7in;
+    margin: 0.45in 0.5in 0.4in 0.5in;
 }
 
 * {
@@ -11,126 +11,111 @@
 }
 
 body {
-    font-family: "Liberation Serif", "Times New Roman", serif;
-    font-size: 10.5pt;
-    line-height: 1.35;
-    color: #111;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.2;
+    color: #000;
     background: white;
 }
 
 /* ── Header ── */
 .header {
     text-align: center;
-    margin-bottom: 10pt;
-    padding-bottom: 6pt;
-    border-bottom: 1.5pt solid #111;
+    margin-bottom: 4pt;
+    padding-bottom: 3pt;
+    border-bottom: 1pt solid #000;
 }
 
 .header .name {
     font-size: 20pt;
     font-weight: bold;
-    letter-spacing: 0.5pt;
-    margin-bottom: 3pt;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2pt;
 }
 
 .header .contact {
-    font-size: 9.5pt;
-    color: #333;
+    font-size: 9pt;
+    color: #000;
 }
 
-.header .contact span + span::before {
-    content: " | ";
-    color: #888;
+.header .contact a {
+    color: #0000EE;
+    text-decoration: underline;
 }
 
 /* ── Section headings ── */
 .section-heading {
-    font-size: 10.5pt;
+    font-size: 10pt;
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 0.8pt;
-    border-bottom: 0.75pt solid #111;
-    margin-top: 9pt;
-    margin-bottom: 4pt;
+    border-bottom: 0.75pt solid #000;
+    margin-top: 6pt;
+    margin-bottom: 2pt;
     padding-bottom: 1pt;
 }
 
 /* ── Summary ── */
 .summary {
-    font-size: 10pt;
-    margin-bottom: 4pt;
-}
-
-/* ── Experience / Projects ── */
-.entry {
-    margin-bottom: 6pt;
-}
-
-.entry-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 1pt;
-}
-
-.entry-title {
-    font-weight: bold;
-    font-size: 10.5pt;
-}
-
-.entry-dates {
     font-size: 9.5pt;
-    color: #444;
-    white-space: nowrap;
-}
-
-.entry-subtitle {
-    font-size: 10pt;
-    color: #333;
-    margin-bottom: 2pt;
-}
-
-.entry-location {
-    font-size: 9.5pt;
-    color: #555;
-}
-
-ul.bullets {
-    margin-left: 14pt;
-    margin-top: 2pt;
-}
-
-ul.bullets li {
-    font-size: 10pt;
-    margin-bottom: 1.5pt;
-    list-style-type: disc;
+    line-height: 1.25;
+    margin-bottom: 0;
 }
 
 /* ── Education ── */
 .edu-entry {
-    margin-bottom: 4pt;
+    margin-bottom: 2pt;
 }
 
-.edu-entry .entry-header {
-    margin-bottom: 0;
+.edu-header {
+    font-size: 10pt;
+    line-height: 1.2;
+}
+
+.edu-detail {
+    font-size: 9pt;
+    color: #222;
+    margin-top: 1pt;
 }
 
 /* ── Skills ── */
 .skills-section {
-    margin-top: 2pt;
+    margin-top: 0;
 }
 
 .skill-group {
-    margin-bottom: 2pt;
-    font-size: 10pt;
+    font-size: 9.5pt;
+    margin-bottom: 1pt;
+    line-height: 1.2;
 }
 
-.skill-group .category {
-    font-weight: bold;
+/* ── Experience & Projects ── */
+.entry {
+    margin-bottom: 4pt;
 }
 
-/* ── Awards ── */
-.award-entry {
-    margin-bottom: 3pt;
+.entry-header {
     font-size: 10pt;
+    line-height: 1.2;
+    margin-bottom: 1pt;
+}
+
+.entry-detail {
+    font-size: 9.5pt;
+    color: #222;
+    margin-top: 1pt;
+}
+
+/* ── Bullets (used in Experience, Projects, Leadership) ── */
+ul.bullets {
+    margin-left: 14pt;
+    margin-top: 1pt;
+    margin-bottom: 0;
+}
+
+ul.bullets li {
+    font-size: 9.5pt;
+    margin-bottom: 1pt;
+    list-style-type: disc;
+    line-height: 1.25;
 }

@@ -35,6 +35,7 @@ class EducationEntry(BaseModel):
     graduation_date: Optional[str] = None
     gpa: Optional[str] = None
     honors: list[str] = []
+    coursework: Optional[str] = None   # e.g. "15-122, 67-262, 10-301"
     source_text: str = ""
 
 
@@ -43,6 +44,7 @@ class ProjectEntry(BaseModel):
     description: str
     technologies: list[str] = []
     url: Optional[str] = None
+    date: Optional[str] = None        # year or date string
     bullets: list[Bullet] = []
     source_text: str = ""
 
@@ -67,6 +69,7 @@ class CandidateProfile(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     linkedin: Optional[str] = None
+    github: Optional[str] = None
     location: Optional[str] = None
     summary: Optional[str] = None
     experiences: list[ExperienceEntry] = []
@@ -74,6 +77,7 @@ class CandidateProfile(BaseModel):
     projects: list[ProjectEntry] = []
     skills: list[Skill] = []
     awards: list[AwardEntry] = []
+    leadership_items: list[str] = []  # flat strings: "VP, Club (2022-24): Led X..."
     source_documents: list[str] = []
     extraction_confidence: float = 0.0   # 0.0–1.0, surfaced in UI
     raw_text: str = ""
@@ -162,6 +166,7 @@ class TailoredResume(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     linkedin: Optional[str] = None
+    github: Optional[str] = None
     location: Optional[str] = None
     summary: str = ""
     experiences: list[TailoredExperience] = []
@@ -169,6 +174,7 @@ class TailoredResume(BaseModel):
     projects: list[ProjectEntry] = []
     skills: list[Skill] = []
     awards: list[AwardEntry] = []
+    leadership_items: list[str] = []  # flat strings for Leadership & Awards section
     keyword_coverage: float = 0.0     # fraction of high-importance JD keywords present
     changes: list[BulletChange] = []  # full audit trail
 

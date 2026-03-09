@@ -17,7 +17,10 @@ from backend.src.generation.cover_letter_generator import generate_cover_letter
 from backend.src.generation.resume_tailoring_engine import tailor_resume
 from backend.src.ingestion.document_ingestion_engine import ingest_text
 from backend.src.matching.relevance_ranker import rank_relevance
-from backend.src.models.schemas import PROGRESS_MESSAGES
+from backend.src.models.schemas import PROGRESS_MESSAGES, TailoredCoverLetter
+
+# Set to True to re-enable cover letter generation
+COVER_LETTER_ENABLED = False
 from backend.src.rendering.pdf_renderer import (
     render_change_summary,
     render_cover_letter_pdf,
@@ -96,9 +99,12 @@ def _execute_pipeline(
     _step(db, run_id, "tailoring_resume")
     tailored_resume = tailor_resume(profile, jd, relevance_map)
 
-    # ── Step 5: Generate cover letter ──────────────────────────────────────
-    _step(db, run_id, "generating_cover_letter")
-    cover_letter = generate_cover_letter(profile, jd, tailored_resume)
+    # ── Step 5: Generate cover letter (disabled — set COVER_LETTER_ENABLED=True to re-enable) ──
+    if COVER_LETTER_ENABLED:
+        _step(db, run_id, "generating_cover_letter")
+        cover_letter = generate_cover_letter(profile, jd, tailored_resume)
+    else:
+        cover_letter = TailoredCoverLetter()
 
     # ── Step 6: Validate ────────────────────────────────────────────────────
     validation = validate(tailored_resume, cover_letter, profile, jd)
@@ -106,7 +112,9 @@ def _execute_pipeline(
     # ── Step 7: Render PDFs ─────────────────────────────────────────────────
     _step(db, run_id, "rendering_pdfs")
     resume_path = render_resume_pdf(tailored_resume, run_id)
-    cl_path = render_cover_letter_pdf(tailored_resume, cover_letter, jd, run_id)
+    cl_path = None
+    if COVER_LETTER_ENABLED:
+        cl_path = render_cover_letter_pdf(tailored_resume, cover_letter, jd, run_id)
     summary_path = render_change_summary(tailored_resume, cover_letter, validation, jd, run_id)
 
     # ── Complete ─────────────────────────────────────────────────────────────

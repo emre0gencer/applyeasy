@@ -1,10 +1,11 @@
 """
 Tests for CandidateProfileBuilder and JobDescriptionAnalyzer.
-These tests mock the Anthropic API to avoid real API calls.
+These tests mock the Groq API to avoid real API calls.
 """
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -27,17 +28,10 @@ def _load_fixture(name: str) -> str:
 # Mock helpers
 # ---------------------------------------------------------------------------
 
-def _make_tool_use_block(name: str, data: dict) -> MagicMock:
-    block = MagicMock()
-    block.type = "tool_use"
-    block.name = name
-    block.input = data
-    return block
-
-
-def _make_response(*blocks) -> MagicMock:
+def _make_json_response(data: dict) -> MagicMock:
     resp = MagicMock()
-    resp.content = list(blocks)
+    resp.choices = [MagicMock()]
+    resp.choices[0].message.content = json.dumps(data)
     return resp
 
 
@@ -51,14 +45,15 @@ class TestCandidateProfileBuilder:
         """Profile builder returns a CandidateProfile with expected fields."""
         doc = ingest_text(_load_fixture("sample_profile.txt"))
 
-        contact_block = _make_tool_use_block("extract_contact", {
-            "name": "Jane Smith",
-            "email": "jane.smith@email.com",
-            "phone": "(555) 123-4567",
-            "linkedin": "linkedin.com/in/janesmith",
-            "location": "San Francisco, CA",
-        })
-        exp_block = _make_tool_use_block("extract_experiences", {
+        # Call 1: core (contact + experiences + education)
+        core_response = _make_json_response({
+            "contact": {
+                "name": "Jane Smith",
+                "email": "jane.smith@email.com",
+                "phone": "(555) 123-4567",
+                "linkedin": "linkedin.com/in/janesmith",
+                "location": "San Francisco, CA",
+            },
             "experiences": [
                 {
                     "company": "Acme Corp",
@@ -72,9 +67,7 @@ class TestCandidateProfileBuilder:
                     ],
                     "source_text": "Senior Software Engineer | Acme Corp | Jan 2022 – Present",
                 }
-            ]
-        })
-        edu_block = _make_tool_use_block("extract_education", {
+            ],
             "education": [
                 {
                     "institution": "University of California, Berkeley",
@@ -84,28 +77,21 @@ class TestCandidateProfileBuilder:
                     "gpa": "3.7",
                     "source_text": "B.S. Computer Science | UC Berkeley | May 2020",
                 }
-            ]
+            ],
         })
-        projects_block = _make_tool_use_block("extract_projects", {"projects": []})
-        skills_block = _make_tool_use_block("extract_skills", {
+
+        # Call 2: supplemental (projects + skills + awards)
+        supplemental_response = _make_json_response({
+            "projects": [],
             "skills": [
                 {"name": "Python", "category": "languages", "source_text": "Python"},
                 {"name": "FastAPI", "category": "frameworks", "source_text": "FastAPI"},
-            ]
+            ],
+            "awards": [],
         })
-        awards_block = _make_tool_use_block("extract_awards", {"awards": []})
-
-        responses = [
-            _make_response(contact_block),
-            _make_response(exp_block),
-            _make_response(edu_block),
-            _make_response(projects_block),
-            _make_response(skills_block),
-            _make_response(awards_block),
-        ]
 
         with patch("backend.src.extraction.candidate_profile_builder._client") as mock_client:
-            mock_client.messages.create.side_effect = responses
+            mock_client.chat.completions.create.side_effect = [core_response, supplemental_response]
             from backend.src.extraction.candidate_profile_builder import build_candidate_profile
             profile = build_candidate_profile(doc)
 
@@ -136,7 +122,7 @@ class TestJobDescriptionAnalyzer:
         """JD analyzer returns structured JobDescription."""
         jd_text = _load_fixture("sample_jd.txt")
 
-        jd_block = _make_tool_use_block("analyze_job_description", {
+        jd_data = {
             "company_name": "TechCorp",
             "role_title": "Senior Backend Engineer",
             "seniority_level": "senior",
@@ -158,10 +144,10 @@ class TestJobDescriptionAnalyzer:
                 {"term": "Docker", "importance": 1, "first_appears_in": "requirements"},
             ],
             "cultural_signals": ["low-ego", "fast-paced"],
-        })
+        }
 
         with patch("backend.src.analysis.job_description_analyzer._client") as mock_client:
-            mock_client.messages.create.return_value = _make_response(jd_block)
+            mock_client.chat.completions.create.return_value = _make_json_response(jd_data)
             from backend.src.analysis.job_description_analyzer import analyze_job_description
             jd = analyze_job_description(jd_text)
 
@@ -181,13 +167,13 @@ class TestJobDescriptionAnalyzer:
     def test_jd_has_raw_text(self):
         """Raw JD text is preserved."""
         jd_text = "Engineer role at Acme"
-        jd_block = _make_tool_use_block("analyze_job_description", {
+        jd_data = {
             "role_title": "Engineer",
             "requirements": [],
             "keywords": [],
-        })
+        }
         with patch("backend.src.analysis.job_description_analyzer._client") as mock_client:
-            mock_client.messages.create.return_value = _make_response(jd_block)
+            mock_client.chat.completions.create.return_value = _make_json_response(jd_data)
             from backend.src.analysis.job_description_analyzer import analyze_job_description
             jd = analyze_job_description(jd_text)
         assert jd.raw_text == jd_text

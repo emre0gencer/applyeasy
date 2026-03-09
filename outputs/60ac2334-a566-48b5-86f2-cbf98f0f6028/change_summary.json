@@ -1,0 +1,123 @@
+{
+  "run_id": "60ac2334-a566-48b5-86f2-cbf98f0f6028",
+  "profile_name": "Emre Gencer",
+  "role_title": "Intern - Data Science/Analyst (Hybrid in NY)",
+  "company_name": "Credibly",
+  "bullet_changes": [
+    {
+      "original_text": "Conducted structured analysis of model behavior and research findings, strengthening quantitative reasoning, documentation, and insight communication skills.",
+      "revised_text": "Analyzed model behavior using Python and Scikit-learn, strengthening quantitative reasoning and Data Science skills through documentation and insight communication.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "Scikit-learn",
+        "Data Science"
+      ]
+    },
+    {
+      "original_text": "Published a research article, “The Role of AI-Enhanced Medical Computer Vision in Diagnostic Automation,” analyzing how CNNs and Vision Transformers enable diagnostic automation in medical imaging.",
+      "revised_text": "Published research on AI-enhanced medical computer vision using Machine Learning and Data Analysis, enabling diagnostic automation in medical imaging with CNNs and Vision Transformers.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Machine Learning",
+        "Data Analysis",
+        "AI"
+      ]
+    },
+    {
+      "original_text": "Compared CNN and Vision Transformer architectures to identify performance tradeoffs, application-specific strengths, and practical considerations for real-world use.",
+      "revised_text": "Compared CNN and Vision Transformer architectures using Python, identifying performance tradeoffs and application-specific strengths for real-world Data Science applications.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "Data Science"
+      ]
+    },
+    {
+      "original_text": "Analyzed financial, R&D, and marketing datasets to surface trends, anomalies, and performance drivers, delivering 15 actionable insights weekly for strategy and campaign optimization.",
+      "revised_text": "Analyzed financial and marketing datasets using SQL and Google Sheets, surfacing trends and anomalies to deliver actionable Data Analysis insights for strategy optimization.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "SQL",
+        "Google Sheets",
+        "Data Analysis"
+      ]
+    },
+    {
+      "original_text": "Performed exploratory and statistical analysis across cross-functional business data, documented assumptions, and recommended follow-up experiments to improve decision quality for business stakeholders.",
+      "revised_text": "Performed exploratory Data Analysis and statistical analysis using Python and Scikit-learn, documenting assumptions and recommending follow-up experiments to improve decision quality.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "Scikit-learn",
+        "Data Analysis"
+      ]
+    },
+    {
+      "original_text": "Built and evaluated ML workflows in Python using the TensorFlow framework on large-scale datasets to support fraud detection model iteration and threshold tuning, improving recall by 3.6% at a fixed false positive rate.",
+      "revised_text": "Built and evaluated Machine Learning workflows in Python using TensorFlow, supporting fraud detection model iteration and threshold tuning with large-scale datasets and Data Science techniques.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "TensorFlow",
+        "Machine Learning",
+        "Data Science"
+      ]
+    },
+    {
+      "original_text": "Translated findings into stakeholder-ready summaries and a SWOT/strategy brief linking ML capabilities to product risk and innovation priorities.",
+      "revised_text": "Translated Data Analysis findings into stakeholder-ready summaries using Data Visualization techniques, linking Machine Learning capabilities to product risk and innovation priorities.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Data Analysis",
+        "Data Visualization",
+        "Machine Learning"
+      ]
+    },
+    {
+      "original_text": "Explored patterns and anomalies in high-volume transaction data to identify predictive signals and improve model performance.",
+      "revised_text": "Explored patterns and anomalies in high-volume transaction data using Python and SQL, identifying predictive signals to improve model performance with Data Science and Machine Learning techniques.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "SQL",
+        "Data Science",
+        "Machine Learning"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "Python",
+    "Scikit-learn",
+    "Data Science",
+    "Machine Learning",
+    "Data Analysis",
+    "AI",
+    "Python",
+    "Data Science",
+    "SQL",
+    "Google Sheets",
+    "Data Analysis",
+    "Python",
+    "Scikit-learn",
+    "Data Analysis",
+    "Python",
+    "TensorFlow",
+    "Machine Learning",
+    "Data Science",
+    "Data Analysis",
+    "Data Visualization",
+    "Machine Learning",
+    "Python",
+    "SQL",
+    "Data Science",
+    "Machine Learning"
+  ],
+  "keyword_coverage": 0.69,
+  "validation_flags": [
+    "8 potential truthfulness warning(s) — review change summary",
+    "8 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-09T06:37:15.072353"
+}

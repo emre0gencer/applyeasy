@@ -1,0 +1,137 @@
+{
+  "run_id": "c279bad3-bc00-4315-80b0-d61b1248ff44",
+  "profile_name": "Emre Gencer",
+  "role_title": "Intern - Data Science/Analyst",
+  "company_name": "Credibly",
+  "bullet_changes": [
+    {
+      "original_text": "Utilized AI tools to analyze financial, R&D, and marketing datasets for strategic insights",
+      "revised_text": "Utilized Python and MySQL to analyze financial, R&D, and marketing datasets for strategic insights",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "MySQL"
+      ]
+    },
+    {
+      "original_text": "Examined application of AI tools for marketing campaign optimization",
+      "revised_text": "Examined the application of Python and MySQL-based AI tools for marketing campaign optimization",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "MySQL"
+      ]
+    },
+    {
+      "original_text": "Assessed market competition and contributed insights on innovation strategies",
+      "revised_text": "Assessed market competition and contributed insights on innovation strategies",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Evaluated diversity, inclusion, and social responsibility initiatives",
+      "revised_text": "Evaluated diversity, inclusion, and social responsibility initiatives",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Gained hands-on experience with production ML systems at enterprise scale",
+      "revised_text": "Gained hands-on experience with production ML systems at enterprise scale using Python and MySQL",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "MySQL"
+      ]
+    },
+    {
+      "original_text": "Applied AI algorithms to detect fraud in payment systems, improving detection accuracy",
+      "revised_text": "Applied AI algorithms to detect fraud in payment systems, improving detection accuracy",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Conducted comprehensive SWOT analysis evaluating company strategy and innovation",
+      "revised_text": "Conducted comprehensive SWOT analysis evaluating company strategy and innovation",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Assessed alignment with UN Sustainable Development Goals and corporate responsibility initiatives",
+      "revised_text": "Assessed alignment with UN Sustainable Development Goals and corporate responsibility initiatives",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Co-authored published paper: 'The Role of AI-Enhanced Medical Computer Vision in Diagnostic Automation'",
+      "revised_text": "Co-authored published paper: 'The Role of AI-Enhanced Medical Computer Vision in Diagnostic Automation' (utilizing Python and MySQL)",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "MySQL"
+      ]
+    },
+    {
+      "original_text": "Mentored by Oxford Tutor Joseph Young throughout research process",
+      "revised_text": "Mentored by Oxford Tutor Joseph Young throughout research process",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Investigated implementation and benefits of medical computer vision methods",
+      "revised_text": "Investigated implementation and benefits of medical computer vision methods",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Implemented CNN and Vision Transformer models for medical image classification",
+      "revised_text": "Implemented CNN and Vision Transformer models for medical image classification",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Completed Technical Report Document and passed first competition stage",
+      "revised_text": "Completed Technical Report Document and passed first competition stage",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Worked on electronic differential systems, steering systems, and electric motor integration",
+      "revised_text": "Worked on electronic differential systems, steering systems, and electric motor integration",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Managed team of 15+ members and organized workload distribution",
+      "revised_text": "Managed team of 15+ members and organized workload distribution",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Led electronic systems development for electric vehicle in TEKNOFEST competition",
+      "revised_text": "Led electronic systems development for electric vehicle in TEKNOFEST competition",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    }
+  ],
+  "keywords_integrated": [
+    "Python",
+    "MySQL",
+    "Python",
+    "MySQL",
+    "Python",
+    "MySQL",
+    "Python",
+    "MySQL"
+  ],
+  "keyword_coverage": 1.0,
+  "validation_flags": [
+    "2 potential truthfulness warning(s) — review change summary",
+    "4 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [
+    "Utilized Python and MySQL to analyze financial, R&D, and marketing datasets for strategic insights at Salesforce → Utilize Python and Scikit-learn (or similar frameworks) to assist in building, testing, and validating machine learning models for credit risk, fraud detection, or marketing propensity at Credibly",
+    "Examined the application of Python and MySQL-based AI tools for marketing campaign optimization at Salesforce → Apply statistical tests to ensure the integrity of our data and the reliability of our forecasting models at Credibly",
+    "Applied AI algorithms to detect fraud in payment systems, improving detection accuracy at Mastercard → Develop Predictive Models: Utilize Python and Scikit-learn (or similar frameworks) to assist in building, testing, and validating machine learning models for credit risk, fraud detection, or marketing propensity at Credibly"
+  ],
+  "generated_at": "2026-03-09T05:00:00.134551"
+}

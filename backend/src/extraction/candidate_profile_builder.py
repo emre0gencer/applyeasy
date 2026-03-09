@@ -1,17 +1,19 @@
 """
 CandidateProfileBuilder — LLM extraction → structured CandidateProfile.
 
-Uses Claude Haiku with tool calling to enforce schema constraints.
+Uses Groq (llama-3.1-8b-instant) with JSON mode to enforce schema constraints.
+Merges 6 extraction calls into 2 to stay within free-tier RPM limits.
 Every extracted entity MUST reference verbatim source_text.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 from typing import Any
 
-import anthropic
+from groq import Groq
 
 from backend.src.models.schemas import (
     AwardEntry,
@@ -24,178 +26,21 @@ from backend.src.models.schemas import (
 )
 from backend.src.ingestion.document_ingestion_engine import IngestedDocument
 
-_client = anthropic.Anthropic()
+_client: "Groq | None" = None
 
-# ---------------------------------------------------------------------------
-# Tool schemas passed to Claude (one per section type)
-# ---------------------------------------------------------------------------
+_FAST_MODEL = "llama-3.1-8b-instant"
 
-_CONTACT_TOOL = {
-    "name": "extract_contact",
-    "description": "Extract contact/header information from resume text.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "name":     {"type": "string", "description": "Full name of the candidate"},
-            "email":    {"type": "string", "description": "Email address if present"},
-            "phone":    {"type": "string", "description": "Phone number if present"},
-            "linkedin": {"type": "string", "description": "LinkedIn URL or handle if present"},
-            "location": {"type": "string", "description": "City/State or full address if present"},
-            "summary":  {"type": "string", "description": "Summary or objective paragraph if present"},
-        },
-        "required": ["name"],
-    },
-}
 
-_EXPERIENCE_TOOL = {
-    "name": "extract_experiences",
-    "description": "Extract all work experience entries from resume text.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "experiences": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "company":     {"type": "string"},
-                        "role_title":  {"type": "string"},
-                        "start_date":  {"type": "string", "description": "Preserve original format exactly"},
-                        "end_date":    {"type": "string", "description": "Preserve original format; use 'Present' if current"},
-                        "location":    {"type": "string"},
-                        "bullets": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "text":        {"type": "string", "description": "The bullet point text"},
-                                    "source_text": {"type": "string", "description": "Verbatim text from source"},
-                                },
-                                "required": ["text", "source_text"],
-                            },
-                        },
-                        "source_text": {"type": "string", "description": "Full text of this experience entry verbatim from source"},
-                    },
-                    "required": ["company", "role_title", "start_date", "source_text"],
-                },
-            }
-        },
-        "required": ["experiences"],
-    },
-}
+def _get_client() -> "Groq":
+    global _client
+    if _client is None:
+        _client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    return _client
 
-_EDUCATION_TOOL = {
-    "name": "extract_education",
-    "description": "Extract all education entries from resume text.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "education": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "institution":      {"type": "string"},
-                        "degree":           {"type": "string"},
-                        "field_of_study":   {"type": "string"},
-                        "graduation_date":  {"type": "string"},
-                        "gpa":              {"type": "string"},
-                        "honors":           {"type": "array", "items": {"type": "string"}},
-                        "source_text":      {"type": "string"},
-                    },
-                    "required": ["institution", "source_text"],
-                },
-            }
-        },
-        "required": ["education"],
-    },
-}
 
-_PROJECTS_TOOL = {
-    "name": "extract_projects",
-    "description": "Extract all project entries from resume text.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "projects": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "name":         {"type": "string"},
-                        "description":  {"type": "string"},
-                        "technologies": {"type": "array", "items": {"type": "string"}},
-                        "url":          {"type": "string"},
-                        "bullets": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "text":        {"type": "string"},
-                                    "source_text": {"type": "string"},
-                                },
-                                "required": ["text", "source_text"],
-                            },
-                        },
-                        "source_text": {"type": "string"},
-                    },
-                    "required": ["name", "description", "source_text"],
-                },
-            }
-        },
-        "required": ["projects"],
-    },
-}
-
-_SKILLS_TOOL = {
-    "name": "extract_skills",
-    "description": "Extract all skills from resume text.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "skills": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "name":        {"type": "string"},
-                        "category":    {"type": "string", "description": "e.g. languages, frameworks, tools, soft_skills"},
-                        "source_text": {"type": "string"},
-                    },
-                    "required": ["name", "source_text"],
-                },
-            }
-        },
-        "required": ["skills"],
-    },
-}
-
-_AWARDS_TOOL = {
-    "name": "extract_awards",
-    "description": "Extract awards, certifications, and honors from resume text.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "awards": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "title":       {"type": "string"},
-                        "issuer":      {"type": "string"},
-                        "date":        {"type": "string"},
-                        "description": {"type": "string"},
-                        "source_text": {"type": "string"},
-                    },
-                    "required": ["title", "source_text"],
-                },
-            }
-        },
-        "required": ["awards"],
-    },
-}
-
-_SYSTEM_PROMPT = """You are a conservative data extractor for resumes.
+_SYSTEM_PROMPT = """You are a professional data extractor. The input may be a formatted resume, \
+a freeform dump of professional/academic background, LinkedIn-style text, project notes, \
+or any combination. Your job is to identify and extract structured information regardless of format.
 
 RULES:
 1. Return ONLY information explicitly present in the source text.
@@ -203,112 +48,118 @@ RULES:
 3. Every source_text field MUST contain the verbatim text from the source that backs the extracted data.
 4. If a field is absent, omit it or use empty string — do NOT guess.
 5. Preserve dates in their original format exactly as written.
-6. When extracting bullets, use the exact wording from the resume."""
+6. For experiences: treat any role, job, internship, or position as an experience entry.
+7. For projects: treat any described project, side project, or academic project as a project entry.
+8. For skills: extract any mentioned technology, language, tool, framework, or skill.
+9. When extracting bullets/descriptions, use the exact wording from the source."""
 
 
-def _call_extraction_tool(section_text: str, tool: dict) -> dict:
-    """Call Claude Haiku with a single extraction tool and return the tool input."""
-    response = _client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=4096,
+def _call_extraction(system: str, user_msg: str, schema_hint: str) -> dict:
+    """Call Groq with JSON mode and return parsed dict."""
+    resp = _get_client().chat.completions.create(
+        model=_FAST_MODEL,
+        messages=[
+            {
+                "role": "system",
+                "content": system + "\nRespond ONLY with valid JSON matching: " + schema_hint,
+            },
+            {"role": "user", "content": user_msg},
+        ],
+        response_format={"type": "json_object"},
         temperature=0,
-        system=_SYSTEM_PROMPT,
-        tools=[tool],
-        tool_choice={"type": "tool", "name": tool["name"]},
-        messages=[{"role": "user", "content": section_text}],
     )
-    for block in response.content:
-        if block.type == "tool_use" and block.name == tool["name"]:
-            return block.input
-    return {}
-
-
-def _extract_contact(header_text: str) -> dict[str, Any]:
-    if not header_text.strip():
+    try:
+        return json.loads(resp.choices[0].message.content)
+    except (json.JSONDecodeError, AttributeError):
         return {}
-    return _call_extraction_tool(
-        f"Extract contact information from this resume header:\n\n{header_text}",
-        _CONTACT_TOOL,
+
+
+_CORE_SCHEMA_HINT = (
+    '{"contact": {"name": str, "email": str, "phone": str, "linkedin": str, "github": str, "location": str, "summary": str}, '
+    '"experiences": [{"company": str, "role_title": str, "start_date": str, "end_date": str, '
+    '"location": str, "bullets": [{"text": str, "source_text": str}], "source_text": str}], '
+    '"education": [{"institution": str, "degree": str, "field_of_study": str, '
+    '"graduation_date": str, "gpa": str, "honors": [str], '
+    '"coursework": str, "source_text": str}]}'
+)
+
+_SUPPLEMENTAL_SCHEMA_HINT = (
+    '{"projects": [{"name": str, "description": str, "technologies": [str], "url": str, "date": str, '
+    '"bullets": [{"text": str, "source_text": str}], "source_text": str}], '
+    '"skills": [{"name": str, "category": str, "source_text": str}], '
+    '"awards": [{"title": str, "issuer": str, "date": str, "description": str, "source_text": str}], '
+    '"leadership_items": [str]}'
+)
+# leadership_items: flat single-string descriptions of leadership roles, awards, hackathon results,
+# language proficiencies, and notable activities — each a complete standalone bullet sentence.
+
+
+def _extract_core(raw_text: str) -> dict:
+    """Single call: extract contact info, experiences, and education from any input format."""
+    user_msg = (
+        "Extract all contact information, work experiences, and education entries "
+        "from the following text. The text may be a resume, freeform background dump, "
+        "or any combination of professional/academic information.\n\n"
+        f"{raw_text}"
     )
+    return _call_extraction(_SYSTEM_PROMPT, user_msg, _CORE_SCHEMA_HINT)
 
 
-def _extract_experiences(experience_text: str) -> list[dict]:
-    if not experience_text.strip():
-        return []
-    result = _call_extraction_tool(
-        f"Extract all work experience entries from this text:\n\n{experience_text}",
-        _EXPERIENCE_TOOL,
+def _extract_supplemental(raw_text: str) -> dict:
+    """Single call: extract projects, skills, and awards from any input format."""
+    user_msg = (
+        "Extract all projects, skills/technologies, and awards/certifications "
+        "from the following text. The text may be a resume, freeform background dump, "
+        "or any combination of professional/academic information.\n\n"
+        f"{raw_text}"
     )
-    return result.get("experiences", [])
+    return _call_extraction(_SYSTEM_PROMPT, user_msg, _SUPPLEMENTAL_SCHEMA_HINT)
 
 
-def _extract_education(education_text: str) -> list[dict]:
-    if not education_text.strip():
-        return []
-    result = _call_extraction_tool(
-        f"Extract all education entries from this text:\n\n{education_text}",
-        _EDUCATION_TOOL,
-    )
-    return result.get("education", [])
+_LINKEDIN_RE = re.compile(
+    r"(?:https?://)?(?:www\.)?linkedin\.com/in/[\w\-]+/?",
+    re.IGNORECASE,
+)
+_GITHUB_RE = re.compile(
+    r"(?:https?://)?(?:www\.)?github\.com/[\w\-]+/?",
+    re.IGNORECASE,
+)
 
 
-def _extract_projects(projects_text: str) -> list[dict]:
-    if not projects_text.strip():
-        return []
-    result = _call_extraction_tool(
-        f"Extract all project entries from this text:\n\n{projects_text}",
-        _PROJECTS_TOOL,
-    )
-    return result.get("projects", [])
-
-
-def _extract_skills(skills_text: str) -> list[dict]:
-    if not skills_text.strip():
-        return []
-    result = _call_extraction_tool(
-        f"Extract all skills from this text:\n\n{skills_text}",
-        _SKILLS_TOOL,
-    )
-    return result.get("skills", [])
-
-
-def _extract_awards(awards_text: str) -> list[dict]:
-    if not awards_text.strip():
-        return []
-    result = _call_extraction_tool(
-        f"Extract all awards, certifications, and honors from this text:\n\n{awards_text}",
-        _AWARDS_TOOL,
-    )
-    return result.get("awards", [])
+def _scan_links(raw_text: str) -> tuple[str | None, str | None]:
+    """Regex scan for LinkedIn and GitHub URLs in raw text. Returns (linkedin, github)."""
+    linkedin = next(iter(_LINKEDIN_RE.findall(raw_text)), None)
+    github = next(iter(_GITHUB_RE.findall(raw_text)), None)
+    return linkedin, github
 
 
 def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
     """
     Extract a structured CandidateProfile from an IngestedDocument.
-    Runs extraction calls in sequence (each is fast on Haiku).
+    Accepts any format: resume, freeform professional/academic dump, or mixed.
+    Uses 2 batched LLM calls — both receive the full raw text for maximum coverage.
+    Links (LinkedIn, GitHub) are also detected via regex as a reliable fallback.
     """
-    sections = doc.sections
     raw_text = doc.raw_text
+    summary_text = doc.sections.get("summary", "")
 
-    # Build section texts, falling back to full raw text if section not found
-    header_text = sections.get("header", raw_text[:2000])
-    experience_text = sections.get("experience", "")
-    education_text = sections.get("education", "")
-    projects_text = sections.get("projects", "")
-    skills_text = sections.get("skills", "")
-    awards_text = sections.get("awards", "")
-    summary_text = sections.get("summary", "")
+    core = _extract_core(raw_text)
+    supplemental = _extract_supplemental(raw_text)
 
-    # If no sections were detected, use full text for experience extraction
-    if not experience_text and len(sections) <= 1:
-        experience_text = raw_text
+    contact_data: dict[str, Any] = core.get("contact", {})
 
-    contact_data = _extract_contact(header_text)
-    experiences_data = _extract_experiences(experience_text)
-    education_data = _extract_education(education_text)
-    projects_data = _extract_projects(projects_text)
-    skills_data = _extract_skills(skills_text)
-    awards_data = _extract_awards(awards_text)
+    # Regex link detection — fills in what the LLM may have missed
+    regex_linkedin, regex_github = _scan_links(raw_text)
+    if not contact_data.get("linkedin") and regex_linkedin:
+        contact_data["linkedin"] = regex_linkedin
+    if not contact_data.get("github") and regex_github:
+        contact_data["github"] = regex_github
+    experiences_data: list[dict] = core.get("experiences", [])
+    education_data: list[dict] = core.get("education", [])
+    projects_data: list[dict] = supplemental.get("projects", [])
+    skills_data: list[dict] = supplemental.get("skills", [])
+    awards_data: list[dict] = supplemental.get("awards", [])
+    leadership_items: list[str] = [s for s in supplemental.get("leadership_items", []) if isinstance(s, str) and s.strip()]
 
     # Build Pydantic models
     experiences = []
@@ -335,6 +186,7 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
             graduation_date=e.get("graduation_date"),
             gpa=e.get("gpa"),
             honors=e.get("honors", []),
+            coursework=e.get("coursework"),
             source_text=e.get("source_text", ""),
         )
         for e in education_data
@@ -351,6 +203,7 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
             description=p.get("description", ""),
             technologies=p.get("technologies", []),
             url=p.get("url"),
+            date=p.get("date"),
             bullets=bullets,
             source_text=p.get("source_text", ""),
         ))
@@ -375,7 +228,6 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
         for a in awards_data
     ]
 
-    # Merge summary from contact extraction or dedicated summary section
     summary = contact_data.get("summary") or summary_text or None
 
     return CandidateProfile(
@@ -383,6 +235,7 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
         email=contact_data.get("email"),
         phone=contact_data.get("phone"),
         linkedin=contact_data.get("linkedin"),
+        github=contact_data.get("github"),
         location=contact_data.get("location"),
         summary=summary,
         experiences=experiences,
@@ -390,6 +243,7 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
         projects=projects,
         skills=skills,
         awards=awards,
+        leadership_items=leadership_items,
         source_documents=[doc.source_format],
         extraction_confidence=doc.confidence,
         raw_text=raw_text,
