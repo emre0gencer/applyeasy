@@ -19,15 +19,13 @@ from backend.src.ingestion.document_ingestion_engine import ingest_text
 from backend.src.matching.relevance_ranker import rank_relevance
 from backend.src.models.schemas import PROGRESS_MESSAGES, TailoredCoverLetter
 
-# Set to True to re-enable cover letter generation
-COVER_LETTER_ENABLED = False
 from backend.src.rendering.pdf_renderer import (
     render_change_summary,
     render_cover_letter_pdf,
     render_resume_pdf,
 )
 from backend.src.storage.database import SessionLocal, get_run_record, update_run_progress
-from backend.src.validation.quality_validator import validate
+from backend.src.validation.quality_validator import compute_raw_suitability, validate
 
 
 def _step(
@@ -46,14 +44,14 @@ def _step(
     )
 
 
-def run_pipeline(run_id: str, raw_text: str, job_description: str) -> None:
+def run_pipeline(run_id: str, raw_text: str, job_description: str, template_id: str = "classic", include_cover_letter: bool = False) -> None:
     """
     Full generation pipeline. Called as a background task.
     Uses its own DB session (background tasks don't share the request session).
     """
     db = SessionLocal()
     try:
-        _execute_pipeline(db, run_id, raw_text, job_description)
+        _execute_pipeline(db, run_id, raw_text, job_description, template_id, include_cover_letter)
     except Exception as exc:
         tb = traceback.format_exc()
         update_run_progress(
@@ -73,6 +71,8 @@ def _execute_pipeline(
     run_id: str,
     raw_text: str,
     job_description: str,
+    template_id: str = "classic",
+    include_cover_letter: bool = False,
 ) -> None:
     # ── Step 1: Extract candidate profile ──────────────────────────────────
     _step(db, run_id, "extracting_profile")
@@ -94,13 +94,33 @@ def _execute_pipeline(
     # ── Step 3: Score relevance ─────────────────────────────────────────────
     _step(db, run_id, "scoring_relevance")
     relevance_map = rank_relevance(profile, jd)
+    # Persist raw suitability immediately — frontend shows this as the "before" baseline
+    raw_score = compute_raw_suitability(profile, jd)
+    update_run_progress(
+        db, run_id,
+        status="running",
+        progress_step="scoring_relevance",
+        progress_message=PROGRESS_MESSAGES["scoring_relevance"],
+        raw_suitability_score=raw_score,
+        experience_count=len(profile.experiences),
+    )
 
     # ── Step 4: Tailor resume ───────────────────────────────────────────────
     _step(db, run_id, "tailoring_resume")
-    tailored_resume = tailor_resume(profile, jd, relevance_map)
+    tailored_resume = tailor_resume(profile, jd, relevance_map, raw_score=raw_score)
+    # Persist partial score data immediately so the frontend can animate
+    # the match score counter before the full pipeline completes.
+    update_run_progress(
+        db, run_id,
+        status="running",
+        progress_step="tailoring_resume",
+        progress_message=PROGRESS_MESSAGES["tailoring_resume"],
+        keyword_coverage=tailored_resume.keyword_coverage,
+        experience_count=len(profile.experiences),
+    )
 
-    # ── Step 5: Generate cover letter (disabled — set COVER_LETTER_ENABLED=True to re-enable) ──
-    if COVER_LETTER_ENABLED:
+    # ── Step 5: Generate cover letter (only if requested) ──────────────────
+    if include_cover_letter:
         _step(db, run_id, "generating_cover_letter")
         cover_letter = generate_cover_letter(profile, jd, tailored_resume)
     else:
@@ -111,9 +131,9 @@ def _execute_pipeline(
 
     # ── Step 7: Render PDFs ─────────────────────────────────────────────────
     _step(db, run_id, "rendering_pdfs")
-    resume_path = render_resume_pdf(tailored_resume, run_id)
+    resume_path = render_resume_pdf(tailored_resume, run_id, template_id)
     cl_path = None
-    if COVER_LETTER_ENABLED:
+    if include_cover_letter:
         cl_path = render_cover_letter_pdf(tailored_resume, cover_letter, jd, run_id)
     summary_path = render_change_summary(tailored_resume, cover_letter, validation, jd, run_id)
 
@@ -129,4 +149,6 @@ def _execute_pipeline(
         resume_pdf_path=resume_path,
         cover_letter_pdf_path=cl_path,
         summary_path=summary_path,
+        keyword_coverage=validation.keyword_coverage,
+        experience_count=len(profile.experiences),
     )

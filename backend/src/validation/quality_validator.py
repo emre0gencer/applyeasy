@@ -121,11 +121,34 @@ def _estimate_page_count(resume: TailoredResume) -> float:
     for edu in resume.education:
         parts += [edu.institution, edu.degree or ""]
     for proj in resume.projects:
-        parts += [proj.name, proj.description]
+        parts += [proj.name, proj.description or ""]
     for skill in resume.skills:
         parts.append(skill.name)
     total_chars = sum(len(p) for p in parts)
     return round(total_chars / _CHARS_PER_PAGE, 2)
+
+
+def compute_raw_suitability(profile: CandidateProfile, jd: JobDescription) -> int:
+    """
+    Pessimistic suitability score from raw profile text vs JD — computed before tailoring.
+    Intentionally harsh: rewards only what's genuinely present in the input.
+    Returns 0-100; scores <50 should trigger the weak-profile alert.
+    """
+    high_kw = [k.term for k in jd.keywords if k.importance >= 2]
+
+    if not high_kw:
+        kw_score = 0.35  # no extractable JD keywords → pessimistic neutral
+    else:
+        profile_lower = profile.raw_text.lower()
+        present = sum(1 for k in high_kw if k.lower() in profile_lower)
+        kw_score = present / len(high_kw)
+
+    exp_depth = min(len(profile.experiences) / 3, 1.0)
+    clarity = profile.extraction_confidence
+
+    # Pessimistic weighting — keyword match dominates; raw text rarely covers JD fully
+    raw = kw_score * 55 + exp_depth * 25 + clarity * 20
+    return max(0, min(100, round(raw)))
 
 
 def validate(

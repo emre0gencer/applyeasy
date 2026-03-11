@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import create_engine, Column, String, Text, Float, DateTime
+from sqlalchemy import create_engine, Column, String, Text, Float, Integer, DateTime, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 DB_PATH = os.environ.get("DB_PATH", "resume_tool.db")
@@ -49,10 +49,25 @@ class RunRecord(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
     job_description = Column(Text, default="")
+    keyword_coverage = Column(Float, nullable=True)
+    experience_count = Column(Integer, nullable=True)
+    raw_suitability_score = Column(Integer, nullable=True)
 
 
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
+    # Migrate existing DBs with new columns (no-op if already present)
+    with engine.connect() as conn:
+        for stmt in [
+            "ALTER TABLE runs ADD COLUMN keyword_coverage FLOAT",
+            "ALTER TABLE runs ADD COLUMN experience_count INTEGER",
+            "ALTER TABLE runs ADD COLUMN raw_suitability_score INTEGER",
+        ]:
+            try:
+                conn.execute(text(stmt))
+                conn.commit()
+            except Exception:
+                pass
 
 
 def get_db():
@@ -113,6 +128,9 @@ def update_run_progress(
     cover_letter_pdf_path: Optional[str] = None,
     summary_path: Optional[str] = None,
     error_message: Optional[str] = None,
+    keyword_coverage: Optional[float] = None,
+    experience_count: Optional[int] = None,
+    raw_suitability_score: Optional[int] = None,
 ) -> None:
     record = db.query(RunRecord).filter(RunRecord.run_id == run_id).first()
     if not record:
@@ -132,6 +150,12 @@ def update_run_progress(
         record.summary_path = summary_path
     if error_message is not None:
         record.error_message = error_message
+    if keyword_coverage is not None:
+        record.keyword_coverage = keyword_coverage
+    if experience_count is not None:
+        record.experience_count = experience_count
+    if raw_suitability_score is not None:
+        record.raw_suitability_score = raw_suitability_score
     if status in ("completed", "failed"):
         record.completed_at = datetime.utcnow()
     db.commit()

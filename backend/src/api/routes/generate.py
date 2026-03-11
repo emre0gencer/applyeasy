@@ -38,6 +38,8 @@ async def generate_documents(
     create_run_record(db, run_id, request.session_id, jd_text)
 
     # Launch pipeline as a background task
-    background_tasks.add_task(run_pipeline, run_id, session.raw_text, jd_text)
+    background_tasks.add_task(
+        run_pipeline, run_id, session.raw_text, jd_text, request.template_id, request.include_cover_letter
+    )
 
     return GenerateResponse(run_id=run_id, message="Generation started")
