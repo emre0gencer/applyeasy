@@ -32,4 +32,7 @@ def get_status(run_id: str, db: Session = Depends(get_db)) -> StatusResponse:
         validation_flags=flags,
         error_message=record.error_message,
         extraction_confidence=record.extraction_confidence,
+        keyword_coverage=record.keyword_coverage,
+        experience_count=record.experience_count,
+        raw_suitability_score=record.raw_suitability_score,
     )

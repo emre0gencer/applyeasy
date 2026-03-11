@@ -1,5 +1,5 @@
 """
-PDFRenderer — Jinja2 + WeasyPrint → PDF files.
+PDFRenderer — Jinja2 + xhtml2pdf → PDF files.
 ATS-safe: single-column, selectable text, standard headings.
 """
 
@@ -16,12 +16,12 @@ from markupsafe import Markup
 
 
 def _strip_bullet(text: str) -> str:
-    """Strip leading bullet chars, then hard-cap at ~280 chars (≤2 lines) at a word boundary."""
+    """Strip leading bullet chars, then hard-cap at ~380 chars at a word boundary."""
     text = re.sub(r'^[\s•\-\*·–○]+', '', text).strip()
-    if len(text) > 280:
-        cut = text[:280]
+    if len(text) > 380:
+        cut = text[:380]
         last_space = cut.rfind(' ')
-        text = (cut[:last_space] if last_space > 180 else cut) + '…'
+        text = (cut[:last_space] if last_space > 250 else cut) + '…'
     return text
 
 
@@ -31,9 +31,10 @@ def _short_url(url: str) -> str:
 
 
 def _url_handle(url: str) -> str:
-    """Extract last path component: linkedin.com/in/john-doe → john-doe, github.com/jdoe → jdoe."""
+    """Extract last path component: linkedin.com/in/john-doe → john-doe."""
     clean = re.sub(r'^https?://(www\.)?', '', url).rstrip('/')
     return clean.split('/')[-1]
+
 
 from backend.src.models.schemas import (
     BulletChange,
@@ -47,6 +48,28 @@ from backend.src.models.schemas import (
 _TEMPLATE_DIR = Path(__file__).parent.parent.parent / "templates"
 _OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "outputs"))
 
+# ── Template registry ────────────────────────────────────────────────────────
+
+TEMPLATE_REGISTRY: dict[str, dict] = {
+    "classic": {
+        "name": "Classic",
+        "description": "Centered, compact, traditional. Works for any role.",
+    },
+    "polished": {
+        "name": "Polished",
+        "description": "Left-aligned, modern hierarchy. Great for tech and business.",
+    },
+    "traditional": {
+        "name": "Traditional",
+        "description": "Formal serif style. Ideal for finance, law, or consulting.",
+    },
+}
+
+_VALID_TEMPLATE_IDS = frozenset(TEMPLATE_REGISTRY.keys())
+_DEFAULT_TEMPLATE_ID = "classic"
+
+
+# ── Jinja2 environment ───────────────────────────────────────────────────────
 
 def _get_jinja_env(template_subdir: str) -> Environment:
     env = Environment(
@@ -59,9 +82,22 @@ def _get_jinja_env(template_subdir: str) -> Environment:
     return env
 
 
+def _load_resume_css(template_id: str) -> str:
+    safe_id = template_id if template_id in _VALID_TEMPLATE_IDS else _DEFAULT_TEMPLATE_ID
+    css_path = _TEMPLATE_DIR / "resume" / f"{safe_id}.css"
+    return css_path.read_text(encoding="utf-8")
+
+
 def _load_css(template_subdir: str) -> str:
     css_path = _TEMPLATE_DIR / template_subdir / "base.css"
     return css_path.read_text(encoding="utf-8")
+
+
+def _render_resume_html(template_id: str, context: dict) -> str:
+    env = _get_jinja_env("resume")
+    template = env.get_template("base.html")
+    context["css"] = Markup(_load_resume_css(template_id))
+    return template.render(**context)
 
 
 def _render_html(template_subdir: str, context: dict) -> str:
@@ -70,6 +106,8 @@ def _render_html(template_subdir: str, context: dict) -> str:
     context["css"] = Markup(_load_css(template_subdir))
     return template.render(**context)
 
+
+# ── PDF generation ───────────────────────────────────────────────────────────
 
 def _html_to_pdf(html: str, output_path: Path) -> None:
     from xhtml2pdf import pisa  # type: ignore
@@ -90,13 +128,22 @@ def _group_skills(resume: TailoredResume) -> dict[str, list[str]]:
     return grouped
 
 
-def render_resume_pdf(resume: TailoredResume, run_id: str) -> str:
-    """Render resume to PDF and return the file path."""
+# ── Public render functions ──────────────────────────────────────────────────
+
+def render_resume_pdf(
+    resume: TailoredResume,
+    run_id: str,
+    template_id: str = _DEFAULT_TEMPLATE_ID,
+) -> str:
+    """Render resume to PDF using the specified template. Returns file path."""
     output_dir = _OUTPUT_DIR / run_id
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "resume.pdf"
 
-    html = _render_html("resume", {"resume": resume, "grouped_skills": _group_skills(resume)})
+    html = _render_resume_html(
+        template_id,
+        {"resume": resume, "grouped_skills": _group_skills(resume)},
+    )
     _html_to_pdf(html, output_path)
     return str(output_path)
 
@@ -112,9 +159,7 @@ def render_cover_letter_pdf(
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "cover_letter.pdf"
 
-    # Split generated text into paragraphs
     paragraphs = [p.strip() for p in cover_letter.generated_text.split("\n\n") if p.strip()]
-
     context = {
         "resume": resume,
         "cover_letter": cover_letter,

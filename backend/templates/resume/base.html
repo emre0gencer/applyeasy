@@ -8,21 +8,21 @@
 
 <!-- ── Header ── -->
 <div class="header">
-  <div class="name">{{ resume.name }}</div>
+  <div class="name">{{ resume.name | truncate(60, True, '…') }}</div>
   <div class="contact">
-    {% set plain = [] %}
-    {% if resume.location %}{% set plain = plain + [resume.location] %}{% endif %}
-    {% if resume.email %}{% set plain = plain + [resume.email] %}{% endif %}
-    {% if resume.phone %}{% set plain = plain + [resume.phone] %}{% endif %}
-    {{ plain | join(' | ') }}
-    {% if resume.linkedin %}
-      {% if plain %} | {% endif %}
-      <a href="{{ resume.linkedin if resume.linkedin.startswith('http') else 'https://' + resume.linkedin }}">LinkedIn - {{ resume.linkedin | url_handle }}</a>
-    {% endif %}
-    {% if resume.github %}
-      {% if resume.linkedin or plain %} | {% endif %}
-      <a href="{{ resume.github if resume.github.startswith('http') else 'https://' + resume.github }}">GitHub - {{ resume.github | url_handle }}</a>
-    {% endif %}
+    {%- set parts = [] -%}
+    {%- if resume.location -%}{%- set parts = parts + [resume.location] -%}{%- endif -%}
+    {%- if resume.email -%}{%- set parts = parts + [resume.email] -%}{%- endif -%}
+    {%- if resume.phone -%}{%- set parts = parts + [resume.phone] -%}{%- endif -%}
+    {{- parts | join(' · ') -}}
+    {%- if resume.linkedin -%}
+      {%- if parts %} · {% endif -%}
+      <a href="{{ resume.linkedin if resume.linkedin.startswith('http') else 'https://' + resume.linkedin }}">{{ resume.linkedin | url_handle }}</a>
+    {%- endif -%}
+    {%- if resume.github -%}
+      {%- if resume.linkedin or parts %} · {% endif -%}
+      <a href="{{ resume.github if resume.github.startswith('http') else 'https://' + resume.github }}">{{ resume.github | url_handle }}</a>
+    {%- endif -%}
   </div>
 </div>
 
@@ -32,13 +32,35 @@
 <div class="summary">{{ resume.summary }}</div>
 {% endif %}
 
+<!-- ── Experience ── -->
+{% if resume.experiences %}
+<div class="section-heading">Experience</div>
+{% for exp in resume.experiences %}
+<div class="entry">
+  <div class="entry-header">
+    {# Date MUST come first in source order for float:right to work in xhtml2pdf #}
+    <span class="entry-date">{{ exp.start_date }}{% if exp.end_date %} – {{ exp.end_date }}{% endif %}</span>
+    <span class="entry-title">{{ exp.role_title }} — {{ exp.company }}{% if exp.location %}, {{ exp.location }}{% endif %}</span>
+  </div>
+  {% if exp.bullets %}
+  <ul class="bullets">
+    {% for tb in exp.bullets %}
+    <li>{{ tb.text | strip_bullet }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
 <!-- ── Education ── -->
 {% if resume.education %}
 <div class="section-heading">Education</div>
 {% for edu in resume.education %}
 <div class="edu-entry">
-  <div class="edu-header">
-    <b>{{ edu.institution }}{% if edu.degree %} — {{ edu.degree }}{% if edu.field_of_study %} {{ edu.field_of_study }}{% endif %}{% endif %}</b>{% if edu.graduation_date %} | {{ edu.graduation_date }}{% endif %}
+  <div class="entry-header">
+    <span class="entry-date">{{ edu.graduation_date or '' }}</span>
+    <span class="entry-title">{{ edu.institution }}{% if edu.degree %} — {{ edu.degree }}{% if edu.field_of_study %} {{ edu.field_of_study }}{% endif %}{% endif %}</span>
   </div>
   {% if edu.gpa or edu.honors %}
   <div class="edu-detail">{% if edu.gpa %}GPA: {{ edu.gpa }}{% endif %}{% if edu.gpa and edu.honors %} · {% endif %}{% if edu.honors %}{{ edu.honors | join(', ') }}{% endif %}</div>
@@ -55,28 +77,9 @@
 <div class="section-heading">Technical Skills</div>
 <div class="skills-section">
 {% for cat, names in grouped_skills.items() %}
-<div class="skill-group"><b>{{ cat }}:</b> {{ names | join(', ') }}</div>
+<div class="skill-group"><span class="skill-cat">{{ cat }}:</span> {{ names | join(', ') }}</div>
 {% endfor %}
 </div>
-{% endif %}
-
-<!-- ── Experience ── -->
-{% if resume.experiences %}
-<div class="section-heading">Experience</div>
-{% for exp in resume.experiences %}
-<div class="entry">
-  <div class="entry-header">
-    <b>{{ exp.role_title }} — {{ exp.company }}{% if exp.location %} ({{ exp.location }}){% endif %}</b> | {{ exp.start_date }}{% if exp.end_date %} – {{ exp.end_date }}{% endif %}
-  </div>
-  {% if exp.bullets %}
-  <ul class="bullets">
-    {% for tb in exp.bullets %}
-    <li>{{ tb.text | strip_bullet }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-</div>
-{% endfor %}
 {% endif %}
 
 <!-- ── Selected Projects ── -->
@@ -85,7 +88,8 @@
 {% for proj in resume.projects %}
 <div class="entry">
   <div class="entry-header">
-    <b>{{ proj.name }}{% if proj.technologies %} — {{ proj.technologies[:3] | join('/') }}{% endif %}</b>{% if proj.date %} | {{ proj.date }}{% endif %}{% if proj.url and not proj.date %} | <a href="{{ proj.url if proj.url.startswith('http') else 'https://' + proj.url }}">{{ proj.url | short_url }}</a>{% endif %}
+    <span class="entry-date">{% if proj.date %}{{ proj.date }}{% elif proj.url %}<a href="{{ proj.url if proj.url.startswith('http') else 'https://' + proj.url }}">{{ proj.url | short_url }}</a>{% endif %}</span>
+    <span class="entry-title">{{ proj.name }}{% if proj.technologies %} — {{ proj.technologies[:3] | join(', ') }}{% endif %}</span>
   </div>
   {% if proj.bullets %}
   <ul class="bullets">

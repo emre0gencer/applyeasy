@@ -1,7 +1,7 @@
 /* Resume template — matches example format, strict 1 page */
 @page {
     size: letter;
-    margin: 0.45in 0.5in 0.4in 0.5in;
+    margin: 0.38in 0.5in 0.35in 0.5in;
 }
 
 * {
@@ -39,8 +39,13 @@ body {
     color: #000;
 }
 
+a {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
 .header .contact a {
-    color: #0000EE;
+    color: #2563eb;
     text-decoration: underline;
 }
 
@@ -50,7 +55,7 @@ body {
     font-weight: bold;
     text-transform: uppercase;
     border-bottom: 0.75pt solid #000;
-    margin-top: 6pt;
+    margin-top: 5pt;
     margin-bottom: 2pt;
     padding-bottom: 1pt;
 }
@@ -91,13 +96,27 @@ body {
 
 /* ── Experience & Projects ── */
 .entry {
-    margin-bottom: 4pt;
+    margin-bottom: 3pt;
 }
 
 .entry-header {
     font-size: 10pt;
     line-height: 1.2;
     margin-bottom: 1pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.entry-title {
+    font-weight: bold;
+}
+
+.entry-date {
+    font-size: 9.5pt;
+    color: #222;
+    white-space: nowrap;
+    padding-left: 8pt;
 }
 
 .entry-detail {
@@ -115,7 +134,7 @@ ul.bullets {
 
 ul.bullets li {
     font-size: 9.5pt;
-    margin-bottom: 1pt;
+    margin-bottom: 0.5pt;
     list-style-type: disc;
     line-height: 1.25;
 }

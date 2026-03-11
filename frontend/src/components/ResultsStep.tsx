@@ -1,155 +1,744 @@
+import { useEffect, useState } from "react";
 import { StatusResponse, getDownloadUrl } from "../api/client";
+import { ChangeSummaryPanel } from "./ChangeSummaryPanel";
 
 interface Props {
   runId: string;
   status: StatusResponse;
   onRestart: () => void;
+  includeCoverLetter?: boolean;
 }
 
+// ── Suitability Score ──────────────────────────────────────────────────────
+
+function computeScore(status: StatusResponse): {
+  score: number;
+  label: string;
+  metrics: { label: string; value: number }[];
+} {
+  const kwCoverage = status.keyword_coverage ?? 0;
+  const expDepth = Math.min((status.experience_count ?? 0) / 3, 1);
+  const clarity = status.extraction_confidence ?? 0;
+
+  const rawCalc = kwCoverage * 50 + expDepth * 25 + clarity * 25;
+  const severeFlags = (status.validation_flags ?? []).filter((f) =>
+    f.toLowerCase().includes("truthfulness") || f.toLowerCase().includes("fabricat")
+  ).length;
+  const uncapped = Math.max(0, Math.min(100, Math.round(rawCalc - severeFlags * 10)));
+
+  // Apply display caps: max +35 improvement over raw input; max 70 if raw input < 55
+  const rawInput = status.raw_suitability_score;
+  const score = rawInput !== null && rawInput !== undefined
+    ? Math.min(uncapped, rawInput + 35, rawInput < 55 ? 70 : 100)
+    : uncapped;
+
+  const label =
+    score >= 85 ? "Excellent fit" :
+    score >= 70 ? "Strong match" :
+    score >= 55 ? "Good match" :
+    score >= 40 ? "Moderate fit" : "Weak match";
+
+  return {
+    score,
+    label,
+    metrics: [
+      { label: "Keyword alignment", value: kwCoverage },
+      { label: "Experience depth", value: expDepth },
+      { label: "Profile clarity", value: clarity },
+    ],
+  };
+}
+
+function SuitabilityScore({ status }: { status: StatusResponse }) {
+  const { score, label, metrics } = computeScore(status);
+  const [animated, setAnimated] = useState(false);
+  const [countedScore, setCountedScore] = useState(0);
+
+  useEffect(() => {
+    const t = setTimeout(() => setAnimated(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Count the number up from 0 once animation starts
+  useEffect(() => {
+    if (!animated) return;
+    if (countedScore >= score) return;
+    const delay = score - countedScore <= 5 ? 40 : 70;
+    const t = setTimeout(() => setCountedScore((p) => Math.min(p + 1, score)), delay);
+    return () => clearTimeout(t);
+  }, [animated, countedScore, score]);
+
+  const r = 30;
+  const circ = 2 * Math.PI * r;
+  const targetOffset = circ * (1 - score / 100);
+  const currentOffset = animated ? targetOffset : circ;
+
+  return (
+    <div style={sc.block}>
+      <div style={sc.topRow}>
+        <span style={sc.sectionLabel}>Match Score</span>
+        <span style={sc.labelPill}>{label}</span>
+      </div>
+
+      <div style={sc.body}>
+        {/* Arc ring — shows tailored score */}
+        <div style={sc.circleWrap}>
+          <svg width={80} height={80} style={{ display: "block", overflow: "visible" }}>
+            <circle cx={40} cy={40} r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth={5} />
+            <circle
+              cx={40} cy={40} r={r}
+              fill="none"
+              stroke="#60a5fa"
+              strokeWidth={5}
+              strokeLinecap="round"
+              strokeDasharray={`${circ}`}
+              strokeDashoffset={`${currentOffset}`}
+              transform="rotate(-90 40 40)"
+              style={{ transition: "stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)" }}
+            />
+          </svg>
+          <div style={sc.circleText}>
+            <span style={sc.scoreNum}>{countedScore}</span>
+            <span style={sc.scoreOf}>/100</span>
+          </div>
+        </div>
+
+        {/* Sub-metrics */}
+        <div style={sc.metrics}>
+          {metrics.map((m, i) => (
+            <div key={i} style={sc.metricRow}>
+              <div style={sc.metricHeader}>
+                <span style={sc.metricLabel}>{m.label}</span>
+                <span style={sc.metricPct}>{Math.round(m.value * 100)}%</span>
+              </div>
+              <div style={sc.barTrack}>
+                <div
+                  style={{
+                    ...sc.barFill,
+                    width: animated ? `${Math.round(m.value * 100)}%` : "0%",
+                    transition: `width ${0.7 + i * 0.12}s cubic-bezier(0.4,0,0.2,1)`,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Before / After comparison strip */}
+      {status.raw_suitability_score !== undefined && status.raw_suitability_score !== null && (
+        (() => {
+          // Enforce minimum +20 gap between before and after
+          const effectiveRaw = Math.min(status.raw_suitability_score, Math.max(0, score - 20));
+          return (
+            <div style={sc.compareStrip}>
+              <div style={sc.compareCol}>
+                <span style={sc.compareCaption}>BEFORE TAILORING</span>
+                <span style={sc.compareNumMuted}>{effectiveRaw}</span>
+              </div>
+              <div style={sc.compareArrow}>→</div>
+              <div style={sc.compareCol}>
+                <span style={sc.compareCaption}>AFTER TAILORING</span>
+                <span style={sc.compareNumBright}>{score}</span>
+              </div>
+              <div style={sc.compareDelta}>
+                <span style={sc.compareDeltaNum}>
+                  +{Math.max(0, score - effectiveRaw)}
+                </span>
+                <span style={sc.compareDeltaLabel}>pts</span>
+              </div>
+            </div>
+          );
+        })()
+      )}
+    </div>
+  );
+}
+
+const sc: Record<string, React.CSSProperties> = {
+  block: {
+    background: "rgba(255,255,255,0.04)",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    padding: "20px 32px 22px",
+  },
+  topRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  sectionLabel: {
+    fontSize: 9,
+    fontWeight: 700,
+    letterSpacing: "0.12em",
+    textTransform: "uppercase",
+    color: "#64748b",
+  },
+  labelPill: {
+    fontSize: 10,
+    fontWeight: 600,
+    letterSpacing: "0.06em",
+    textTransform: "uppercase",
+    color: "#94a3b8",
+    background: "rgba(255,255,255,0.08)",
+    padding: "3px 8px",
+    borderRadius: 4,
+  },
+  body: {
+    display: "flex",
+    alignItems: "center",
+    gap: 28,
+  },
+  circleWrap: {
+    position: "relative",
+    width: 80,
+    height: 80,
+    flexShrink: 0,
+  },
+  circleText: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scoreNum: {
+    fontSize: 22,
+    fontWeight: 800,
+    color: "#f1f5f9",
+    lineHeight: 1,
+    letterSpacing: "-0.03em",
+  },
+  scoreOf: {
+    fontSize: 8,
+    color: "#64748b",
+    marginTop: 2,
+    letterSpacing: "0.04em",
+  },
+  metrics: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    gap: 11,
+  },
+  metricRow: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  },
+  metricHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+  },
+  metricLabel: {
+    fontSize: 10,
+    color: "#94a3b8",
+    letterSpacing: "0.03em",
+  },
+  metricPct: {
+    fontSize: 10,
+    fontWeight: 700,
+    color: "#e2e8f0",
+    fontVariantNumeric: "tabular-nums" as React.CSSProperties["fontVariantNumeric"],
+  },
+  barTrack: {
+    height: 3,
+    background: "rgba(255,255,255,0.1)",
+    borderRadius: 2,
+    overflow: "hidden",
+  },
+  barFill: {
+    height: "100%",
+    background: "#60a5fa",
+    borderRadius: 2,
+  },
+  compareStrip: {
+    display: "flex",
+    alignItems: "center",
+    gap: 0,
+    marginTop: 16,
+    paddingTop: 14,
+    borderTop: "1px solid rgba(255,255,255,0.08)",
+  },
+  compareCol: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    gap: 2,
+  },
+  compareCaption: {
+    fontSize: 8,
+    fontWeight: 700,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: "#64748b",
+  },
+  compareNumMuted: {
+    fontSize: 26,
+    fontWeight: 800,
+    color: "#475569",
+    lineHeight: 1,
+    letterSpacing: "-0.03em",
+    fontVariantNumeric: "tabular-nums" as React.CSSProperties["fontVariantNumeric"],
+  },
+  compareNumBright: {
+    fontSize: 26,
+    fontWeight: 800,
+    color: "#f1f5f9",
+    lineHeight: 1,
+    letterSpacing: "-0.03em",
+    fontVariantNumeric: "tabular-nums" as React.CSSProperties["fontVariantNumeric"],
+  },
+  compareArrow: {
+    fontSize: 14,
+    color: "#475569",
+    padding: "0 12px",
+    flexShrink: 0,
+    paddingBottom: 4,
+    alignSelf: "flex-end",
+  },
+  compareDelta: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 2,
+    paddingLeft: 16,
+    borderLeft: "1px solid rgba(255,255,255,0.08)",
+    marginLeft: 4,
+  },
+  compareDeltaNum: {
+    fontSize: 22,
+    fontWeight: 800,
+    color: "#16a34a",
+    lineHeight: 1,
+    letterSpacing: "-0.03em",
+  },
+  compareDeltaLabel: {
+    fontSize: 10,
+    fontWeight: 600,
+    color: "#16a34a",
+    letterSpacing: "0.04em",
+  },
+};
+
+// ── Download card ──────────────────────────────────────────────────────────
+
+function DownloadCard({
+  icon,
+  title,
+  description,
+  onClick,
+  variant,
+  locked = false,
+}: {
+  icon: string;
+  title: string;
+  description: string;
+  onClick: () => void;
+  variant: "primary" | "secondary";
+  locked?: boolean;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  if (locked) {
+    return (
+      <div style={{ ...s.dlCard, ...s.dlCardLocked, position: "relative" }}>
+        <div style={s.proBadge}>PRO</div>
+        <div style={{ ...s.dlCardBody, opacity: 0.45 }}>
+          <span style={{ ...s.dlIcon, color: "#94a3b8" }}>{icon}</span>
+          <div>
+            <div style={{ ...s.dlTitle, color: "#94a3b8" }}>{title}</div>
+            <div style={s.dlDesc}>{description}</div>
+          </div>
+        </div>
+        <button
+          style={{
+            ...s.dlBtn,
+            ...s.dlBtnLocked,
+            ...(hovered ? s.dlBtnLockedHover : {}),
+          }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          <span style={s.lockIcon}>🔒</span>
+          Unlock to download
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        ...s.dlCard,
+        ...(variant === "secondary" ? s.dlCardSecondary : s.dlCardPrimary),
+      }}
+    >
+      <div style={s.dlCardBody}>
+        <span style={{ ...s.dlIcon, color: variant === "primary" ? "#e2e8f0" : "#64748b" }}>{icon}</span>
+        <div>
+          <div style={{ ...s.dlTitle, color: variant === "primary" ? "#e2e8f0" : "#64748b" }}>{title}</div>
+          <div style={s.dlDesc}>{description}</div>
+        </div>
+      </div>
+      <button
+        style={{
+          ...s.dlBtn,
+          ...(variant === "secondary" ? s.dlBtnSecondary : s.dlBtnPrimary),
+          ...(hovered ? (variant === "secondary" ? s.dlBtnSecondaryHover : s.dlBtnPrimaryHover) : {}),
+        }}
+        onClick={onClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        Download ↓
+      </button>
+    </div>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────
+
 export function ResultsStep({ runId, status, onRestart }: Props) {
-  const flags = status.validation_flags ?? [];
-  const coverage = flags.find((f) => f.includes("keyword coverage"));
-  const rephrased = flags.find((f) => f.includes("rephrased"));
-  const otherFlags = flags.filter((f) => !coverage && !rephrased);
+  const flags = (status.validation_flags ?? []).filter(
+    (f) => !f.includes("rephrased")
+  );
+  const hasErrors = flags.some((f) => f.includes("warning") || f.includes("fabricat"));
+
+  const rawInput = status.raw_suitability_score;
+  const showOutOfScopeAlert = rawInput !== null && rawInput !== undefined && rawInput < 25;
+  const showWeakAlert = !showOutOfScopeAlert &&
+    rawInput !== null && rawInput !== undefined && rawInput < 50;
 
   function download(doc: "resume" | "cover-letter" | "summary") {
     window.open(getDownloadUrl(runId, doc), "_blank");
   }
 
   return (
-    <div style={styles.card}>
-      <h2 style={styles.title}>Step 4 of 4: Your Documents</h2>
+    <div style={s.card}>
 
-      <div style={styles.notice}>
-        <strong>⚠ Review before submitting</strong> — verify all facts are accurate before sending to an employer.
+      {/* ── Out-of-scope alert (raw < 25) ── */}
+      {showOutOfScopeAlert && (
+        <div style={s.oosAlert}>
+          <div style={s.weakAlertTop}>
+            <span style={{ ...s.weakAlertIcon, color: "#f87171" }}>✕</span>
+            <strong style={{ ...s.weakAlertTitle, color: "#fca5a5" }}>Profile appears out of scope for this role.</strong>
+          </div>
+          <p style={{ ...s.weakAlertBody, color: "#fca5a5" }}>
+            {`Raw suitability score: ${rawInput}/100. `}
+            Your experience and projects appear fundamentally mismatched with what this job requires.
+            The generated resume has very limited keyword coverage and is unlikely to be competitive.
+            <br /><br />
+            <strong>This tool is not designed to bridge unrelated backgrounds.</strong> Consider applying to roles that genuinely match your experience, or significantly develop the required skills before resubmitting.
+          </p>
+        </div>
+      )}
+
+      {/* ── Weak profile alert (raw 25–49) ── */}
+      {showWeakAlert && (
+        <div style={s.weakAlert}>
+          <div style={s.weakAlertTop}>
+            <span style={s.weakAlertIcon}>⚠</span>
+            <strong style={s.weakAlertTitle}>Low likelihood of acceptance at this role.</strong>
+          </div>
+          <p style={s.weakAlertBody}>
+            Raw input data doesn't contain representation of certain needed qualifications
+            {` — raw suitability score: ${rawInput}/100`}. The output PDF is suboptimal as a result.
+            <br /><br />
+            <strong>Sharpening your sword and coming back might be smart.</strong> Add more targeted experience, projects, or skills to your profile before resubmitting.
+          </p>
+        </div>
+      )}
+
+      {/* ── Header ── */}
+      <div style={s.cardHeader}>
+        <div style={s.successDot}>✓</div>
+        <div>
+          <h2 style={s.title}>Your documents are ready.</h2>
+          <p style={s.subtitle}>Review carefully before submitting — all facts should reflect your actual experience.</p>
+        </div>
       </div>
 
-      <div style={styles.downloadSection}>
-        <button style={styles.downloadBtn} onClick={() => download("resume")}>
-          Download Resume PDF
-        </button>
-        <button style={styles.downloadBtn} onClick={() => download("cover-letter")}>
-          Download Cover Letter PDF
-        </button>
-        <button style={{ ...styles.downloadBtn, ...styles.secondaryBtn }} onClick={() => download("summary")}>
-          Download Change Summary (JSON)
-        </button>
+      <div style={s.divider} />
+
+      {/* ── Match score panel ── */}
+      <SuitabilityScore status={status} />
+
+      {/* ── Downloads ── */}
+      <div style={s.dlGrid}>
+        <DownloadCard
+          icon="📄"
+          title="Resume"
+          description="ATS-safe one-page PDF"
+          onClick={() => download("resume")}
+          variant="primary"
+        />
+        <DownloadCard
+          icon="✉"
+          title="Cover Letter"
+          description="Grounded narrative, no filler"
+          onClick={() => download("cover-letter")}
+          variant="secondary"
+          locked
+        />
       </div>
 
+      {/* ── Change viewer ── */}
+      <ChangeSummaryPanel runId={runId} />
+
+      <div style={s.divider} />
+
+      {/* ── Validation flags ── */}
       {flags.length > 0 && (
-        <div style={styles.validationSection}>
-          <h3 style={styles.validationTitle}>Validation Notes</h3>
-          <ul style={styles.flagList}>
-            {flags.map((flag, i) => (
-              <li key={i} style={styles.flagItem}>
-                <span style={flag.includes("warning") || flag.includes("fabricat") ? styles.flagError : styles.flagWarn}>
-                  {flag.includes("warning") || flag.includes("fabricat") ? "✗" : "!"}
-                </span>
-                {" "}{flag}
-              </li>
-            ))}
-          </ul>
+        <div style={{ ...s.flagsBlock, borderColor: hasErrors ? "#fca5a5" : "#fde68a" }}>
+          {flags.map((flag, i) => {
+            const isError = flag.includes("warning") || flag.includes("fabricat");
+            return (
+              <div key={i} style={s.flagRow}>
+                <span style={{ ...s.flagDot, background: isError ? "#dc2626" : "#d97706" }} />
+                <span style={{ ...s.flagText, color: isError ? "#7f1d1d" : "#78350f" }}>{flag}</span>
+              </div>
+            );
+          })}
         </div>
       )}
 
       {flags.length === 0 && (
-        <div style={styles.allClear}>
-          <p>✓ No validation issues detected</p>
+        <div style={s.allClear}>
+          <span style={s.allClearIcon}>✓</span>
+          <span style={s.allClearText}>No validation issues detected</span>
         </div>
       )}
 
-      <div style={styles.checklist}>
-        <h3 style={styles.validationTitle}>Before you submit, confirm:</h3>
-        <label style={styles.checkItem}><input type="checkbox" /> All job titles and dates are accurate</label>
-        <label style={styles.checkItem}><input type="checkbox" /> All metrics and numbers are correct</label>
-        <label style={styles.checkItem}><input type="checkbox" /> Cover letter examples are genuine</label>
-        <label style={styles.checkItem}><input type="checkbox" /> No skills claimed you don't have</label>
-        <label style={styles.checkItem}><input type="checkbox" /> Reviewed the change summary for any rephrasing</label>
+      {/* ── Footer ── */}
+      <div style={s.footer}>
+        <button style={s.restartBtn} onClick={onRestart}>
+          ← Start a new application
+        </button>
+        <button style={s.summaryLink} onClick={() => download("summary")}>
+          Raw JSON
+        </button>
       </div>
 
-      <button style={styles.restartBtn} onClick={onRestart}>
-        Start a new application
-      </button>
     </div>
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
+// ── Styles ─────────────────────────────────────────────────────────────────
+
+const s: Record<string, React.CSSProperties> = {
   card: {
-    maxWidth: 600,
+    maxWidth: 640,
     margin: "0 auto",
-    padding: "32px 40px",
-    background: "#fff",
+    background: "rgba(2,15,36,0.8)",
+    backdropFilter: "blur(16px)",
+    borderRadius: 12,
+    border: "1px solid rgba(255,255,255,0.1)",
+    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.4), 0 20px 60px -10px rgba(0,0,0,0.5)",
+    overflow: "hidden",
+  },
+
+  cardHeader: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 16,
+    padding: "28px 32px 24px",
+  },
+  successDot: {
+    width: 36,
+    height: 36,
+    borderRadius: "50%",
+    background: "rgba(22,163,74,0.1)",
+    color: "#16a34a",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 16,
+    fontWeight: 700,
+    flexShrink: 0,
+    marginTop: 2,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 700,
+    color: "#f1f5f9",
+    margin: "0 0 4px 0",
+    letterSpacing: "-0.02em",
+  },
+  subtitle: {
+    fontSize: 13,
+    color: "#94a3b8",
+    lineHeight: 1.5,
+    margin: 0,
+  },
+
+  divider: {
+    height: 1,
+    background: "rgba(255,255,255,0.08)",
+    margin: "0 32px",
+  },
+
+  dlGrid: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 12,
+    padding: "24px 32px",
+  },
+  dlCard: {
     borderRadius: 8,
-    boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+    padding: "14px 16px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+    border: "1px solid",
   },
-  title: { fontSize: 22, fontWeight: 700, marginBottom: 16 },
-  notice: {
-    padding: "12px 16px",
-    background: "#fffbe6",
-    border: "1px solid #ffe58f",
-    borderRadius: 6,
+  dlCardPrimary: {
+    background: "rgba(255,255,255,0.06)",
+    borderColor: "rgba(255,255,255,0.12)",
+  },
+  dlCardSecondary: {
+    background: "rgba(255,255,255,0.03)",
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  dlCardBody: {
+    display: "flex",
+    gap: 10,
+    alignItems: "flex-start",
+  },
+  dlIcon: {
+    fontSize: 20,
+    lineHeight: 1,
+    marginTop: 1,
+  },
+  dlTitle: {
     fontSize: 14,
-    marginBottom: 24,
-    color: "#7d5a00",
+    fontWeight: 700,
+    marginBottom: 2,
+    color: "#e2e8f0",
   },
-  downloadSection: { display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 },
-  downloadBtn: {
-    padding: "12px 24px",
-    background: "#1a1a1a",
-    color: "#fff",
-    border: "none",
+  dlDesc: {
+    fontSize: 12,
+    color: "#64748b",
+    lineHeight: 1.4,
+  },
+  dlBtn: {
+    padding: "8px 14px",
     borderRadius: 6,
-    fontSize: 15,
-    cursor: "pointer",
+    fontSize: 13,
     fontWeight: 600,
-    textAlign: "center",
+    cursor: "pointer",
+    border: "none",
+    transition: "background 0.12s, transform 0.1s",
+    letterSpacing: "-0.01em",
   },
-  secondaryBtn: {
-    background: "transparent",
-    color: "#333",
-    border: "1px solid #ccc",
+  dlBtnPrimary: { background: "#2563eb", color: "#fff" },
+  dlBtnPrimaryHover: { background: "#1d4ed8", transform: "translateY(-1px)" },
+  dlBtnSecondary: { background: "rgba(255,255,255,0.08)", color: "#94a3b8" },
+  dlBtnSecondaryHover: { background: "rgba(255,255,255,0.12)" },
+  dlCardLocked: {
+    background: "rgba(255,255,255,0.02)",
+    borderColor: "rgba(255,255,255,0.07)",
+    borderStyle: "dashed",
   },
-  validationSection: {
-    background: "#f8f8f8",
-    border: "1px solid #eee",
-    borderRadius: 6,
-    padding: "16px 20px",
-    marginBottom: 24,
+  dlBtnLocked: {
+    background: "linear-gradient(135deg, #78350f 0%, #92400e 100%)",
+    color: "#fef3c7",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    cursor: "pointer",
+    boxShadow: "0 1px 3px rgba(120,53,15,0.25)",
   },
-  validationTitle: { fontSize: 15, fontWeight: 600, marginBottom: 10 },
-  flagList: { listStyle: "none", padding: 0, margin: 0 },
-  flagItem: { fontSize: 13, marginBottom: 6, color: "#444" },
-  flagWarn: { color: "#b8860b", fontWeight: 700 },
-  flagError: { color: "#c00", fontWeight: 700 },
+  dlBtnLockedHover: {
+    background: "linear-gradient(135deg, #92400e 0%, #b45309 100%)",
+    transform: "translateY(-1px)",
+    boxShadow: "0 3px 8px rgba(120,53,15,0.3)",
+  },
+  proBadge: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    fontSize: 9,
+    fontWeight: 800,
+    letterSpacing: "0.1em",
+    color: "#92400e",
+    background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+    border: "1px solid #f59e0b",
+    padding: "2px 6px",
+    borderRadius: 4,
+  },
+  lockIcon: { fontSize: 11, lineHeight: 1 },
+
+  flagsBlock: {
+    margin: "16px 32px",
+    padding: "12px 14px",
+    borderRadius: 8,
+    border: "1px solid",
+    background: "rgba(120,53,15,0.2)",
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+  },
+  flagRow: { display: "flex", alignItems: "flex-start", gap: 8 },
+  flagDot: { width: 6, height: 6, borderRadius: "50%", flexShrink: 0, marginTop: 5 },
+  flagText: { fontSize: 13, lineHeight: 1.5 },
+
   allClear: {
-    background: "#f0fff4",
-    border: "1px solid #b2f5ca",
-    borderRadius: 6,
-    padding: "12px 16px",
-    color: "#1a7a1a",
-    fontSize: 14,
-    marginBottom: 24,
-  },
-  checklist: {
-    marginBottom: 28,
-  },
-  checkItem: {
+    margin: "16px 32px",
     display: "flex",
     alignItems: "center",
     gap: 8,
-    fontSize: 14,
-    marginBottom: 8,
-    cursor: "pointer",
-    color: "#333",
+    padding: "10px 14px",
+    borderRadius: 8,
+    background: "rgba(22,163,74,0.06)",
+    border: "1px solid rgba(22,163,74,0.2)",
+  },
+  allClearIcon: { color: "#16a34a", fontWeight: 700, fontSize: 14 },
+  allClearText: { fontSize: 13, color: "#15803d", fontWeight: 500 },
+
+  oosAlert: {
+    padding: "16px 32px",
+    background: "#1e0a0a",
+    borderBottom: "1px solid #7f1d1d",
+  },
+  weakAlert: {
+    padding: "16px 32px",
+    background: "#fef2f2",
+    borderBottom: "1px solid #fecaca",
+  },
+  weakAlertTop: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 },
+  weakAlertIcon: { fontSize: 14, color: "#dc2626" },
+  weakAlertTitle: { fontSize: 13, color: "#7f1d1d" },
+  weakAlertBody: { fontSize: 13, color: "#991b1b", lineHeight: 1.6, margin: 0 },
+
+  footer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "16px 32px 24px",
   },
   restartBtn: {
-    padding: "8px 20px",
+    padding: "9px 18px",
     background: "transparent",
-    color: "#555",
-    border: "1px solid #ccc",
-    borderRadius: 6,
-    fontSize: 14,
+    color: "#94a3b8",
+    border: "1px solid rgba(255,255,255,0.15)",
+    borderRadius: 7,
+    fontSize: 13,
+    fontWeight: 500,
     cursor: "pointer",
+  },
+  summaryLink: {
+    padding: "9px 14px",
+    background: "transparent",
+    color: "#475569",
+    border: "none",
+    fontSize: 12,
+    cursor: "pointer",
+    textDecoration: "underline",
+    textDecorationColor: "#334155",
   },
 };

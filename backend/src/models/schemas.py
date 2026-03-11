@@ -233,6 +233,8 @@ class UploadResponse(BaseModel):
 class GenerateRequest(BaseModel):
     session_id: str
     job_description: str
+    template_id: str = "classic"
+    include_cover_letter: bool = False
 
 
 class GenerateResponse(BaseModel):
@@ -248,6 +250,9 @@ class StatusResponse(BaseModel):
     validation_flags: list[str] = []
     error_message: Optional[str] = None
     extraction_confidence: Optional[float] = None
+    keyword_coverage: Optional[float] = None
+    experience_count: Optional[int] = None
+    raw_suitability_score: Optional[int] = None
 
 
 # ---------------------------------------------------------------------------
