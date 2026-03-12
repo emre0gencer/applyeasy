@@ -1,10 +1,15 @@
 """
 PDFRenderer — Jinja2 + xhtml2pdf → PDF files.
 ATS-safe: single-column, selectable text, standard headings.
+
+1-page guarantee: render_resume_pdf shrinks all pt values in the CSS
+(fonts, spacing) in 4% steps until the output fits on a single page.
+Page margins (@page, defined in 'in') are never touched.
 """
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import re
@@ -93,10 +98,46 @@ def _load_css(template_subdir: str) -> str:
     return css_path.read_text(encoding="utf-8")
 
 
-def _render_resume_html(template_id: str, context: dict) -> str:
+def _scale_css_pt_values(css: str, scale: float) -> str:
+    """Multiply every explicit `pt` value in the CSS by scale.
+
+    Only affects content measurements (font-size, margin, padding, etc.).
+    Page margins in `@page` use `in` units and are never touched.
+    """
+    if abs(scale - 1.0) < 1e-4:
+        return css
+
+    def _sub(m: re.Match) -> str:
+        return f"{float(m.group(1)) * scale:.2f}pt"
+
+    return re.sub(r"([\d.]+)pt", _sub, css)
+
+
+def _html_to_pdf_bytes(html: str) -> bytes:
+    """Render HTML → PDF and return raw bytes (no file I/O)."""
+    from xhtml2pdf import pisa  # type: ignore
+
+    buf = io.BytesIO()
+    result = pisa.CreatePDF(html, dest=buf, encoding="utf-8")
+    if result.err:
+        raise RuntimeError(f"PDF generation failed with {result.err} errors")
+    return buf.getvalue()
+
+
+def _count_pdf_pages(pdf_bytes: bytes) -> int:
+    """Return the number of pages in a PDF given its raw bytes."""
+    import fitz  # PyMuPDF  # type: ignore
+
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    n = len(doc)
+    doc.close()
+    return n
+
+
+def _render_resume_html(template_id: str, context: dict, css: str | None = None) -> str:
     env = _get_jinja_env("resume")
     template = env.get_template("base.html")
-    context["css"] = Markup(_load_resume_css(template_id))
+    context["css"] = Markup(css if css is not None else _load_resume_css(template_id))
     return template.render(**context)
 
 
@@ -130,21 +171,41 @@ def _group_skills(resume: TailoredResume) -> dict[str, list[str]]:
 
 # ── Public render functions ──────────────────────────────────────────────────
 
+_FIT_SCALE_START = 1.0
+_FIT_SCALE_STEP  = 0.04
+_FIT_SCALE_MIN   = 0.72   # ~7.5pt body at minimum — still readable
+
+
 def render_resume_pdf(
     resume: TailoredResume,
     run_id: str,
     template_id: str = _DEFAULT_TEMPLATE_ID,
 ) -> str:
-    """Render resume to PDF using the specified template. Returns file path."""
+    """Render resume to PDF, shrinking fonts/spacing until it fits on 1 page.
+
+    The @page margins (defined in 'in') are never altered. Only the CSS pt
+    values (font sizes, margins between entries, etc.) are scaled down in 4%
+    steps from 100% to a floor of 72%.  All content is preserved.
+    """
     output_dir = _OUTPUT_DIR / run_id
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "resume.pdf"
 
-    html = _render_resume_html(
-        template_id,
-        {"resume": resume, "grouped_skills": _group_skills(resume)},
-    )
-    _html_to_pdf(html, output_path)
+    base_css = _load_resume_css(template_id)
+    context = {"resume": resume, "grouped_skills": _group_skills(resume)}
+
+    scale = _FIT_SCALE_START
+    pdf_bytes: bytes = b""
+
+    while scale >= _FIT_SCALE_MIN - 1e-4:
+        scaled_css = _scale_css_pt_values(base_css, scale)
+        html = _render_resume_html(template_id, context.copy(), scaled_css)
+        pdf_bytes = _html_to_pdf_bytes(html)
+        if _count_pdf_pages(pdf_bytes) <= 1:
+            break
+        scale -= _FIT_SCALE_STEP
+
+    output_path.write_bytes(pdf_bytes)
     return str(output_path)
 
 

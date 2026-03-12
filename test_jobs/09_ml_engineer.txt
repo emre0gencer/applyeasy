@@ -1,0 +1,31 @@
+Machine Learning Engineer — Recommendations (New Grad / 0–2 yrs)
+Cartex | New York, NY (Hybrid) | Full-Time
+
+About Cartex
+Cartex is a marketplace connecting independent artists and collectors. We have 4M registered users, 800K active listings, and a growing subscription business. Recommendations are the core of how buyers discover art they love — and how sellers get found. Our ML team of 8 owns everything from data pipelines to model serving.
+
+The Role
+We're hiring an ML Engineer to work on our discovery and recommendations systems. This is not a pure research role — you'll train models, but you'll also build the infrastructure to serve them, instrument them, and iterate on them quickly. We expect you to care about the full loop: from feature engineering through A/B test result.
+
+What You'll Do
+- Build and improve recommendation models (collaborative filtering, two-tower retrieval, re-ranking) trained on user browsing, save, and purchase behavior
+- Design and implement feature pipelines using Python and SQL on top of our Snowflake data warehouse
+- Serve models via FastAPI endpoints; optimize for latency and throughput at production scale (thousands of requests/second)
+- Instrument models with logging and monitoring; define metrics and alert thresholds; participate in on-call rotation
+- Design and analyze A/B tests to measure recommendation quality improvements in terms of click-through rate, add-to-cart rate, and downstream purchase lift
+- Collaborate with data scientists and product managers to scope and prioritize modeling improvements
+
+Required:
+- Bachelor's or Master's in Computer Science, Statistics, or a quantitative field
+- Solid Python skills; experience building ML pipelines with scikit-learn, PyTorch, or TensorFlow
+- Understanding of recommendation systems fundamentals: collaborative filtering, matrix factorization, embedding-based retrieval
+- Experience with SQL and working with large datasets in a cloud warehouse (BigQuery, Snowflake, Redshift)
+- Familiarity with model serving and REST API development
+
+Preferred:
+- Experience deploying models to production (Docker, Kubernetes, or managed ML platforms like SageMaker, Vertex AI)
+- Exposure to real-time feature stores or streaming data (Kafka, Flink)
+- Experience designing or analyzing A/B tests for ML model improvements
+- Contributions to open-source ML projects or technical writing
+
+Compensation: $115,000–$135,000 + equity + benefits

@@ -1,0 +1,33 @@
+Information Security Analyst I — SOC & Incident Response
+Ironside Financial Services | Charlotte, NC (On-Site) | Full-Time
+
+About Ironside
+Ironside is a regional bank holding company with $24B in assets, 180 branches, and a growing digital banking platform. Our Information Security team of 25 professionals is responsible for protecting customer data, ensuring regulatory compliance (FFIEC, SOX, PCI-DSS), and responding to an increasing volume of threat activity targeting financial services.
+
+The Role
+We're hiring a Security Analyst I for our 24/7 Security Operations Center. You'll monitor security events, investigate alerts, respond to incidents, and contribute to threat hunting and vulnerability management activities. This is a day-shift role with on-call rotations.
+
+What You'll Do
+- Monitor SIEM (Splunk) dashboards and alert queues for indicators of compromise, policy violations, and anomalous activity across endpoints, network, and cloud environments
+- Triage, investigate, and respond to security incidents: phishing campaigns, malware detections, unauthorized access attempts, data loss events
+- Conduct log analysis and forensic investigation to determine scope, root cause, and containment steps for security events
+- Perform vulnerability scans using Qualys or Nessus; prioritize findings and coordinate remediation with IT and business unit owners
+- Write clear, detailed incident reports and post-mortems; maintain case documentation in ticketing system
+- Support phishing simulation campaigns and security awareness training administration
+- Contribute to threat intelligence review and detection rule tuning in SIEM
+
+Required:
+- Bachelor's degree in Cybersecurity, Computer Science, Information Systems, or a related field (or equivalent certifications + experience)
+- Understanding of network fundamentals: TCP/IP, DNS, HTTP/S, firewall concepts, VPN
+- Familiarity with Windows and Linux operating systems at an administrative level
+- Basic knowledge of attacker TTPs (MITRE ATT&CK framework) and common attack vectors (phishing, credential stuffing, lateral movement)
+- Strong analytical and written communication skills; ability to write a clear incident report
+
+Preferred:
+- Security certification: CompTIA Security+, CySA+, or CEH (or actively pursuing)
+- Hands-on experience with SIEM tools (Splunk preferred), endpoint detection tools (CrowdStrike, SentinelOne), or vulnerability scanners
+- Exposure to scripting (Python, PowerShell, Bash) for alert triage or automation
+- Internship or coursework in cybersecurity, network security, or incident response
+- Familiarity with financial services regulatory frameworks (FFIEC, PCI-DSS)
+
+Compensation: $62,000–$78,000 base + annual bonus. Security+ exam reimbursement. Comprehensive benefits. On-site required in Charlotte.

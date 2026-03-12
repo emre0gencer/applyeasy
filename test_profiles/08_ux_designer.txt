@@ -1,0 +1,48 @@
+Simone Harrington
+simone.harrington@email.com | (415) 555-0963 | linkedin.com/in/simoneharrington | simoneharrington.design
+San Francisco, CA
+
+EDUCATION
+B.F.A. Interaction Design, California College of the Arts, May 2024
+GPA: 3.6
+Minor: Computer Science (Python, JavaScript fundamentals)
+Relevant Coursework: User Research Methods, Information Architecture, Prototyping, Accessibility Design, Typography
+
+EXPERIENCE
+
+UX Design Intern — Helix Health Tech, San Francisco, CA | Jun 2023 – Dec 2023
+- Led end-to-end redesign of a patient appointment scheduling flow used by 80K monthly active users; reduced drop-off rate by 28% based on post-launch analytics
+- Conducted 12 moderated usability sessions with patients aged 50–75 to identify pain points in the existing flow; synthesized findings into affinity map and 5 key insights
+- Produced wireframes, high-fidelity mockups, and an interactive prototype in Figma; handed off annotated specs to 3 front-end engineers
+- Ran A/B test on confirmation page copy; variant with plain-language summary outperformed control by 14% on patient satisfaction score
+
+Product Design Intern — Folio Studio, Oakland, CA | Jun 2022 – Aug 2022
+- Designed new onboarding screens for an iOS app (8K users) following platform conventions and Apple HIG guidelines
+- Created a component library in Figma with 60+ reusable elements; reduced design inconsistency across 4 product surfaces
+- Collaborated with engineers during sprint reviews to flag implementation deviations from spec
+
+Freelance UX Designer | Jan 2022 – Present
+- Designed website and brand identity for 3 small businesses (bakery, yoga studio, independent bookstore); projects involved discovery, wireframing, and responsive Webflow builds
+- Average client NPS: 9.2/10 based on post-project surveys
+
+PROJECTS
+
+Transit Companion App — Research + Figma prototype | Mar 2024
+- Designed a mobile app helping low-vision users navigate public transit using haptic feedback and high-contrast UI
+- Conducted 8 interviews and 3 contextual inquiry sessions with low-vision participants
+- Prototype tested with 5 users achieved task completion rate of 92% vs. 64% for baseline BART app
+
+Portfolio Website — Webflow, custom CSS | Ongoing
+- Designed and built personal portfolio showcasing 8 case studies with interactive before/after comparisons
+- Achieved 94 Lighthouse accessibility score; implemented WCAG 2.1 AA across all pages
+
+TECHNICAL SKILLS
+Design: Figma (advanced), Sketch, Adobe XD, Illustrator, Photoshop, Principle (micro-interactions)
+Research: Usability testing, semi-structured interviews, card sorting, tree testing, heuristic evaluation, affinity mapping
+Prototyping: Figma interactive prototypes, Webflow, Framer (basic)
+Front-end: HTML, CSS, JavaScript (basic), React (component-level)
+Analytics: Mixpanel, FullStory session replay, Google Analytics
+
+AWARDS
+AIGA SF Student Award — Interaction Design Category, 2023
+CCA Dean's Scholarship recipient (4 years)

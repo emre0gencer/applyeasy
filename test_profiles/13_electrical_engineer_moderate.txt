@@ -1,0 +1,42 @@
+Kevin Tran
+kevin.tran@email.com | (503) 555-0817 | linkedin.com/in/kevintranee
+Portland, OR
+
+EDUCATION
+B.S. Electrical Engineering, Oregon State University, June 2023
+GPA: 3.2
+Relevant Coursework: Circuit Analysis, Signals & Systems, Digital Logic Design, Embedded Systems, Power Electronics, Electromagnetics
+
+EXPERIENCE
+
+Electrical Engineering Intern — Cascade Automation, Hillsboro, OR | Jun 2022 – Aug 2022
+- Designed a PCB for a motor control module in Altium Designer; board passed EMI pre-compliance screening on first spin
+- Wrote C firmware for an STM32 microcontroller to implement PID speed control; tuned gains to achieve settling time under 200ms
+- Debugged I2C communication issues between a sensor and MCU using a logic analyzer; identified clock stretching incompatibility and patched driver
+
+Senior Capstone Project — Oregon State, Sep 2022 – Jun 2023
+- Led 3-person team to build an autonomous greenhouse monitoring system: ESP32 nodes collected temperature, humidity, and soil moisture; data pushed over MQTT to a Raspberry Pi dashboard
+- Designed power regulation circuitry (buck converter, linear regulators) and managed PCB layout; system ran 9 months in lab without hardware fault
+- Presented to industry panel; team placed 3rd in department showcase
+
+Part-Time Retail Electronics Associate — Best Buy, Portland, OR | Sep 2021 – May 2022
+- Provided technical guidance to customers on consumer electronics; consistently met monthly attachment rate targets
+
+PROJECTS
+
+Home Energy Monitor — ESP32, Python, InfluxDB | 2023
+- Built a non-invasive whole-home power meter using split-core current transformers; streams data to InfluxDB and Grafana dashboard
+- Calibrated readings against utility bill actuals to within 3% error
+
+Amateur Radio License Project — 2022
+- Studied RF propagation and antenna theory for FCC Technician exam; earned license on first attempt
+
+TECHNICAL SKILLS
+Hardware: Altium Designer, KiCad, oscilloscope, function generator, logic analyzer, multimeter
+Embedded: C/C++ (STM32, ESP32, Arduino), MATLAB/Simulink (basic), FreeRTOS (basic)
+Protocols: I2C, SPI, UART, CAN (introductory), MQTT
+Power: Buck/boost converter design, linear regulation, battery management basics
+Other: Python (scripting, data logging), Git, LTspice
+
+AWARDS
+OSU College of Engineering Capstone Showcase — 3rd Place, 2023

@@ -1,0 +1,47 @@
+Darius Okonkwo
+darius.okonkwo@email.com | (240) 555-0731 | linkedin.com/in/dariusokonkwo | github.com/dokonkwo
+Washington, DC
+
+EDUCATION
+B.S. Computer Science, University of Maryland, May 2024
+GPA: 3.6 | Cybersecurity track
+Relevant Coursework: Network Security, Cryptography, Operating Systems, Penetration Testing, Malware Analysis, Digital Forensics
+
+EXPERIENCE
+
+Security Operations Center (SOC) Intern — ClearPath Federal Solutions, Bethesda, MD | Jun 2023 – Dec 2023
+- Monitored SIEM platform (Splunk) for anomalous activity across 1,200-node enterprise network; triaged 30–50 alerts per shift
+- Investigated 14 phishing incidents end-to-end: extracted IOCs, correlated with threat intel feeds (MISP, VirusTotal), escalated 3 to Tier 2
+- Wrote detection rules in Splunk SPL to reduce false positives on a noisy authentication alert by 61%
+- Assisted with vulnerability scan remediation tracking using Tenable Nessus; documented findings for quarterly risk report
+
+IT Security Intern — Harborline Credit Union, Rockville, MD | Jun 2022 – Aug 2022
+- Conducted access rights review for 340 employee accounts; identified and flagged 28 accounts with excessive privilege
+- Assisted in drafting an updated password policy aligned with NIST SP 800-63B guidelines
+- Ran tabletop exercise simulation for a ransomware scenario with the IT team; documented gaps in incident response plan
+
+PROJECTS
+
+HomeLab IDS — pfSense, Suricata, Elasticsearch, Kibana | Ongoing
+- Built a home network lab with segmented VLANs and Suricata IDS feeding logs into an ELK stack for visualization
+- Wrote custom Suricata rules to detect port scanning and DNS tunneling; validated with Nmap and dnscat2
+- Documented all configurations and playbooks in a GitHub-hosted wiki
+
+CTF Portfolio — HackTheBox, TryHackMe | 2022–Present
+- Earned HackTheBox "Hacker" rank (top 12%); solved 40+ machines including Active Directory environments
+- Completed OWASP Top 10 learning path and web exploitation rooms covering SQLi, XSS, IDOR, SSRF
+- TryHackMe top 8% globally; completed SOC Level 1 learning path
+
+TECHNICAL SKILLS
+SIEM/Monitoring: Splunk (SPL), Elastic SIEM, Microsoft Sentinel (basic)
+Vulnerability Management: Nessus, OpenVAS, Qualys (basic)
+Network: Wireshark, tcpdump, pfSense, Nmap, Snort/Suricata
+Scripting: Python (log parsing, automation), Bash, PowerShell (basic)
+Frameworks: MITRE ATT&CK, NIST CSF, OWASP Top 10
+OS: Linux (Kali, Ubuntu), Windows Server, Active Directory
+
+CERTIFICATIONS & AWARDS
+CompTIA Security+ — certified, November 2023
+CompTIA Network+ — certified, May 2022
+UMD Cybersecurity Club, President 2023–2024 — organized 6 CTF training sessions per semester
+CISA Cybersecurity Awareness Month Essay Competition — 2nd Place, 2023

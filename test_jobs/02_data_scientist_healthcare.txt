@@ -1,0 +1,40 @@
+Data Scientist — Clinical Analytics (Entry Level)
+Veridia Health | Chicago, IL (Hybrid) | Full-Time
+
+About Veridia Health
+Veridia is a healthcare analytics company partnering with regional hospital systems and payers to improve care quality and reduce unnecessary costs. We work with claims data, EHR extracts, and patient-reported outcomes across a network of 80+ hospitals. Our analytics team of 20 scientists and engineers supports everything from operational dashboards to causal program evaluations.
+
+The Role
+We're looking for an entry-level or early-career Data Scientist to join our Clinical Analytics team. You'll work on predictive modeling projects that help hospital partners intervene earlier with high-risk patients, evaluate the effectiveness of clinical programs, and surface actionable insights from messy real-world health data. Strong statistical foundations and comfort with causal thinking are more important to us than ML breadth.
+
+What You'll Do
+- Build and validate predictive models (readmission risk, length-of-stay, no-show prediction) using structured claims and EHR data
+- Design and execute observational study analyses, applying propensity score methods, difference-in-differences, and interrupted time series to evaluate clinical programs
+- Clean, join, and validate large datasets (millions of patient records) from disparate source systems using Python and SQL
+- Communicate findings clearly to non-technical clinical and operational stakeholders through written reports, visualizations, and slide decks
+- Contribute to automated reporting pipelines that deliver weekly KPIs to hospital partners
+- Collaborate with data engineers to scope data requirements and validate pipelines
+
+What We're Looking For
+Required:
+- Bachelor's or Master's degree in Statistics, Biostatistics, Data Science, Epidemiology, or a closely related quantitative field
+- Strong working knowledge of Python for data analysis (pandas, NumPy, scikit-learn) and SQL
+- Foundational understanding of statistical inference: hypothesis testing, confidence intervals, regression, multivariate adjustment
+- Experience applying at least one causal inference or observational study method (propensity scoring, matching, IV, DiD, etc.)
+- Ability to present technical work to non-technical audiences clearly and without jargon
+
+Preferred:
+- Graduate-level training in biostatistics, epidemiology, or health economics
+- Experience with healthcare datasets: claims (HEDIS, ICD/CPT codes), EHR data, survey instruments (CAHPS, etc.)
+- Familiarity with survival analysis, hierarchical models, or longitudinal data methods in R or Python
+- Experience with Tableau, Power BI, or equivalent BI tools for stakeholder-facing dashboards
+- Published or in-progress academic work (thesis, working paper, conference poster) in health data science
+
+Compensation & Benefits
+- $80,000–$100,000 base salary depending on degree level and experience
+- Annual performance bonus (up to 10%)
+- Health, dental, vision — company covers 90% of premium
+- Remote-friendly with Chicago anchor (monthly travel budget for office visits)
+- Tuition reimbursement for graduate coursework
+
+We especially encourage applications from candidates with graduate training in biostatistics, public health, or health economics.

@@ -1,0 +1,39 @@
+Michael Torres
+michael.torres@email.com | (212) 555-0293 | linkedin.com/in/michaeltorres
+New York, NY
+
+EDUCATION
+B.S. Finance & Economics, NYU Stern School of Business, May 2023
+GPA: 3.7 | Beta Gamma Sigma Honor Society
+Relevant Coursework: Financial Modeling, Corporate Valuation, M&A Theory, LBO Analysis, Fixed Income, Derivatives, Econometrics
+
+EXPERIENCE
+
+Investment Banking Analyst Intern — Meridian Capital Advisors (TMT Group), New York, NY | Jun 2022 – Aug 2022
+- Built 3-statement financial models and DCF valuations for 5 M&A transactions in the technology sector (deal sizes $75M–$420M); all models reviewed and approved by VP
+- Prepared pitch books, confidential information memoranda (CIMs), and management presentations for 2 live sell-side mandates; presented to Managing Director in weekly deal reviews
+- Conducted comparable company analysis and precedent transaction analysis using Bloomberg Terminal and CapIQ across 30+ peer companies and 45+ precedent transactions
+- Supported buy-side due diligence on a $310M SaaS acquisition: reviewed data room, flagged 4 material risks including revenue concentration and contract renewal terms
+
+Equity Research Intern — Barton Asset Management, New York, NY | Jan 2022 – May 2022
+- Modeled revenue, EBITDA, and FCF drivers for 10 TMT companies using 10-K/Q filings, earnings call transcripts, and PitchBook data; initiated coverage on 2 names with buy recommendations adopted by the portfolio manager
+- Built LBO analysis for 3 potential private equity targets to assess PE sponsor interest and potential competing bids
+- Maintained accretion/dilution model templates used by 4 other analysts on the team; reduced build time by 35% via VBA automation
+- Authored 2 initiation reports (18–22 pages) and 6 earnings update memos; one analysis directly influenced a $2.1M position increase
+
+Finance Intern — TechBridge Corp, Jersey City, NJ | Jun 2021 – Aug 2021
+- Assisted FP&A team with 3-statement monthly variance analysis; reconciled actuals vs. budget across 8 cost centers, identifying $340K in over-accruals
+- Built Excel model automating quarterly board presentation financials, reducing manual effort by 6 hours per cycle
+- Prepared materials for two board of directors' financial reviews; handled GAAP reconciliation schedules for operating and capital lease accounting
+
+TECHNICAL SKILLS
+Financial Modeling: 3-statement models, DCF, LBO, accretion/dilution, comparable company analysis, precedent transactions, merger models
+Tools: Excel (advanced, VBA macros), PowerPoint, Bloomberg Terminal, CapIQ, PitchBook, Tableau
+Accounting: GAAP, ASC 842 lease accounting, working capital modeling, deferred revenue normalization
+Languages: Python (pandas, matplotlib for financial data analysis), SQL
+Sector Knowledge: SaaS metrics (ARR, NRR, CAC/LTV), media rights structures, telecom capex modeling
+
+LEADERSHIP & AWARDS
+NYU Stern Investment Banking Club, VP of Transactions (2021–2023) — led 14-person team through 3 mock deal simulations
+CFA Level I — passed, June 2022; Level II — registered, 2023
+Dean's List (all 4 years)

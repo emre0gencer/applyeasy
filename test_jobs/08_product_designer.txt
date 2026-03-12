@@ -1,0 +1,50 @@
+Product Designer — Consumer (0–2 years experience)
+Orbin | San Francisco, CA (Hybrid) | Full-Time
+
+About Orbin
+Orbin is a Series A consumer health app helping people understand and improve their sleep through guided behavioral programs. We have 350K monthly active users and a 4.7-star App Store rating. Design is a core competency here — our founding team includes two designers, and our design system is something we're genuinely proud of. We're a team of 30.
+
+The Role
+We're looking for a Product Designer to own design for our Onboarding and Engagement surfaces — the parts of the product that determine whether someone builds a habit or churns after day three. You'll work alongside a senior designer, a PM, and 3 engineers in a tight cross-functional pod. We ship bi-weekly.
+
+What You'll Do
+- Lead design for onboarding flows, habit-tracking interfaces, and in-app engagement features (streaks, weekly recaps, program progression)
+- Conduct user research: plan and run 8–12 usability sessions per quarter, synthesize findings into clear insights, and translate them into design decisions
+- Produce wireframes, high-fidelity mockups, and interactive prototypes in Figma; iterate rapidly based on feedback from research and engineering feasibility reviews
+- Define and spec interactions clearly enough for engineers to implement without ambiguity; participate in implementation QA
+- Design and analyze A/B tests with the growth team; interpret results and make recommendations informed by both quantitative data and qualitative research
+- Maintain and extend the Orbin design system components; advocate for accessibility and consistency across surfaces
+
+What We're Looking For
+Required:
+- Portfolio demonstrating end-to-end product design work (research through delivery) on at least 2 shipped or high-fidelity projects — consumer mobile preferred
+- Proficiency in Figma: components, auto layout, interactive prototyping, design systems
+- Experience conducting user research (moderated usability testing, interviews); ability to synthesize findings into actionable insights
+- Ability to write clear design specifications and collaborate closely with engineers; basic understanding of how components are implemented in iOS or React Native
+- Strong visual design sensibility: thoughtful use of typography, spacing, color, and hierarchy
+
+Preferred:
+- Experience designing for consumer mobile apps, especially health, wellness, or productivity
+- Familiarity with accessibility standards (WCAG 2.1 AA) and designing for diverse user populations
+- Exposure to quantitative product analytics (Mixpanel, Amplitude, or similar) to inform design decisions
+- Experience running or supporting A/B tests in a product environment
+- Basic front-end knowledge (HTML/CSS; React or React Native familiarity is a plus)
+- Prior startup experience where you moved quickly with limited resources
+
+We Will Evaluate You On:
+- Quality of thinking in your case studies, not just visual craft
+- How clearly you communicate design rationale
+- Whether your research actually changed a decision
+
+What We're NOT Looking For:
+- Designers who treat user research as a formality after the design is already done
+- Portfolios full of concept redesigns of existing apps with no real constraints or outcomes
+
+Compensation
+- $95,000–$115,000 base salary depending on experience
+- Meaningful early-stage equity
+- Health, dental, vision (100% premium covered for employee)
+- $1,500/year for design tools, conferences, or learning
+- Flexible hybrid: 2 days/week in our SoMa office
+
+To Apply: Portfolio link required. Cover letter optional but welcome if you have something specific to say about Orbin.

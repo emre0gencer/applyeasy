@@ -1,0 +1,43 @@
+Aisha Okonkwo
+aisha.okonkwo@email.com | (617) 555-0748 | linkedin.com/in/aishaokonkwo | github.com/aokonkwo
+Cambridge, MA
+
+EDUCATION
+B.S. Biomedical Engineering, MIT, June 2024
+GPA: 4.0 | Sigma Xi Scientific Research Honor Society
+Relevant Coursework: Biomechanics, Cell Biology, Biostatistics, Signals & Systems, Computational Biology, Organic Chemistry
+
+EXPERIENCE
+
+Undergraduate Researcher — Lauffenburger Lab, MIT Biological Engineering | Sep 2022 – Present
+- Designed and executed in vitro experiments characterizing cytokine signaling responses in primary human macrophages under TGF-β stimulation
+- Developed a Python pipeline (pandas, SciPy) to process and normalize 96-well plate fluorescence data from 40+ assays; reduced analyst processing time by 70%
+- Analyzed single-cell RNA sequencing data (10x Genomics) using Seurat in R; identified 3 candidate marker genes for a macrophage subpopulation
+- Contributed experimental methods and results sections to a manuscript currently in revision at Nature Biomedical Engineering
+
+Research Intern — Genentech (South San Francisco, CA) | Jun 2023 – Aug 2023
+- Performed CRISPR-Cas9 knockout screens in Jurkat T-cell lines to identify resistance mechanisms to PD-1 checkpoint inhibitors
+- Processed and analyzed NGS library data using custom Python scripts; delivered ranked hit list to senior scientist within agreed timeline
+- Maintained cell culture protocols for 6 cell lines; trained 2 new summer interns on aseptic technique
+
+PROJECTS
+
+Wearable Lactate Sensor (Senior Capstone) — Electrochemistry, Arduino, MATLAB | Jan 2024
+- Developed a flexible enzymatic electrochemical sensor for real-time sweat lactate monitoring during exercise
+- Characterized sensor linearity, sensitivity, and response time; achieved R² = 0.996 over 0–20 mM range
+- Fabricated sensor substrates using photolithography in MIT.nano cleanroom
+
+Bioinformatics Pipeline — Python, Snakemake, RNA-seq | Oct 2023
+- Built an end-to-end RNA-seq analysis pipeline (STAR alignment → DESeq2) for publicly available GEO datasets
+- Containerized pipeline using Docker for reproducibility; documented on GitHub
+
+TECHNICAL SKILLS
+Biology: Cell culture (BSL-2), CRISPR-Cas9, ELISA, Western blot, flow cytometry, immunofluorescence, PCR
+Bioinformatics: Python (pandas, NumPy, Biopython), R (DESeq2, Seurat), Bash, Snakemake, STAR, GATK
+Instruments: 96-well plate reader, qPCR, confocal microscopy, electrochemistry
+Fabrication: Photolithography, soft lithography (PDMS), 3D printing
+
+AWARDS
+MIT Presidential Fellowship (incoming PhD), 2024
+Goldwater Scholarship, 2023
+MIT Undergraduate Research Opportunities Program (UROP) Award, 2023

@@ -109,6 +109,30 @@ class JobDescription(BaseModel):
     cultural_signals: list[str] = []
     seniority_level: str = ""
     raw_text: str = ""
+    # v2: richer structured understanding
+    must_have_requirements: list[str] = []  # text of is_required=True requirements
+    preferred_requirements: list[str] = []  # text of is_required=False requirements
+    domain_signals: list[str] = []          # e.g. ["backend API ownership", "ML experimentation"]
+    evidence_style: str = ""               # dominant evidence type the role rewards
+    repeated_themes: list[str] = []         # themes appearing across multiple JD sections
+    seniority_cues: list[str] = []          # phrases indicating expected seniority
+
+
+# ---------------------------------------------------------------------------
+# Evidence signals (extracted from bullets — no LLM, heuristic)
+# ---------------------------------------------------------------------------
+
+class BulletEvidence(BaseModel):
+    """Structured evidence signals extracted from a single resume bullet."""
+    action: str = ""                        # first strong ownership verb detected
+    scope_signals: list[str] = []          # e.g. ["end-to-end", "user-facing", "production"]
+    complexity_signals: list[str] = []     # e.g. ["schema design", "api integration"]
+    ownership_signals: list[str] = []      # e.g. ["designed", "built", "implemented"]
+    deliverable_signals: list[str] = []    # e.g. ["api", "database", "pipeline"]
+    explicit_metrics: list[str] = []       # literal numbers/percentages found in text
+    evidence_strength: float = 0.0         # 0.0–1.0 composite signal strength
+    quantifiable_info_score: float = 0.0   # 0.0–1.0 grounded information density
+    unsupported_claim_risk: float = 0.0    # 0.0–1.0 risk of vague/inflated claims
 
 
 # ---------------------------------------------------------------------------
@@ -119,6 +143,8 @@ class ScoredBullet(BaseModel):
     bullet: Bullet
     relevance_score: float
     matching_keywords: list[str] = []
+    evidence: Optional[BulletEvidence] = None          # v2: heuristic evidence signals
+    bullet_contribution_score: float = 0.0             # v2: blended relevance+evidence score
 
 
 class ScoredEntry(BaseModel):
@@ -201,6 +227,9 @@ class ValidationResult(BaseModel):
     cover_letter_word_count: int = 0
     generic_phrases_found: list[str] = []
     hallucination_warnings: list[str] = []
+    # v2: richer diagnostics
+    score_breakdown: dict[str, float] = {}         # sub-scores from raw suitability v2
+    evidence_quality_flags: list[str] = []         # evidence-thinness, redundancy, robustness
 
 
 # ---------------------------------------------------------------------------

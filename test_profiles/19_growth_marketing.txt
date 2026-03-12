@@ -1,0 +1,42 @@
+Jade Washington
+jade.washington@email.com | (323) 555-0761 | linkedin.com/in/jadewashington | jadewashington.co
+Los Angeles, CA
+
+EDUCATION
+B.S. Marketing, USC Marshall School of Business, May 2024
+GPA: 3.6 | Digital Marketing concentration
+Relevant Coursework: Consumer Behavior, Marketing Analytics, Paid Media Strategy, Brand Management, Growth Marketing, Marketing Experimentation
+
+EXPERIENCE
+
+Growth Marketing Intern — Clover Health (D2C Supplements), Los Angeles, CA | Jun 2023 – Dec 2023
+- Managed $45K/month paid social budget across Meta and TikTok; optimized toward ROAS and new customer CAC; improved blended ROAS from 1.8x to 2.6x over 5 months
+- Launched and iterated 3 landing page A/B tests in Unbounce; winning variant raised add-to-cart rate from 3.1% to 4.7%
+- Built a cohort retention analysis in Excel (later migrated to Looker); identified that customers acquired via influencer referral had 22% higher 60-day LTV than paid social cohorts
+- Briefed and managed relationships with 8 micro-influencers (10K–80K followers); negotiated performance-based contracts with GMV clauses
+
+Email Marketing Intern — Halo Commerce, Culver City, CA | Jun 2022 – Aug 2022
+- Owned email calendar for a 280K-subscriber list in Klaviyo; built 4 automated flows (welcome, abandoned cart, post-purchase, winback)
+- Wrote copy and designed templates for 6 campaign sends; average open rate 38% vs. industry benchmark of 22%
+- Segmented list by purchase behavior; reduced unsubscribe rate by 19% by removing non-engaged cohorts from broadcast sends
+
+PROJECTS
+
+Newsletter — The Funnel (Marketing strategy) | Jan 2024 – Present
+- Biweekly newsletter analyzing growth campaigns and performance marketing trends; 1,100 subscribers, 51% average open rate
+- Monetized via a single sponsorship deal with a SaaS tool; $400 per issue
+
+Personal Brand Audit Toolkit — Free Notion template | 2023
+- Published a brand audit framework for DTC brands; downloaded 700+ times via Product Hunt and Gumroad
+- Covered positioning, creative performance, retention metrics, and competitive benchmarking across 20 dimensions
+
+TECHNICAL SKILLS
+Paid Media: Meta Ads Manager, TikTok Ads, Google Ads (Search, Performance Max — basic)
+Email/CRM: Klaviyo, Mailchimp, HubSpot (basic)
+Analytics: Google Analytics 4, Looker (basic), Northbeam (MTA), Excel (cohort analysis, pivot tables)
+CRO: Unbounce, VWO, Hotjar, heuristic UX evaluation
+Other: Figma (ad creative briefing), Canva, Notion, Slack
+
+AWARDS
+USC Marshall Marketing Leadership Award, 2024
+AMA Collegiate Case Competition — Runner-up, Western Region, 2023

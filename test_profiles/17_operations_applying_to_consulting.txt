@@ -1,0 +1,37 @@
+Derek Hollis
+derek.hollis@email.com | (404) 555-0584 | linkedin.com/in/derekhollis
+Atlanta, GA
+
+EDUCATION
+B.B.A. Operations Management, Georgia State University, May 2023
+GPA: 3.0
+Relevant Coursework: Supply Chain Management, Operations Research, Business Statistics, Project Management, Accounting Principles
+
+EXPERIENCE
+
+Operations Coordinator — Peachtree Fulfillment Services, Atlanta, GA | Aug 2023 – Present
+- Coordinate daily inbound and outbound shipments across a 180,000 sq ft warehouse; liaise with 6 carrier accounts to resolve exceptions
+- Track KPIs (on-time delivery rate, pick accuracy, cost per order) in Excel; flag issues to shift supervisor in morning stand-ups
+- Onboarded 14 new seasonal workers over two peak seasons; trained them on WMS (Manhattan Associates) scanning procedures
+- Identified a labeling error causing 120 mis-sorted parcels/week; escalated to quality team; fix reduced mis-sort rate by 65%
+
+Logistics Intern — Delta Cargo, Atlanta, GA | Jun 2022 – Aug 2022
+- Updated air cargo booking records in company TMS; cross-checked manifests against physical pallet counts for 4 daily flights
+- Assisted in compiling a customs compliance checklist used for 3 new international routes
+- Shadowed freight coordinators; observed operations but did not lead analysis independently
+
+PROJECTS
+
+Senior Capstone: Route Optimization Study | Spring 2023
+- Used Excel Solver to model a small delivery vehicle routing problem for a hypothetical courier company (10 stops, 2 vehicles)
+- Reduced total route distance by 12% vs. the manual schedule baseline
+- No external data, no strategic recommendations framing — focused on operational execution
+
+TECHNICAL SKILLS
+Operations: WMS (Manhattan Associates), TMS basics, Excel (pivot tables, Solver — intermediate), inventory management
+Tools: Microsoft Office Suite, Slack, SAP (data entry level), Google Sheets
+Analytics: Descriptive statistics in Excel; no SQL, Python, or BI tools
+Soft Skills: Coordination, scheduling, cross-functional communication, shift management
+
+AWARDS
+GSU College of Business Dean's List — 1 semester

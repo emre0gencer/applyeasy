@@ -1,0 +1,141 @@
+/* ── Polished Template ─────────────────────────────────────────────────────
+   Left-aligned header · modern hierarchy · clean spacing
+   Target: software engineering, product, consulting, tech management
+   ─────────────────────────────────────────────────────────────────────── */
+
+@page {
+    size: letter;
+    margin: 0.42in 0.5in 0.38in 0.5in;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.2;
+    color: #000;
+    background: #fff;
+}
+
+/* ── Header — left-aligned ── */
+.header {
+    text-align: left;
+    margin-bottom: 5pt;
+    padding-bottom: 4pt;
+    border-bottom: 0.5pt solid #000;
+}
+
+.name {
+    font-size: 18pt;
+    font-weight: bold;
+    letter-spacing: 0.01em;
+    margin-bottom: 2pt;
+}
+
+.contact {
+    font-size: 8.5pt;
+    color: #111;
+}
+
+.contact a {
+    color: #000;
+    text-decoration: none;
+}
+
+/* ── Section headings — wider letter-spacing, thinner rule ── */
+.section-heading {
+    font-size: 8.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    border-bottom: 0.5pt solid #000;
+    margin-top: 7pt;
+    margin-bottom: 2.5pt;
+    padding-bottom: 1.5pt;
+}
+
+/* ── Entry layout ── */
+.entry {
+    margin-bottom: 5pt;
+    overflow: hidden;
+}
+
+.edu-entry {
+    margin-bottom: 3pt;
+    overflow: hidden;
+}
+
+.entry-header {
+    overflow: hidden;
+    margin-bottom: 1pt;
+}
+
+.entry-date {
+    float: right;
+    font-size: 9pt;
+    white-space: nowrap;
+    padding-left: 8pt;
+    font-weight: normal;
+    color: #333;
+}
+
+.entry-title {
+    font-weight: bold;
+    font-size: 9.5pt;
+    display: block;
+    overflow: hidden;
+}
+
+.entry-detail {
+    font-size: 9pt;
+    margin-top: 1pt;
+    color: #333;
+}
+
+/* ── Education details ── */
+.edu-detail {
+    font-size: 8.5pt;
+    margin-top: 1pt;
+    color: #333;
+}
+
+/* ── Technical Skills ── */
+.skills-section {
+    margin-top: 0;
+}
+
+.skill-group {
+    font-size: 9pt;
+    margin-bottom: 1.5pt;
+    line-height: 1.2;
+}
+
+.skill-cat {
+    font-weight: bold;
+}
+
+/* ── Summary ── */
+.summary {
+    font-size: 9pt;
+    line-height: 1.25;
+}
+
+/* ── Bullets ── */
+ul.bullets {
+    margin-left: 11pt;
+    margin-top: 1pt;
+    margin-bottom: 0;
+    padding-left: 3pt;
+}
+
+ul.bullets li {
+    font-size: 9pt;
+    margin-bottom: 1.5pt;
+    line-height: 1.25;
+    list-style-type: disc;
+}

@@ -1,0 +1,47 @@
+Supply Chain Analyst — Planning & Procurement
+Torqline Industrial Group | Detroit, MI | Full-Time, On-Site
+
+About Torqline
+Torqline is a Tier 1 automotive supplier providing powertrain components to Ford, GM, and Stellantis. We operate 4 manufacturing plants in Michigan and Ohio with combined annual revenues of $1.1B. Our supply chain team is responsible for keeping 3,000+ active SKUs flowing across a global supplier base — without shutting down an OEM assembly line.
+
+The Role
+We're hiring a Supply Chain Analyst to support our Demand Planning and Supplier Performance teams. This is a high-visibility role for someone who wants to understand how a complex industrial supply chain actually operates — and who is comfortable building the analytical tools that make it run better. You'll report to the Supply Chain Manager and work daily with procurement, production planning, logistics, and plant operations.
+
+What You'll Do
+- Analyze demand signals from OEM customers (EDI releases, rolling forecasts) and translate them into production and procurement requirements across a 12-week horizon
+- Monitor supplier on-time delivery (OTD), lead time variability, and fill rates for a portfolio of 60+ direct material suppliers; escalate underperformance and support corrective action plans
+- Maintain and improve inventory models (safety stock, reorder points, min/max) for critical components; balance service level targets against working capital constraints
+- Support the RFQ and supplier evaluation process for direct material sourcing events; prepare bid tabulations and supplier scorecards
+- Lead root-cause analysis on stockout and excess inventory events; recommend and implement preventive actions
+- Build and maintain Excel/Power BI dashboards tracking key supply chain KPIs for weekly operations review
+- Contribute to S&OP process inputs: gather and validate supply-side constraints for monthly planning cycles
+
+What We're Looking For
+Required:
+- Bachelor's degree in Supply Chain Management, Operations Management, Industrial Engineering, or a related business or technical field
+- Strong analytical skills: comfortable working with large Excel datasets, pivot tables, and building models from scratch
+- Understanding of core supply chain concepts: demand forecasting, inventory management (EOQ, safety stock), supplier performance metrics
+- Organized, detail-oriented, able to manage multiple priorities in a fast-paced environment
+- Clear communicator — you'll interface with plant managers, suppliers, and OEM customer representatives
+
+Preferred:
+- Internship experience in supply chain, procurement, logistics, or operations at a manufacturing company
+- Familiarity with ERP systems (SAP preferred; Oracle, QAD, or similar acceptable)
+- Experience with Power BI, Tableau, or similar data visualization tools
+- APICS CPIM or CSCP certification (or actively pursuing)
+- Exposure to lean manufacturing or Six Sigma process improvement methods
+- Basic Python or SQL skills for data extraction and automation
+
+This Is a Good Fit If You:
+- Get energized by finding patterns in messy data, not frustrated by it
+- Want to understand manufacturing and supplier operations, not just analyze spreadsheets remotely
+- Are comfortable saying "I don't know, but I'll find out" and following through
+
+Compensation
+- $60,000–$75,000 base salary depending on experience and certifications
+- Annual incentive bonus (up to 8%)
+- Medical, dental, vision; 401(k) with 5% match
+- Tuition reimbursement for supply chain, engineering, or MBA coursework
+- APICS certification reimbursement
+
+Note: This role requires on-site presence in Detroit. Relocation assistance provided for candidates outside the area.

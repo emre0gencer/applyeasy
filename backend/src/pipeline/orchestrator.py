@@ -25,7 +25,7 @@ from backend.src.rendering.pdf_renderer import (
     render_resume_pdf,
 )
 from backend.src.storage.database import SessionLocal, get_run_record, update_run_progress
-from backend.src.validation.quality_validator import compute_raw_suitability, validate
+from backend.src.validation.quality_validator import compute_raw_suitability_v2, validate
 
 
 def _step(
@@ -94,8 +94,10 @@ def _execute_pipeline(
     # ── Step 3: Score relevance ─────────────────────────────────────────────
     _step(db, run_id, "scoring_relevance")
     relevance_map = rank_relevance(profile, jd)
-    # Persist raw suitability immediately — frontend shows this as the "before" baseline
-    raw_score = compute_raw_suitability(profile, jd)
+    # v2: multi-factor suitability score (must-have coverage, semantic relevance,
+    # evidence quality, preferred coverage, extraction clarity).
+    # score_breakdown is passed to validate() for internal diagnostics.
+    raw_score, score_breakdown = compute_raw_suitability_v2(profile, jd, relevance_map)
     update_run_progress(
         db, run_id,
         status="running",
@@ -127,7 +129,8 @@ def _execute_pipeline(
         cover_letter = TailoredCoverLetter()
 
     # ── Step 6: Validate ────────────────────────────────────────────────────
-    validation = validate(tailored_resume, cover_letter, profile, jd)
+    # v2: pass score_breakdown so evidence quality flags can reference sub-scores
+    validation = validate(tailored_resume, cover_letter, profile, jd, score_breakdown=score_breakdown)
 
     # ── Step 7: Render PDFs ─────────────────────────────────────────────────
     _step(db, run_id, "rendering_pdfs")

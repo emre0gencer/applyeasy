@@ -1,6 +1,10 @@
 """
 RelevanceRanker — cosine similarity scoring of experiences vs. JD requirements.
 Uses local sentence-transformers (all-MiniLM-L6-v2). No API calls.
+
+v2: Augments cosine similarity with heuristic evidence signals to produce a
+    bullet_contribution_score that rewards evidence strength and information
+    density alongside semantic relevance.
 """
 
 from __future__ import annotations
@@ -9,6 +13,7 @@ from functools import lru_cache
 
 import numpy as np
 
+from backend.src.analysis.evidence_extractor import extract_evidence
 from backend.src.models.schemas import (
     Bullet,
     CandidateProfile,
@@ -41,7 +46,11 @@ def _cosine_sim(a: np.ndarray, b: np.ndarray) -> float:
 
 
 def _build_job_query(jd: JobDescription) -> str:
-    """Build a composite query string representing the job requirements."""
+    """Build a composite query string representing the job requirements.
+
+    v2: Incorporates domain_signals and must_have_requirements when available
+    to improve semantic alignment with the role's evidence expectations.
+    """
     parts = [jd.role_title]
     # Prioritize high-importance keywords
     high = [k.term for k in jd.keywords if k.importance >= 2]
@@ -49,10 +58,19 @@ def _build_job_query(jd: JobDescription) -> str:
     req_texts = [r.text for r in jd.requirements if r.is_required][:10]
     parts.extend(high or all_kw[:10])
     parts.extend(req_texts[:5])
-    return " | ".join(parts)
+    # v2: add domain signals for richer semantic context
+    if jd.domain_signals:
+        parts.extend(jd.domain_signals[:3])
+    if jd.must_have_requirements:
+        parts.extend(jd.must_have_requirements[:3])
+    return " | ".join(p for p in parts if p)
 
 
-def _score_bullets(bullets: list[Bullet], job_query_vec: np.ndarray, jd: JobDescription) -> list[ScoredBullet]:
+def _score_bullets(
+    bullets: list[Bullet],
+    job_query_vec: np.ndarray,
+    jd: JobDescription,
+) -> list[ScoredBullet]:
     if not bullets:
         return []
     texts = [b.text for b in bullets]
@@ -63,10 +81,25 @@ def _score_bullets(bullets: list[Bullet], job_query_vec: np.ndarray, jd: JobDesc
         sim = _cosine_sim(vec, job_query_vec)
         # Find keywords that appear literally in the bullet text
         matching_kw = [k for k in kw_terms if k in bullet.text.lower()]
+
+        # v2: extract evidence signals and compute contribution score.
+        # Bullet contribution blends semantic relevance with evidence quality:
+        #   45% cosine similarity  — how semantically aligned the bullet is
+        #   35% evidence strength  — scope, complexity, ownership, deliverable signals
+        #   20% quantifiable info  — grounded information density
+        evidence = extract_evidence(bullet.text)
+        contribution = (
+            sim * 0.45
+            + evidence.evidence_strength * 0.35
+            + evidence.quantifiable_info_score * 0.20
+        )
+
         scored.append(ScoredBullet(
             bullet=bullet,
             relevance_score=round(sim, 4),
             matching_keywords=matching_kw,
+            evidence=evidence,
+            bullet_contribution_score=round(contribution, 4),
         ))
     return scored
 
@@ -78,8 +111,8 @@ def _score_experience(
     jd: JobDescription,
 ) -> ScoredEntry:
     scored_bullets = _score_bullets(exp.bullets, job_query_vec, jd)
-    # Overall score = max bullet score (with role title boost)
-    bullet_scores = [sb.relevance_score for sb in scored_bullets] or [0.0]
+    # v2: use bullet_contribution_score (evidence-aware) instead of pure cosine sim
+    bullet_scores = [sb.bullet_contribution_score for sb in scored_bullets] or [0.0]
     overall = max(bullet_scores)
     # Boost if role title overlaps with JD title
     role_lower = exp.role_title.lower()
@@ -109,7 +142,8 @@ def _score_project(
         from backend.src.models.schemas import Bullet as B
         bullets = [B(text=proj.description, source_text=proj.source_text)]
     scored_bullets = _score_bullets(bullets, job_query_vec, jd)
-    bullet_scores = [sb.relevance_score for sb in scored_bullets] or [0.0]
+    # v2: use bullet_contribution_score (evidence-aware) instead of pure cosine sim
+    bullet_scores = [sb.bullet_contribution_score for sb in scored_bullets] or [0.0]
     overall = max(bullet_scores)
     # Boost for tech overlap
     proj_tech = set(t.lower() for t in proj.technologies)

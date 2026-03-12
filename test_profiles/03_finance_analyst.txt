@@ -1,0 +1,37 @@
+Jordan Whitfield
+jordan.whitfield@email.com | (212) 555-0374 | linkedin.com/in/jordanwhitfield
+New York, NY
+
+EDUCATION
+B.S. Finance, New York University — Stern School of Business, May 2024
+GPA: 3.6 | Beta Gamma Sigma Honor Society
+Relevant Coursework: Financial Modeling, Corporate Valuation, Derivatives, Econometrics, Fixed Income
+
+EXPERIENCE
+
+Investment Banking Analyst Intern — Ashford Capital Partners, New York, NY | Jun 2023 – Aug 2023
+- Built 3-statement financial models and DCF valuations for 4 M&A transactions in the industrials sector (deal sizes $80M–$350M)
+- Prepared pitch books and CIM drafts for 2 live sell-side mandates; presented to Managing Director for review
+- Conducted comparable company analysis and precedent transaction analysis using CapIQ and Bloomberg
+- Supported due diligence on a $200M acquisition: reviewed data room documents, flagged 3 material risks to senior bankers
+
+Equity Research Intern — Hargrove Asset Management, New York, NY | Jan 2023 – May 2023
+- Modeled revenue and cost drivers for 8 consumer staples companies using 10-K/Q filings and earnings transcripts
+- Wrote 2 initiation reports (15–20 pages each) with buy/hold/sell recommendations; one idea adopted by the portfolio manager
+- Maintained a coverage universe tracker updated weekly with price targets, consensus estimates, and earnings dates
+
+Finance Intern — Clearpath Logistics, Newark, NJ | Jun 2022 – Aug 2022
+- Assisted FP&A team with monthly variance analysis; reconciled actuals vs. budget across 6 cost centers
+- Built an Excel dashboard that automated fleet cost reporting, reducing manual effort from 5 hours to 30 minutes per month
+- Prepared materials for board of directors' quarterly financial review
+
+TECHNICAL SKILLS
+Financial Modeling: DCF, LBO (basic), comparable company analysis, accretion/dilution
+Tools: Excel (advanced, VBA), PowerPoint, Bloomberg Terminal, CapIQ, Tableau
+Languages: Python (pandas, matplotlib for data analysis), SQL (basic)
+Accounting: GAAP, 3-statement modeling, working capital analysis
+
+LEADERSHIP & AWARDS
+NYU Stern Investment Club, Vice President of Research (2022–2024) — led a 12-person team managing a $50K paper portfolio
+CFA Level I — passed, December 2023
+Dean's List (3 of 4 years)

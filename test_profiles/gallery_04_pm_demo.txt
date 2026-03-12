@@ -1,0 +1,44 @@
+Jasmine Park
+jasmine.park@email.com | (512) 555-0167 | linkedin.com/in/jasminepark
+Austin, TX
+
+EDUCATION
+B.S. Computer Science & Management Science, UT Austin, May 2023
+GPA: 3.8 | Dean's List (all semesters)
+Relevant Coursework: Human-Computer Interaction, Product Design, Data Analysis, Business Strategy, Software Engineering
+
+EXPERIENCE
+
+Associate Product Manager Intern — Centerline (B2B SaaS), Austin, TX | Jun 2022 – Dec 2022
+- Owned roadmap for a workflow automation feature used by 800+ enterprise accounts; wrote 11 PRDs and 18 user stories with clear success metrics, edge cases, and acceptance criteria that engineers executed without follow-up meetings
+- Defined and tracked key product metrics (activation rate, DAU, feature retention, ticket deflection rate) in Amplitude; surfaced 22% drop-off in enterprise onboarding flow that led to redesigned first-run experience
+- Ran 25 customer discovery interviews and 3 usability tests; synthesized insights into opportunity sizing model that reprioritized Q3 backlog, deprioritizing 2 features and accelerating 1 high-impact integration
+- Launched A/B tested redesign of comment-and-approval workflow; drove 24% lift in feature retention at 30 days post-launch (p < 0.05)
+- Collaborated with design in Figma to iterate on wireframes and user flows; drove to specification before engineering sprint started, reducing mid-sprint scope changes by 40%
+
+Product Strategy Intern — LiveWire Ventures, Austin, TX | Jun 2021 – Aug 2021
+- Conducted market sizing and competitive teardowns for 3 B2B SaaS portfolio companies; built opportunity scoring models across 9 product-market fit dimensions
+- Ran SQL queries on product usage databases (Mixpanel, PostgreSQL) to quantify activation and retention rates; findings used in 2 follow-on investment decisions
+- Presented to general partners; one product analysis directly shaped a term sheet for a $4M seed investment
+
+PROJECTS
+
+ShiftSwap — Product design + Figma + user research | Jan 2023
+- Led 4-person team to design, test, and validate a B2B shift-trading SaaS for hourly workforce managers; recruited 42 beta users from local restaurant operators
+- Ran 18 user interviews, synthesized pain points into 4 persona archetypes, iterated Figma prototype across 3 rounds of usability feedback
+- Built financial model estimating $2.4M ARR potential within Austin market based on operational data from 6 pilot restaurants
+
+Product Analytics Dashboard — SQL, Python, Streamlit | Nov 2022
+- Built a self-serve analytics dashboard surfacing funnel conversion, feature adoption, and churn signals for a 12-person SaaS startup
+- Wrote 14 SQL queries against PostgreSQL product database; packaged as a Streamlit app connected to Amplitude export API
+
+TECHNICAL SKILLS
+Product: PRDs, user stories, roadmapping (Linear, Jira, Notion), backlog prioritization (RICE, opportunity scoring), OKR setting
+Analytics: Amplitude, Mixpanel, SQL (intermediate-advanced), Python (pandas, basic scripting), Google Sheets, Excel
+Design: Figma (wireframes through high-fi prototypes), user journey mapping, Jobs-to-be-Done, affinity mapping
+Research: Customer discovery interviews, usability testing, NPS analysis, Jobs-to-be-Done framework
+B2B SaaS: Activation, retention, expansion, churn, ARR modeling, PLG vs. SLG motion fundamentals
+
+LEADERSHIP & AWARDS
+UT Austin Product Management Club, President (2021–2023) — ran 6 speaker events, 2 case competitions, 1 product design sprint (80 participants)
+Longhorn Startup Pitch Competition — 1st Place, Product Track, 2022

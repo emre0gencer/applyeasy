@@ -1,0 +1,38 @@
+Theo Papadopoulos
+theo.papadopoulos@email.com | (617) 555-0392 | linkedin.com/in/theopapadopoulos
+Boston, MA
+
+EDUCATION
+B.S. Civil Engineering, Tufts University, May 2023
+GPA: 3.4 | Structural Engineering concentration
+Relevant Coursework: Structural Analysis, Reinforced Concrete Design, Steel Design, Geotechnical Engineering, Hydrology, Transportation Engineering
+
+EXPERIENCE
+
+Junior Structural Engineer — Holt Farrington Engineers, Boston, MA | Aug 2023 – Present
+- Performed structural calculations for 3 mid-rise residential projects (6–12 stories) under PE supervision; prepared load takeoff and gravity framing plans
+- Modeled a 5-story mixed-use building in ETABS; iterated design to reduce steel tonnage by 8% while maintaining code compliance (ASCE 7-22, IBC 2021)
+- Prepared construction document packages for 2 projects; coordinated with MEP consultants to resolve 15 structural conflicts in BIM clash detection review
+- Responded to 20+ RFIs from contractors during construction phase of a school renovation project
+
+Civil Engineering Co-op — Whitmore Infrastructure Group, Cambridge, MA | Jan 2022 – Jun 2022
+- Assisted in roadway design for a 1.2-mile municipal reconstruction project: prepared horizontal alignment plans in AutoCAD Civil 3D, generated earthwork quantity estimates
+- Ran HEC-RAS hydraulic model for a culvert replacement; confirmed proposed design met 100-year storm event criteria
+- Attended 4 site visits; documented field conditions and updated as-built markups
+
+PROJECTS
+
+Capstone: Pedestrian Bridge Design — Tufts, 2023
+- Led 4-person team to design a 60-ft pedestrian truss bridge over a campus walkway; selected steel W-sections, checked deflection and fatigue criteria per AASHTO LRFD
+- Produced 25-page design report and full set of structural drawings in AutoCAD
+- Received highest mark in cohort from faculty review panel
+
+TECHNICAL SKILLS
+Software: ETABS, SAP2000, AutoCAD, Civil 3D, Revit (basic), HEC-RAS, Microsoft Excel (advanced)
+Design codes: ASCE 7, ACI 318, AISC 360, IBC, AASHTO LRFD
+Methods: Structural analysis, gravity/lateral system design, load path analysis, BIM coordination
+Other: AutoCAD drafting, technical report writing, field observation
+
+CERTIFICATIONS
+Engineer-in-Training (EIT) — Massachusetts, 2023
+OSHA 10-Hour Construction Safety, 2022

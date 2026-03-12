@@ -1,0 +1,42 @@
+Noah Lindqvist
+noah.lindqvist@email.com | (206) 555-0318 | linkedin.com/in/noahlindqvist
+Seattle, WA
+
+EDUCATION
+B.S. Environmental Science, University of Washington, June 2023
+GPA: 3.5 | Concentration: Water Resources and Terrestrial Ecosystems
+Relevant Coursework: Environmental Chemistry, Hydrology, Ecology, GIS, Environmental Policy, Statistics for Environmental Science
+
+EXPERIENCE
+
+Environmental Field Technician — Cascades Environmental Consulting, Seattle, WA | Sep 2023 – Present
+- Conduct Phase I and Phase II Environmental Site Assessments (ESAs) per ASTM E1527-21 standards; have completed 18 Phase I reports and 4 Phase II subsurface investigation plans
+- Collect soil and groundwater samples per EPA SW-846 methods; log field data using GPS-enabled tablets; maintain chain of custody documentation
+- Operate water quality monitoring equipment (YSI multiparameter probe); record dissolved oxygen, pH, conductivity, and temperature at 12 long-term monitoring sites monthly
+- Prepare draft technical report sections (boring logs, analytical tables, site maps in ArcGIS) under senior scientist review
+
+Undergraduate Research Intern — UW Climate and Land Use Change Research Group | Jan 2022 – Jun 2023
+- Processed and analyzed remote sensing imagery (Landsat, Sentinel-2) in Google Earth Engine to map forest cover change in Pacific Northwest from 2000–2022
+- Ran statistical regressions in R correlating canopy loss with precipitation, elevation, and fire history variables; contributed to a manuscript under peer review
+- Maintained 3 weather station data loggers in the field; downloaded and QA/QC'd hourly datasets
+
+PROJECTS
+
+Stormwater Runoff Modeling — ArcGIS, HEC-HMS | Fall 2022
+- Modeled peak runoff and sediment loading for a 15-acre hypothetical urban development site; sized 2 detention pond options to meet King County stormwater standards
+- Presented engineering drawings and hydrograph analysis to a 10-person simulated county review board
+
+Personal Nature Photography — noahlindqvist.com | Ongoing
+- Documents Pacific Northwest flora and fauna; 4,200 Instagram followers; collaborated with 2 conservation nonprofits on awareness campaigns
+
+TECHNICAL SKILLS
+Field: Soil and groundwater sampling, YSI multiparameter, GPS survey, chain of custody, boring log preparation
+GIS/Remote Sensing: ArcGIS Pro, QGIS, Google Earth Engine, Landsat/Sentinel-2 analysis
+Modeling: HEC-HMS, basic SWMM, ArcGIS Spatial Analyst
+Data/Statistics: R (tidyverse, ggplot2), Excel, Python (basic NumPy/pandas)
+Regulatory: ASTM E1527-21, EPA SW-846, CERCLA Phase I/II basics, Clean Water Act Section 404 awareness
+
+CERTIFICATIONS
+OSHA 40-Hour HAZWOPER, 2023
+40-Hour Environmental Field Technician Certificate, UW Professional & Continuing Education, 2023
+Wilderness First Aid, 2022
