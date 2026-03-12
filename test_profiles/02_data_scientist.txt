@@ -1,0 +1,48 @@
+Priya Nambiar
+priya.nambiar@email.com | (734) 555-0287 | linkedin.com/in/priyanambiar | github.com/pnambiar
+Ann Arbor, MI
+
+EDUCATION
+M.S. Data Science, University of Michigan, May 2024
+GPA: 3.9
+Thesis: "Causal Inference in Observational Health Data Using Doubly Robust Estimators"
+
+B.S. Statistics, University of Michigan, May 2022
+GPA: 3.8 | Phi Beta Kappa
+
+EXPERIENCE
+
+Data Science Intern — Meridian Health Analytics, Detroit, MI | May 2023 – Aug 2023
+- Built a gradient boosting model (XGBoost) to predict 30-day hospital readmission risk, achieving AUC of 0.81 on held-out test set
+- Cleaned and joined claims data across 4 disparate sources (1.2M patient records) using pandas and SQL
+- Presented findings to clinical leadership; model was piloted in 2 hospital units
+- Automated weekly reporting pipeline in Python, saving 6 hours of analyst time per week
+
+Research Assistant — U-M Survey Research Center | Sep 2022 – Apr 2023
+- Analyzed longitudinal survey data using R (lme4, survey) for a federally funded study on household food insecurity
+- Applied propensity score matching to control for selection bias in treatment group comparisons
+- Co-authored a working paper submitted to the Journal of Public Health Economics
+
+PROJECTS
+
+Churn Prediction — Python, scikit-learn, SHAP | Mar 2024
+- Trained logistic regression and random forest models on 500K telecom customer records to predict churn within 90 days
+- Used SHAP values to generate feature importance explanations for business stakeholders
+- Reduced feature set from 140 to 28 features via recursive feature elimination without loss in AUC
+
+NYC Taxi Demand Forecasting — Python, Prophet, SQL | Oct 2023
+- Forecasted hourly taxi demand by zone using Meta's Prophet with US holiday regressors
+- Pulled and aggregated 3 years of TLC trip record data from BigQuery (120M rows)
+- Achieved 11% lower MAPE than baseline moving-average forecast
+
+TECHNICAL SKILLS
+Languages: Python, R, SQL
+ML Libraries: scikit-learn, XGBoost, LightGBM, PyTorch, statsmodels, SHAP
+Data: pandas, NumPy, Spark (basic), BigQuery, dbt
+Visualization: matplotlib, seaborn, Tableau
+Tools: Git, Docker, Jupyter, VS Code
+
+AWARDS & CERTIFICATIONS
+NSF Graduate Research Fellowship — Honorable Mention, 2022
+AWS Certified Cloud Practitioner, 2023
+Michigan Data Science Team, Project Lead 2021–2022

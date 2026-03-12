@@ -1,0 +1,32 @@
+Electrical Engineer I — Power Electronics & Embedded Systems
+Lumina Energy Systems | Austin, TX | Full-Time, On-Site
+
+About Lumina
+Lumina Energy Systems designs and manufactures power electronics hardware for commercial EV charging infrastructure and behind-the-meter battery storage. We are a 90-person hardware startup with Series B funding and units deployed in 8 states. Our hardware team owns everything from schematic to production validation.
+
+The Role
+We're hiring an Electrical Engineer I to work on power conversion hardware — DC-DC converters, grid-tied inverter control boards, and the embedded systems that run them. This role is hands-on and spans design, validation, and manufacturing bring-up.
+
+What You'll Do
+- Design and review analog and digital circuit schematics for power electronics applications (switching converters, gate driver circuits, signal conditioning, communication interfaces) in Altium Designer
+- Perform board-level bring-up and debug of prototype PCBAs using oscilloscopes, power analyzers, and bench instruments
+- Write and test embedded firmware in C for STM32 microcontrollers: peripheral drivers (SPI, I2C, UART, CAN), control loop implementation, and fault handling state machines
+- Develop hardware test plans and execute characterization tests: efficiency curves, thermal performance, EMI pre-compliance, and power quality measurements
+- Collaborate with mechanical and thermal engineers on packaging constraints and thermal management design
+- Support design-for-manufacture reviews with contract manufacturing partners; generate production test procedures and acceptance criteria
+
+Required:
+- Bachelor's degree in Electrical Engineering
+- Proficiency in analog circuit design and simulation (LTspice or equivalent)
+- Experience with PCB schematic and layout in Altium Designer, KiCad, or equivalent EDA tool
+- Embedded C programming experience on microcontrollers (STM32, PIC, or similar)
+- Hands-on lab skills: oscilloscope, DMM, bench power supplies, signal generator; comfortable debugging hardware at the component level
+
+Preferred:
+- Experience with power electronics topologies: buck, boost, full-bridge, LLC resonant converters
+- Familiarity with motor control or grid-tied inverter control loops (PID, FOC)
+- Exposure to communication protocols used in energy applications: CAN, Modbus, SunSpec, OCPP
+- EMC/EMI test experience or familiarity with FCC/CE compliance testing
+- Internship or project experience in power electronics, EV, solar, or energy storage hardware
+
+Compensation: $82,000–$98,000 base + equity + full benefits. Fast-growing Series B company with direct hardware ownership from day one.

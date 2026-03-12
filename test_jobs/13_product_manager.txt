@@ -1,0 +1,32 @@
+Associate Product Manager (APM)
+Looper — B2B SaaS | Austin, TX (Hybrid) | Full-Time
+
+About Looper
+Looper is a workflow automation platform for mid-market operations teams. We have 1,100 paying customers, $14M ARR, and are growing 85% year-over-year. We're building the operating layer for teams that run complex, human-in-the-loop processes. Product is central to everything we do.
+
+The Role
+Our APM program is a 2-year rotational experience designed to develop PMs who can own a roadmap, talk to customers, and ship independently. APMs rotate through 2–3 product areas, including our core workflow builder, integrations platform, and analytics surface. After the program, strong performers move into PM II roles with full product ownership.
+
+What You'll Do
+- Talk to customers regularly — user interviews, discovery calls, support ticket analysis — to understand problems before prescribing solutions
+- Write clear, specific product requirements documents (PRDs): problem statement, success metrics, scope, edge cases; no ambiguous acceptance criteria
+- Collaborate with engineering to scope features, estimate complexity, and manage sprint delivery
+- Define and track key metrics for your surface; build dashboards and run lightweight analyses to understand what's working
+- Prioritize a backlog across competing stakeholder demands using structured frameworks (RICE, opportunity scoring, etc.)
+- Work with design on user flows and prototypes; drive toward clarity before engineering starts
+
+Required:
+- Bachelor's degree in any field
+- Strong analytical thinking: comfortable forming and testing hypotheses with data, not just intuition
+- Excellent written communication: ability to write a PRD that engineers can execute without 5 follow-up meetings
+- Genuine curiosity about how software products are built and why users behave the way they do
+- Prior experience shipping something — internship, side project, hackathon, student club — where you owned a problem from start to finish
+
+Preferred:
+- Prior product, engineering, UX, or strategy internship experience
+- Comfort with SQL for basic product analytics queries
+- Familiarity with B2B SaaS product concepts: activation, retention, expansion, churn
+- Experience using tools like Figma, Notion, Linear, Amplitude, or Mixpanel
+- Technical background or ability to understand engineering constraints
+
+Compensation: $85,000–$100,000 + equity + benefits. Strong internal promotion track.

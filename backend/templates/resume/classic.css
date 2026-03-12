@@ -1,0 +1,140 @@
+/* ── Classic Template ──────────────────────────────────────────────────────
+   Centered header · UPPERCASE section headings · maximum content density
+   Target: any role, traditional safe choice
+   ─────────────────────────────────────────────────────────────────────── */
+
+@page {
+    size: letter;
+    margin: 0.38in 0.45in 0.33in 0.45in;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.15;
+    color: #000;
+    background: #fff;
+}
+
+/* ── Header ── */
+.header {
+    text-align: center;
+    margin-bottom: 4pt;
+    padding-bottom: 3pt;
+    border-bottom: 0.75pt solid #000;
+}
+
+.name {
+    font-size: 17pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2pt;
+}
+
+.contact {
+    font-size: 8.5pt;
+}
+
+.contact a {
+    color: #000;
+    text-decoration: none;
+}
+
+/* ── Section headings ── */
+.section-heading {
+    font-size: 9pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 0.75pt solid #000;
+    margin-top: 6pt;
+    margin-bottom: 2pt;
+    padding-bottom: 1pt;
+}
+
+/* ── Entry layout (float-based — xhtml2pdf safe) ── */
+.entry {
+    margin-bottom: 4pt;
+    overflow: hidden;
+}
+
+.edu-entry {
+    margin-bottom: 2pt;
+    overflow: hidden;
+}
+
+.entry-header {
+    overflow: hidden;
+    margin-bottom: 0.5pt;
+}
+
+/* Date floats right; must appear FIRST in HTML source */
+.entry-date {
+    float: right;
+    font-size: 9pt;
+    white-space: nowrap;
+    padding-left: 6pt;
+    font-weight: normal;
+}
+
+.entry-title {
+    font-weight: bold;
+    font-size: 9.5pt;
+    display: block;
+    overflow: hidden;
+}
+
+.entry-detail {
+    font-size: 9pt;
+    margin-top: 0.5pt;
+}
+
+/* ── Education details ── */
+.edu-detail {
+    font-size: 8.5pt;
+    margin-top: 0.5pt;
+    color: #222;
+}
+
+/* ── Technical Skills ── */
+.skills-section {
+    margin-top: 0;
+}
+
+.skill-group {
+    font-size: 9pt;
+    margin-bottom: 1pt;
+    line-height: 1.2;
+}
+
+.skill-cat {
+    font-weight: bold;
+}
+
+/* ── Summary ── */
+.summary {
+    font-size: 9pt;
+    line-height: 1.2;
+}
+
+/* ── Bullets ── */
+ul.bullets {
+    margin-left: 10pt;
+    margin-top: 0.5pt;
+    margin-bottom: 0;
+    padding-left: 3pt;
+}
+
+ul.bullets li {
+    font-size: 9pt;
+    margin-bottom: 1pt;
+    line-height: 1.2;
+    list-style-type: disc;
+}

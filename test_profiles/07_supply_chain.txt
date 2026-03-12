@@ -1,0 +1,46 @@
+Nathan Briggs
+nathan.briggs@email.com | (614) 555-0852 | linkedin.com/in/nathanbriggs
+Columbus, OH
+
+EDUCATION
+B.S. Supply Chain Management, Ohio State University — Fisher College of Business, May 2024
+GPA: 3.5 | APICS Student Chapter member
+Relevant Coursework: Operations Management, Logistics & Transportation, Procurement Strategy, Lean Six Sigma, Business Analytics
+
+EXPERIENCE
+
+Supply Chain Intern — Carver Automotive Components, Columbus, OH | Jun 2023 – Aug 2023
+- Analyzed supplier lead time data for 80+ SKUs and identified 14 high-risk single-source components; proposed dual-sourcing strategy adopted by procurement manager
+- Built an Excel/Power BI dashboard tracking on-time delivery (OTD) performance across 35 Tier 1 suppliers; OTD visibility improved from weekly reports to daily
+- Assisted in RFQ process for a $4M tooling contract; compiled bid comparisons and scored 8 suppliers against criteria matrix
+- Participated in gemba walks and kaizen events targeting finished goods warehouse throughput; documented 3 process improvement opportunities
+
+Operations Intern — Midstate Distribution Co., Dayton, OH | Jun 2022 – Aug 2022
+- Supported warehouse slotting analysis for a 150K sq ft DC; recommended 40+ SKU relocations based on velocity and cube data, projected to reduce pick travel by 12%
+- Assisted cycle count program: counted 2,000+ locations per week, investigated and resolved 35 inventory discrepancies
+- Updated routing guides for 6 LTL lanes after carrier rate renegotiation
+
+Logistics Coordinator (part-time) — Campus Fulfillment Hub, Columbus, OH | Sep 2021 – May 2022
+- Processed 80–120 outbound orders per day using NetSuite WMS; maintained 99.2% ship-on-time rate
+- Trained 4 new part-time employees on order picking, packing, and carrier label generation procedures
+
+PROJECTS
+
+Inventory Optimization Simulation — Python, SimPy | Feb 2024
+- Simulated a (s, Q) inventory policy for a fictional auto parts distributor using discrete-event simulation
+- Tested 25 combinations of reorder point and order quantity; identified policy reducing total annual cost by 18% vs. baseline
+
+Lean Process Mapping — Fisher Supply Chain Lab | Oct 2023
+- Conducted time studies and mapped value stream for a simulated assembly process; identified 3 non-value-added steps
+- Proposed revised layout that reduced WIP inventory by 30% in simulation
+
+TECHNICAL SKILLS
+Tools: Excel (advanced, pivot tables, Power Query), Power BI, SAP (basic ERP navigation), NetSuite, Minitab
+Analytics: Regression analysis, demand forecasting (moving average, exponential smoothing), simulation (SimPy)
+Frameworks: Lean, Six Sigma DMAIC (Green Belt in progress), SCOR model fundamentals
+Languages: Python (pandas, SimPy), SQL (basic)
+
+CERTIFICATIONS & AWARDS
+APICS CSCP — exam scheduled Aug 2024
+Lean Six Sigma Green Belt — in progress
+Ohio State Dean's List (2 semesters)

@@ -36,6 +36,92 @@ interface Props {
   initialJd?: string;
 }
 
+function TemplatePreview({ id, selected }: { id: string; selected: boolean }) {
+  const fg = (op: number) =>
+    selected ? `rgba(255,255,255,${Math.min(op + 0.22, 1)})` : `rgba(255,255,255,${op})`;
+
+  const bar = (w: string, h: number, op = 0.28) => ({
+    width: w,
+    height: h,
+    background: fg(op),
+    borderRadius: 1,
+    flexShrink: 0,
+  });
+
+  const base = {
+    display: "flex" as const,
+    flexDirection: "column" as const,
+    gap: 3,
+    width: "100%",
+    padding: "16px 18px 14px",
+  };
+
+  if (id === "classic") {
+    return (
+      <div style={{ ...base, alignItems: "center" as const }}>
+        <div style={bar("44%", 4, 0.5)} />
+        <div style={bar("26%", 2, 0.3)} />
+        <div style={{ ...bar("76%", 1, 0.1), marginTop: 5, marginBottom: 4 }} />
+        <div style={bar("82%", 2, 0.25)} />
+        <div style={bar("70%", 2, 0.25)} />
+        <div style={bar("76%", 2, 0.25)} />
+      </div>
+    );
+  }
+
+  if (id === "polished") {
+    return (
+      <div style={{ ...base, alignItems: "flex-start" as const }}>
+        <div style={bar("54%", 4, 0.5)} />
+        <div style={bar("28%", 2, 0.3)} />
+        <div
+          style={{
+            display: "flex" as const,
+            gap: 6,
+            marginTop: 6,
+            width: "100%",
+            alignItems: "stretch" as const,
+          }}
+        >
+          <div
+            style={{
+              width: 2,
+              background: fg(0.5),
+              borderRadius: 1,
+              alignSelf: "stretch" as const,
+              flexShrink: 0,
+            }}
+          />
+          <div
+            style={{
+              flex: 1,
+              display: "flex" as const,
+              flexDirection: "column" as const,
+              gap: 3,
+            }}
+          >
+            <div style={bar("90%", 2, 0.25)} />
+            <div style={bar("76%", 2, 0.25)} />
+            <div style={bar("83%", 2, 0.25)} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // traditional
+  return (
+    <div style={{ ...base, alignItems: "center" as const }}>
+      <div style={bar("40%", 4, 0.5)} />
+      <div style={{ ...bar("68%", 1, 0.2), marginTop: 3 }} />
+      <div style={{ ...bar("68%", 1, 0.1), marginBottom: 5 }} />
+      <div style={bar("80%", 2, 0.25)} />
+      <div style={bar("68%", 2, 0.25)} />
+      <div style={bar("74%", 2, 0.25)} />
+    </div>
+  );
+}
+
 export function JobDescriptionStep({ sessionId, onBack, onNext, initialJd = "" }: Props) {
   const [jd, setJd] = useState(initialJd);
   const [templateId, setTemplateId] = useState("classic");
@@ -65,19 +151,24 @@ export function JobDescriptionStep({ sessionId, onBack, onNext, initialJd = "" }
 
   return (
     <div style={styles.card}>
-      <h2 style={styles.title}>Step 2 of 4: Job Description</h2>
-      <p style={styles.subtitle}>Paste the full job posting below.</p>
+      {/* Header */}
+      <div style={styles.cardTop}>
+        <h2 style={styles.title}>Paste the job description</h2>
+        <p style={styles.subtitle}>Use the complete posting for best keyword coverage.</p>
+      </div>
 
+      {/* Textarea — full-bleed */}
       <textarea
         style={styles.textarea}
         value={jd}
         onChange={(e) => setJd(e.target.value)}
-        placeholder="Paste the complete job description here..."
-        rows={12}
+        placeholder="Paste the complete job description here…"
+        rows={13}
       />
 
-      <div style={styles.templateSection}>
-        <p style={styles.templateLabel}>Resume template</p>
+      {/* Template selection */}
+      <div style={styles.section}>
+        <p style={styles.sectionLabel}>Resume template</p>
         <div style={styles.templateGrid} role="radiogroup">
           {TEMPLATES.map((t) => {
             const selected = templateId === t.id;
@@ -97,43 +188,82 @@ export function JobDescriptionStep({ sessionId, onBack, onNext, initialJd = "" }
                   onChange={() => setTemplateId(t.id)}
                   style={{ position: "absolute", opacity: 0, width: 0, height: 0 }}
                 />
-                <div style={styles.templateCardTop}>
-                  <span style={{ ...styles.templateName, color: selected ? "#fff" : "#cbd5e1" }}>{t.name}</span>
-                  {selected && <span style={styles.templateCheck}>✓</span>}
+                {/* Mini layout preview */}
+                <div
+                  style={{
+                    background: selected ? "rgba(59,130,246,0.07)" : "rgba(255,255,255,0.025)",
+                    borderBottom: selected
+                      ? "1px solid rgba(59,130,246,0.14)"
+                      : "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <TemplatePreview id={t.id} selected={selected} />
                 </div>
-                <span style={{ ...styles.templateDesc, color: selected ? "rgba(255,255,255,0.85)" : "#555" }}>{t.description}</span>
-                <span style={{ ...styles.templateDetail, color: selected ? "rgba(255,255,255,0.65)" : "#888" }}>{t.detail}</span>
+                {/* Card text */}
+                <div style={styles.cardBody}>
+                  <div style={styles.cardNameRow}>
+                    <span
+                      style={{
+                        ...styles.templateName,
+                        color: selected ? "#f1f5f9" : "#cbd5e1",
+                      }}
+                    >
+                      {t.name}
+                    </span>
+                    {selected && (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                        <circle cx="8" cy="8" r="7.5" fill="rgba(37,99,235,0.4)" stroke="#3b82f6" />
+                        <path d="M5 8L7 10.5L11 5.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <span
+                    style={{
+                      ...styles.templateDesc,
+                      color: selected ? "rgba(255,255,255,0.6)" : "#64748b",
+                    }}
+                  >
+                    {t.description}
+                  </span>
+                  <span
+                    style={{
+                      ...styles.templateDetail,
+                      color: selected ? "rgba(255,255,255,0.42)" : "#475569",
+                    }}
+                  >
+                    {t.detail}
+                  </span>
+                </div>
               </label>
             );
           })}
         </div>
       </div>
 
-      <div style={styles.docSection}>
-        <p style={styles.templateLabel}>Documents to generate</p>
+      {/* Documents to generate */}
+      <div style={styles.section}>
+        <p style={styles.sectionLabel}>Documents to generate</p>
         <div style={styles.docRow}>
-          {/* Resume — always selected, always active */}
-          <button
-            type="button"
-            onClick={() => {}}
-            style={{ ...styles.docCard, ...styles.docCardSelected, position: "relative", cursor: "default" }}
-          >
-            <div style={styles.docCardTop}>
-              <span style={{ ...styles.docIcon, color: "#15803d" }}>📄</span>
-              <span style={{ ...styles.docCheck, opacity: 1 }}>✓</span>
+          {/* Resume — always on */}
+          <div style={{ ...styles.docCard, ...styles.docCardActive }}>
+            <div style={styles.docCardInner}>
+              <span style={styles.docCheckMark}>✓</span>
+              <div>
+                <div style={styles.docTitle}>Resume</div>
+                <div style={styles.docSub}>ATS-safe tailored PDF</div>
+              </div>
             </div>
-            <span style={{ ...styles.docLabel, color: "#14532d" }}>Resume</span>
-            <span style={{ ...styles.docSub, color: "#16a34a" }}>ATS-safe tailored PDF</span>
-          </button>
-
-          {/* Cover Letter — locked PRO, never clickable */}
+          </div>
+          {/* Cover Letter — locked */}
           <div style={{ ...styles.docCard, ...styles.docCardLocked, position: "relative" }}>
-            <span style={styles.docProBadge}>🔒 PRO</span>
-            <div style={styles.docCardTop}>
-              <span style={{ ...styles.docIcon, color: "#475569" }}>✉</span>
+            <span style={styles.proBadge}>PRO</span>
+            <div style={styles.docCardInner}>
+              <span style={styles.docLockMark}>✉</span>
+              <div>
+                <div style={styles.docTitleLocked}>Cover Letter</div>
+                <div style={styles.docSub}>Grounded narrative</div>
+              </div>
             </div>
-            <span style={{ ...styles.docLabel, color: "#94a3b8" }}>Cover Letter</span>
-            <span style={{ ...styles.docSub, color: "#64748b" }}>Grounded narrative</span>
           </div>
         </div>
       </div>
@@ -145,7 +275,7 @@ export function JobDescriptionStep({ sessionId, onBack, onNext, initialJd = "" }
           ← Back
         </button>
         <button style={styles.primary} onClick={handleGenerate} disabled={loading}>
-          {loading ? "Starting..." : "Generate Documents →"}
+          {loading ? "Starting…" : "Generate Resume →"}
         </button>
       </div>
     </div>
@@ -154,39 +284,58 @@ export function JobDescriptionStep({ sessionId, onBack, onNext, initialJd = "" }
 
 const styles: Record<string, React.CSSProperties> = {
   card: {
-    maxWidth: 680,
+    maxWidth: 840,
     margin: "0 auto",
-    padding: "32px 40px",
-    background: "rgba(2,15,36,0.8)",
-    backdropFilter: "blur(16px)",
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.1)",
-    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.4), 0 20px 60px -10px rgba(0,0,0,0.5)",
+    background: "rgba(2,15,36,0.82)",
+    backdropFilter: "blur(20px)",
+    borderRadius: 14,
+    border: "1px solid rgba(255,255,255,0.09)",
+    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.4), 0 24px 64px -12px rgba(0,0,0,0.55)",
+    overflow: "hidden",
   },
-  title: { fontSize: 22, fontWeight: 700, marginBottom: 6, color: "#f1f5f9" },
-  subtitle: { color: "#94a3b8", marginBottom: 20 },
+  cardTop: {
+    padding: "36px 44px 24px",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 700,
+    color: "#f1f5f9",
+    letterSpacing: "-0.025em",
+    margin: "0 0 6px 0",
+  },
+  subtitle: {
+    color: "#64748b",
+    fontSize: 14,
+    margin: 0,
+    lineHeight: 1.5,
+  },
   textarea: {
+    display: "block",
     width: "100%",
-    padding: "12px",
-    border: "1.5px solid rgba(255,255,255,0.12)",
-    borderRadius: 6,
-    fontSize: 13,
+    padding: "18px 44px",
+    borderTop: "1px solid rgba(255,255,255,0.07)",
+    borderBottom: "1px solid rgba(255,255,255,0.07)",
+    borderLeft: "none",
+    borderRight: "none",
+    fontSize: 14,
     resize: "vertical",
     boxSizing: "border-box",
-    marginBottom: 20,
     fontFamily: "inherit",
-    background: "rgba(255,255,255,0.05)",
+    background: "rgba(255,255,255,0.03)",
     color: "#e2e8f0",
     outline: "none",
+    lineHeight: 1.65,
   },
-  templateSection: {
-    marginBottom: 20,
+  section: {
+    padding: "28px 44px 0",
   },
-  templateLabel: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: "#94a3b8",
-    marginBottom: 10,
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase" as React.CSSProperties["textTransform"],
+    color: "#475569",
+    margin: "0 0 12px 0",
   },
   templateGrid: {
     display: "grid",
@@ -197,37 +346,34 @@ const styles: Record<string, React.CSSProperties> = {
     position: "relative",
     display: "flex",
     flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 4,
-    padding: "12px 14px",
-    borderRadius: 6,
     cursor: "pointer",
-    textAlign: "left",
-    transition: "border-color 0.15s, background 0.15s",
+    borderRadius: 10,
+    overflow: "hidden",
+    transition: "border-color 0.12s, box-shadow 0.12s",
   },
   templateCardSelected: {
-    background: "#2563eb",
     border: "1.5px solid #3b82f6",
+    boxShadow: "0 0 0 1px rgba(59,130,246,0.1), 0 4px 16px rgba(37,99,235,0.1)",
   },
   templateCardUnselected: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1.5px solid rgba(255,255,255,0.1)",
-    opacity: 0.75,
+    border: "1.5px solid rgba(255,255,255,0.08)",
   },
-  templateCardTop: {
+  cardBody: {
+    padding: "10px 14px 14px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 3,
+  },
+  cardNameRow: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
-  },
-  templateCheck: {
-    fontSize: 12,
-    color: "#fff",
-    fontWeight: 700,
+    marginBottom: 3,
   },
   templateName: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 700,
+    letterSpacing: "-0.01em",
   },
   templateDesc: {
     fontSize: 11,
@@ -236,35 +382,7 @@ const styles: Record<string, React.CSSProperties> = {
   templateDetail: {
     fontSize: 11,
     lineHeight: 1.4,
-  },
-  buttonRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  primary: {
-    padding: "10px 28px",
-    background: "#2563eb",
-    color: "#fff",
-    border: "none",
-    borderRadius: 6,
-    fontSize: 15,
-    cursor: "pointer",
-    fontWeight: 600,
-  },
-  secondary: {
-    padding: "10px 24px",
-    background: "transparent",
-    color: "#94a3b8",
-    border: "1px solid rgba(255,255,255,0.15)",
-    borderRadius: 6,
-    fontSize: 15,
-    cursor: "pointer",
-  },
-  error: { color: "#fca5a5", marginBottom: 12, fontSize: 14 },
-
-  docSection: {
-    marginBottom: 20,
+    marginTop: 1,
   },
   docRow: {
     display: "flex",
@@ -272,68 +390,113 @@ const styles: Record<string, React.CSSProperties> = {
   },
   docCard: {
     flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 3,
-    padding: "12px 14px",
     borderRadius: 8,
-    cursor: "pointer",
-    textAlign: "left",
-    transition: "border-color 0.15s, background 0.15s",
-    fontFamily: "inherit",
+    padding: "12px 16px",
   },
-  docCardSelected: {
-    background: "rgba(22,163,74,0.12)",
-    border: "1.5px solid rgba(22,163,74,0.5)",
-    boxShadow: "0 0 0 3px rgba(22,163,74,0.08)",
-  },
-  docCardUnselected: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1.5px solid rgba(255,255,255,0.1)",
+  docCardActive: {
+    background: "rgba(22,163,74,0.07)",
+    border: "1.5px solid rgba(22,163,74,0.25)",
   },
   docCardLocked: {
-    background: "rgba(255,255,255,0.03)",
-    border: "1.5px solid rgba(255,255,255,0.08)",
+    background: "rgba(255,255,255,0.025)",
+    border: "1.5px solid rgba(255,255,255,0.07)",
     cursor: "not-allowed",
   },
-  docCardTop: {
+  docCardInner: {
     display: "flex",
-    justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
-    marginBottom: 2,
+    gap: 10,
   },
-  docIcon: {
-    fontSize: 18,
-    lineHeight: 1,
-  },
-  docCheck: {
+  docCheckMark: {
+    width: 26,
+    height: 26,
+    borderRadius: "50%",
+    background: "rgba(22,163,74,0.15)",
+    border: "1px solid rgba(22,163,74,0.35)",
+    color: "#16a34a",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     fontSize: 12,
     fontWeight: 700,
-    color: "#16a34a",
-    transition: "opacity 0.1s",
+    flexShrink: 0,
   },
-  docLabel: {
-    fontSize: 14,
+  docLockMark: {
+    width: 26,
+    height: 26,
+    borderRadius: "50%",
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    color: "#475569",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 12,
+    flexShrink: 0,
+  },
+  docTitle: {
+    fontSize: 13,
     fontWeight: 700,
+    color: "#e2e8f0",
     lineHeight: 1,
+    marginBottom: 3,
+  },
+  docTitleLocked: {
+    fontSize: 13,
+    fontWeight: 700,
+    color: "#475569",
+    lineHeight: 1,
+    marginBottom: 3,
   },
   docSub: {
     fontSize: 11,
-    lineHeight: 1.4,
+    color: "#475569",
+    lineHeight: 1.3,
   },
-  docProBadge: {
+  proBadge: {
     position: "absolute",
     top: 8,
     right: 8,
     fontSize: 9,
     fontWeight: 800,
-    letterSpacing: "0.06em",
+    letterSpacing: "0.08em",
     color: "#92400e",
     background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
     border: "1px solid #f59e0b",
     padding: "2px 5px",
-    borderRadius: 4,
+    borderRadius: 3,
+  },
+  error: {
+    color: "#fca5a5",
+    fontSize: 13,
+    padding: "10px 44px 0",
+    margin: 0,
+  },
+  buttonRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "24px 44px 36px",
+    marginTop: 8,
+  },
+  primary: {
+    padding: "12px 32px",
+    background: "#2563eb",
+    color: "#fff",
+    border: "none",
+    borderRadius: 8,
+    fontSize: 15,
+    fontWeight: 600,
+    cursor: "pointer",
+    letterSpacing: "-0.01em",
+  },
+  secondary: {
+    padding: "12px 24px",
+    background: "transparent",
+    color: "#64748b",
+    border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: 8,
+    fontSize: 15,
+    cursor: "pointer",
   },
 };

@@ -1,0 +1,44 @@
+Research Associate I — Immunology (Cancer Immunotherapy)
+Pyrex Biosciences | South San Francisco, CA | Full-Time, On-Site
+
+About Pyrex Biosciences
+Pyrex is a Series C-stage biotech company developing next-generation cell therapies and bispecific antibodies for solid tumor cancers. We have two programs in IND-enabling studies and a robust discovery pipeline. Our 65-person team spans biology, protein engineering, and translational sciences. We are rigorous, collaborative, and deeply focused on doing work that eventually reaches patients.
+
+The Role
+We are looking for a Research Associate I to join our Tumor Immunology group. You'll work under senior scientists on experiments that characterize immune cell function, tumor-immune interactions, and the mechanisms of our therapeutic candidates in vitro and in vivo. This is a bench-heavy role: you will spend most of your time generating data, and we expect you to do it with care and reproducibility.
+
+What You'll Do
+- Design and execute cell-based assays to characterize T-cell and NK-cell function: cytotoxicity assays, cytokine secretion panels (ELISA, MSD), flow cytometry immunophenotyping
+- Culture and maintain human primary immune cell lines (PBMCs, T cells, NK cells) and tumor cell lines under BSL-2 conditions
+- Perform CRISPR-Cas9-based genetic perturbations in primary T cells and cell lines for functional screening experiments
+- Analyze NGS and flow cytometry data using Python/R scripts; contribute to data visualization and result summaries for team meetings
+- Maintain accurate, complete lab notebook records following GLP principles; prepare experimental summaries for research reports
+- Troubleshoot assay performance issues; propose and test protocol modifications
+- Support in vivo mouse study coordination: sample collection, processing, and downstream analysis
+
+What We're Looking For
+Required:
+- Bachelor's or Master's degree in Biology, Biochemistry, Immunology, Biomedical Engineering, or a closely related life science field
+- Hands-on experience with mammalian cell culture (aseptic technique, primary cell handling preferred)
+- Experience with flow cytometry: panel design, instrument operation (BD LSRII, Attune, or similar), and data analysis (FlowJo or equivalent)
+- Familiarity with standard molecular biology techniques: PCR, Western blot, ELISA
+- Organized and detail-oriented; ability to run multiple experiments in parallel with minimal supervision
+
+Preferred:
+- Experience with CRISPR-Cas9 in primary immune cells or cell lines
+- Exposure to NGS library preparation or computational analysis of sequencing data (bulk or single-cell RNA-seq)
+- Familiarity with Python or R for data processing and visualization
+- Experience in a cancer immunology, CAR-T, or checkpoint biology research environment
+- Industry research internship experience
+
+What We Value
+We don't care about publication count for this role. We care about whether you can run a clean experiment, troubleshoot intelligently, and communicate your results honestly — including negative results.
+
+Compensation
+- $65,000–$80,000 base salary depending on degree and experience
+- Annual bonus (target 10%)
+- Equity participation in a Series C company
+- Comprehensive benefits: medical, dental, vision, 401(k) with 4% match
+- Relocation assistance available for out-of-area candidates
+
+To Apply: Resume required. Optional: attach a 1-page summary of a technical project, experiment, or research contribution you're proud of.

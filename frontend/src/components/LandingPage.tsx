@@ -1,10 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { uploadText } from "../api/client";
+import { ResumeGallery } from "./ResumeGallery";
 
 interface Props {
   onSubmit: (sessionId: string, rawText: string) => void;
   initialText?: string;
 }
+
+const SLOGANS = [
+  "ATS-OPTIMIZED",
+  "KEYWORD-ACCURATE",
+  "ZERO HALLUCINATIONS",
+  "30-SECOND RESULTS",
+  "ONE PAGE BY DEFAULT",
+  "GROUNDED IN YOUR EXPERIENCE",
+  "NO ACCOUNT REQUIRED",
+  "TAILORED TO THE ROLE",
+  "BUILT DIFFERENTLY",
+  "YOUR WORDS, BETTER PLACED",
+];
 
 export function LandingPage({ onSubmit, initialText = "" }: Props) {
   const [scrolled, setScrolled] = useState(false);
@@ -12,6 +26,8 @@ export function LandingPage({ onSubmit, initialText = "" }: Props) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [ctaHovered, setCtaHovered] = useState(false);
+  const [bottomCtaHovered, setBottomCtaHovered] = useState(false);
+  const [navLinkHovered, setNavLinkHovered] = useState(false);
   const [textareaFocused, setTextareaFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -40,75 +56,128 @@ export function LandingPage({ onSubmit, initialText = "" }: Props) {
   }
 
   function scrollToForm() {
-    textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    setTimeout(() => textareaRef.current?.focus(), 400);
+    const startY = window.scrollY;
+    if (startY === 0) {
+      textareaRef.current?.focus();
+      return;
+    }
+    const duration = Math.min(300 + startY * 0.35, 1100); // proportional, max 1.1s
+    const startTime = performance.now();
+    function easeOutCubic(t: number) { return 1 - Math.pow(1 - t, 3); }
+    function step(now: number) {
+      const t = easeOutCubic(Math.min((now - startTime) / duration, 1));
+      window.scrollTo(0, startY * (1 - t));
+      if (t < 1) requestAnimationFrame(step);
+      else textareaRef.current?.focus();
+    }
+    requestAnimationFrame(step);
   }
 
-  const navBg = scrolled ? "rgba(2,12,27,0.92)" : "transparent";
-  const navBorder = scrolled ? "1px solid rgba(255,255,255,0.08)" : "1px solid transparent";
-  const navBlur = scrolled ? "blur(12px)" : "none";
+  const marqueeItems = [...SLOGANS, ...SLOGANS];
 
   return (
     <div style={s.root}>
+      <style>{`
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+      `}</style>
+
       {/* ── Nav ── */}
       <nav
         style={{
           ...s.nav,
-          background: navBg,
-          backdropFilter: navBlur,
-          borderBottom: navBorder,
+          background: scrolled ? "rgba(2,8,20,0.98)" : "rgba(2,8,20,0.55)",
         }}
       >
         <span style={s.navWordmark}>
-          <span style={{ color: "#f1f5f9", fontWeight: 700 }}>Apply</span>
-          <span style={{ color: "#60a5fa", fontWeight: 800 }}>Easy</span>
+          <span style={{ color: "#f1f5f9", fontWeight: 900 }}>Apply</span>
+          <span style={{ color: "#3b82f6", fontWeight: 900 }}>Easy</span>
         </span>
-        <a href="#how-it-works" style={s.navLink}>How it works</a>
+        <div style={s.navRight}>
+          <a
+            href="#how-it-works"
+            style={{ ...s.navLink, color: navLinkHovered ? "#cbd5e1" : "#64748b" }}
+            onMouseEnter={() => setNavLinkHovered(true)}
+            onMouseLeave={() => setNavLinkHovered(false)}
+          >
+            How it works
+          </a>
+        </div>
       </nav>
 
       {/* ── Hero ── */}
       <section style={s.hero}>
+        <div style={s.heroAtmosphere} />
+
+        {/* ── Marquee — floats in the upper hero area, not connected to nav ── */}
+        <div style={s.marqueeOuter}>
+          <div style={s.marqueeTrack}>
+            {marqueeItems.map((slogan, i) => (
+              <span key={i} style={s.marqueeItem}>
+                <span style={s.marqueeDiamond}>◆</span>
+                {slogan}
+              </span>
+            ))}
+          </div>
+        </div>
         <div style={s.heroInner}>
-          {/* Left — headline */}
+
+          {/* Left: copy */}
           <div style={s.heroLeft}>
-            <div style={s.eyebrow}>AI-powered · ATS-safe · Zero hallucination</div>
+            <div style={s.eyebrow}>
+              <span style={s.eyebrowBar} />
+              <span style={s.eyebrowText}>AI-POWERED RESUME TAILORING</span>
+            </div>
+
             <h1 style={s.headline}>
-              Your resume,<br />rewritten for<br />every job.
+              Your resume,<br />
+              rewritten for<br />
+              <span style={s.headlineAccent}>every role.</span>
             </h1>
-            <p style={s.subhead}>
-              Paste your background once. ApplyEasy reads the job description,
-              selects what's relevant, and rewrites your bullets with the right
-              keywords — grounded entirely in your real experience.
-            </p>
-            <div style={s.heroMeta}>
-              <span style={s.metaPill}>✓ ATS-safe PDF</span>
-              <span style={s.metaPill}>✓ One page by default</span>
-              <span style={s.metaPill}>✓ ~30 seconds</span>
+
+            <div style={s.metaRow}>
+              {["ATS-safe PDF", "One page by default", "~30 seconds"].map((item) => (
+                <span key={item} style={s.metaPill}>
+                  <span style={s.metaCheck}>✓</span>
+                  {item}
+                </span>
+              ))}
             </div>
 
             <div style={s.disclaimer}>
               <span style={s.disclaimerIcon}>⚠</span>
               <p style={s.disclaimerText}>
-                <strong>Use at your own risk.</strong> This application is meant to provide the best version of your academic/professional profile in the context of the said job posting and the information you provide about yourself in a clear format. Application doesn't take into account that you might be lying, misrepresenting, or misclaiming your information; nor that you might be applying to a job clearly out of scope of your own profile; these are the obvious wrong usages of this application. Application isn't programmed to deliver reliable results in similar wide-ranging mis-use circumstances.
+                <strong>Use at your own risk.</strong>{" "}
+                This application tailors your professional profile based on the job posting and
+                information you provide. It doesn't validate accuracy or suitability — responsibility
+                for honest representation is entirely yours.
               </p>
             </div>
           </div>
 
-          {/* Right — embedded form */}
+          {/* Right: form card */}
           <div style={s.formCard}>
             <div style={s.formHeader}>
-              <div style={s.formTitle}>Start here</div>
+              <div style={s.formTitle}>Your professional background</div>
               <div style={s.formSubtitle}>
-                Paste your resume, LinkedIn text, or anything professionally relevant.
-                No formatting required.
+                Resume, LinkedIn export, or any plain text. No formatting required.
               </div>
             </div>
+
             <textarea
               ref={textareaRef}
               style={{
                 ...s.textarea,
-                borderColor: textareaFocused ? "#6366f1" : error ? "#dc2626" : "rgba(255,255,255,0.12)",
-                boxShadow: textareaFocused ? "0 0 0 3px rgba(99,102,241,0.2)" : "none",
+                borderColor: textareaFocused
+                  ? "rgba(59,130,246,0.6)"
+                  : error
+                  ? "rgba(239,68,68,0.6)"
+                  : "rgba(255,255,255,0.12)",
+                boxShadow: textareaFocused
+                  ? "0 0 0 3px rgba(59,130,246,0.12)"
+                  : "none",
               }}
               value={text}
               onChange={(e) => { setText(e.target.value); if (error) setError(""); }}
@@ -117,15 +186,22 @@ export function LandingPage({ onSubmit, initialText = "" }: Props) {
               placeholder={
                 "Jane Smith\njane@email.com | linkedin.com/in/janesmith\n\nSoftware Engineer at Acme Corp (Jan 2022 – Present)\n- Built Kafka pipeline processing 2M events/day\n- Led migration from monolith to microservices\n\nB.S. Computer Science, UC Berkeley, 2020\nGPA: 3.8 | Dean's List\n\nSkills: Python, FastAPI, React, PostgreSQL, Docker, Kubernetes"
               }
-              rows={12}
+              rows={13}
             />
+
             {error && <div style={s.errorMsg}>{error}</div>}
+
             <button
               style={{
                 ...s.cta,
-                background: loading ? "#818cf8" : ctaHovered ? "#4f46e5" : "#6366f1",
-                transform: ctaHovered && !loading ? "translateY(-1px)" : "none",
+                background: loading ? "#1e3a8a" : "#2563eb",
+                boxShadow:
+                  ctaHovered && !loading
+                    ? "4px 4px 0 rgba(255,255,255,0.18)"
+                    : "3px 3px 0 rgba(0,0,0,0.45)",
+                transform: ctaHovered && !loading ? "translate(-1px,-1px)" : "none",
                 cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.8 : 1,
               }}
               onClick={handleSubmit}
               disabled={loading}
@@ -134,38 +210,46 @@ export function LandingPage({ onSubmit, initialText = "" }: Props) {
             >
               {loading ? "Processing…" : "Tailor my resume →"}
             </button>
+
             <div style={s.formFootnote}>
-              No account required. Your data is never stored beyond your session.
+              No account required · Data never stored beyond your session
             </div>
           </div>
         </div>
       </section>
 
+      {/* ── Resume Gallery ── */}
+      <ResumeGallery />
+
       {/* ── How It Works ── */}
       <section id="how-it-works" style={s.howSection}>
         <div style={s.sectionInner}>
-          <div style={s.sectionEyebrow}>How it works</div>
-          <h2 style={s.sectionHeading}>From raw resume to tailored PDF in three steps.</h2>
+          <div style={s.sectionLabel}>Process</div>
+          <h2 style={s.sectionHeading}>
+            Three steps.<br />One tailored PDF.
+          </h2>
+
           <div style={s.stepsGrid}>
             {[
               {
-                n: "1",
+                n: "01",
                 title: "Paste your background",
                 body: "Drop in your full work history, skills, and education. Any plain text works — resume, LinkedIn export, or freeform notes.",
               },
               {
-                n: "2",
+                n: "02",
                 title: "Add the job description",
                 body: "Paste the full job posting. ApplyEasy extracts requirements, importance-ranked keywords, and what the role actually demands.",
               },
               {
-                n: "3",
+                n: "03",
                 title: "Download tailored documents",
                 body: "Get a one-page ATS-safe PDF with reordered, keyword-rich bullets — every claim traceable to your real experience.",
               },
             ].map((step) => (
               <div key={step.n} style={s.stepCard}>
-                <div style={s.stepNum}>{step.n}</div>
+                <div style={s.stepNumGhost}>{step.n}</div>
+                <div style={s.stepNumLabel}>{step.n}</div>
                 <div style={s.stepTitle}>{step.title}</div>
                 <div style={s.stepBody}>{step.body}</div>
               </div>
@@ -177,28 +261,31 @@ export function LandingPage({ onSubmit, initialText = "" }: Props) {
       {/* ── Feature Callouts ── */}
       <section style={s.featureSection}>
         <div style={s.sectionInner}>
-          <div style={s.sectionEyebrow}>Why it works</div>
-          <h2 style={s.sectionHeading}>Built differently from other AI resume tools.</h2>
+          <div style={s.sectionLabel}>Engineering</div>
+          <h2 style={s.sectionHeading}>
+            Built differently from<br />other AI resume tools.
+          </h2>
+
           <div style={s.featureGrid}>
             {[
               {
-                icon: "⊙",
+                tag: "STRUCTURE",
                 title: "ATS-safe by design",
                 body: "The output PDF uses a clean single-column layout with standard section headings that applicant tracking systems expect. No tables, no columns, no parsing failures.",
               },
               {
-                icon: "⊘",
+                tag: "INTEGRITY",
                 title: "Zero hallucination guarantee",
                 body: "Every rewritten bullet is grounded in your original text. A validation layer flags any metric, name, or claim that wasn't present in your source material.",
               },
               {
-                icon: "◎",
-                title: "Keyword-targeted, not keyword-stuffed",
+                tag: "PRECISION",
+                title: "Keyword-targeted, not stuffed",
                 body: "Keywords are ranked by importance from the job description and woven in only where technically accurate. The engine caps integrations per bullet so copy reads naturally.",
               },
             ].map((f) => (
               <div key={f.title} style={s.featureCard}>
-                <div style={s.featureIcon}>{f.icon}</div>
+                <div style={s.featureTag}>{f.tag}</div>
                 <div style={s.featureTitle}>{f.title}</div>
                 <div style={s.featureBody}>{f.body}</div>
               </div>
@@ -210,17 +297,27 @@ export function LandingPage({ onSubmit, initialText = "" }: Props) {
       {/* ── Bottom CTA ── */}
       <section style={s.bottomCta}>
         <div style={s.bottomCtaInner}>
-          <h2 style={s.bottomCtaHeading}>Ready to tailor your first application?</h2>
-          <p style={s.bottomCtaSubhead}>No account. No credit card. Paste and go.</p>
+          <div style={s.sectionLabel}>Get started</div>
+          <h2 style={s.bottomCtaHeading}>
+            Ready for your<br />next application?
+          </h2>
+          <p style={s.bottomCtaSubhead}>
+            No account. No credit card. Paste your background and go.
+          </p>
           <button
             style={{
-              ...s.cta,
-              background: ctaHovered ? "#4f46e5" : "#6366f1",
-              marginTop: 8,
+              ...s.ctaBottom,
+              background: bottomCtaHovered ? "#1d4ed8" : "#2563eb",
+              boxShadow: bottomCtaHovered
+                ? "5px 5px 0 rgba(255,255,255,0.18)"
+                : "4px 4px 0 rgba(0,0,0,0.5)",
+              transform: bottomCtaHovered ? "translate(-1px,-1px)" : "none",
             }}
             onClick={scrollToForm}
+            onMouseEnter={() => setBottomCtaHovered(true)}
+            onMouseLeave={() => setBottomCtaHovered(false)}
           >
-            Get started →
+            Start tailoring →
           </button>
         </div>
       </section>
@@ -240,15 +337,18 @@ export function LandingPage({ onSubmit, initialText = "" }: Props) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 const s: Record<string, React.CSSProperties> = {
+
   root: {
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     color: "#f1f5f9",
     background: "transparent",
     overflowX: "hidden",
   },
 
-  /* Nav */
+  /* ── Nav ── */
   nav: {
     position: "fixed",
     top: 0,
@@ -258,127 +358,177 @@ const s: Record<string, React.CSSProperties> = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0 40px",
-    height: 60,
-    transition: "background 0.2s, box-shadow 0.2s, border-bottom 0.2s",
+    padding: "0 44px",
+    height: 64,
+    backdropFilter: "blur(20px)",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    transition: "background 0.25s",
   },
   navWordmark: {
     fontSize: 20,
-    letterSpacing: "-0.03em",
+    letterSpacing: "-0.04em",
     display: "flex",
     alignItems: "baseline",
-    gap: 0,
     userSelect: "none" as const,
+    cursor: "default",
+  },
+  navRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: 24,
   },
   navLink: {
-    fontSize: 14,
-    color: "#94a3b8",
-    textDecoration: "none",
+    fontSize: 13,
     fontWeight: 500,
+    textDecoration: "none",
+    letterSpacing: "0.01em",
+    transition: "color 0.15s",
   },
 
-  /* Hero */
+  /* ── Hero ── */
   hero: {
+    position: "relative",
     minHeight: "100vh",
-    paddingTop: 60,
+    paddingTop: 64,
     display: "flex",
     alignItems: "center",
     background: "transparent",
+    overflow: "hidden",
+  },
+  heroAtmosphere: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: [
+      "radial-gradient(ellipse at 70% 55%, rgba(37,99,235,0.08) 0%, transparent 50%)",
+      "radial-gradient(ellipse at 15% 30%, rgba(56,189,248,0.04) 0%, transparent 42%)",
+    ].join(", "),
+    pointerEvents: "none",
   },
   heroInner: {
-    maxWidth: 1100,
+    position: "relative",
+    zIndex: 1,
+    maxWidth: 1320,
     margin: "0 auto",
-    padding: "80px 48px",
+    padding: "72px 60px 88px",
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "72px",
+    gridTemplateColumns: "1.2fr 1fr",
+    gap: "80px",
     alignItems: "center",
     width: "100%",
-    boxSizing: "border-box",
+    boxSizing: "border-box" as React.CSSProperties["boxSizing"],
   },
   heroLeft: {
     display: "flex",
-    flexDirection: "column",
-    gap: 0,
-  },
-  eyebrow: {
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    color: "#818cf8",
-    marginBottom: 20,
-  },
-  headline: {
-    fontSize: 56,
-    fontWeight: 800,
-    lineHeight: 1.05,
-    letterSpacing: "-0.035em",
-    color: "#f1f5f9",
-    margin: "0 0 24px 0",
-  },
-  subhead: {
-    fontSize: 18,
-    lineHeight: 1.65,
-    color: "#94a3b8",
-    margin: "0 0 32px 0",
-    maxWidth: 460,
-  },
-  heroMeta: {
-    display: "flex",
-    gap: 10,
-    flexWrap: "wrap",
-  },
-  metaPill: {
-    fontSize: 13,
-    fontWeight: 500,
-    color: "#94a3b8",
-    background: "rgba(255,255,255,0.06)",
-    padding: "5px 12px",
-    borderRadius: 100,
-    border: "1px solid rgba(255,255,255,0.1)",
+    flexDirection: "column" as React.CSSProperties["flexDirection"],
   },
 
+  /* Eyebrow */
+  eyebrow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 24,
+  },
+  eyebrowBar: {
+    width: 24,
+    height: 2,
+    background: "#3b82f6",
+    flexShrink: 0,
+  },
+  eyebrowText: {
+    fontSize: 10,
+    fontWeight: 800,
+    letterSpacing: "0.14em",
+    textTransform: "uppercase" as React.CSSProperties["textTransform"],
+    color: "#3b82f6",
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+  },
+
+  /* Headline */
+  headline: {
+    fontSize: 96,
+    fontWeight: 900,
+    lineHeight: 0.97,
+    letterSpacing: "-0.05em",
+    color: "#f1f5f9",
+    margin: "0 0 32px 0",
+  },
+  headlineAccent: {
+    color: "#3b82f6",
+    display: "block",
+  },
+
+  metaRow: {
+    display: "flex",
+    gap: 8,
+    flexWrap: "wrap" as React.CSSProperties["flexWrap"],
+    marginBottom: 30,
+  },
+  metaPill: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    fontSize: 13,
+    fontWeight: 600,
+    color: "#94a3b8",
+    background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(255,255,255,0.09)",
+    padding: "7px 15px",
+    borderRadius: 100,
+    letterSpacing: "0.01em",
+  },
+  metaCheck: {
+    color: "#4ade80",
+    fontWeight: 700,
+    fontSize: 12,
+  },
+
+  /* Disclaimer */
   disclaimer: {
-    marginTop: 16,
     display: "flex",
     alignItems: "flex-start",
     gap: 8,
-    padding: "9px 12px",
-    background: "rgba(127,29,29,0.25)",
-    border: "1px solid rgba(127,29,29,0.5)",
-    borderRadius: 7,
+    paddingLeft: 12,
+    borderLeft: "2px solid rgba(255,255,255,0.07)",
   },
   disclaimerIcon: {
     fontSize: 11,
-    color: "#fca5a5",
+    color: "#475569",
     flexShrink: 0,
     marginTop: 1,
   },
   disclaimerText: {
-    fontSize: 10,
-    color: "#fca5a5",
-    lineHeight: 1.55,
+    fontSize: 11,
+    color: "#475569",
+    lineHeight: 1.65,
     margin: 0,
   },
 
   /* Form card */
   formCard: {
-    background: "rgba(2,15,36,0.75)",
-    backdropFilter: "blur(16px)",
-    borderRadius: 16,
-    padding: "32px",
-    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.4), 0 20px 60px -10px rgba(0,0,0,0.5)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    position: "relative",
+    background: "rgba(4,12,30,0.88)",
+    backdropFilter: "blur(20px)",
+    borderRadius: 14,
+    padding: "36px",
+    border: "1.5px solid rgba(255,255,255,0.12)",
+    boxShadow: [
+      "6px 6px 0 rgba(0,0,0,0.4)",
+      "0 24px 56px -12px rgba(0,0,0,0.6)",
+    ].join(", "),
   },
   formHeader: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   formTitle: {
-    fontSize: 16,
-    fontWeight: 700,
-    color: "#f1f5f9",
-    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: 800,
+    color: "#e2e8f0",
+    marginBottom: 5,
+    letterSpacing: "-0.01em",
   },
   formSubtitle: {
     fontSize: 13,
@@ -386,21 +536,22 @@ const s: Record<string, React.CSSProperties> = {
     lineHeight: 1.55,
   },
   textarea: {
+    display: "block",
     width: "100%",
-    padding: "12px 14px",
-    border: "1.5px solid rgba(255,255,255,0.12)",
+    padding: "14px 16px",
+    border: "1px solid",
     borderRadius: 8,
     fontSize: 12,
-    fontFamily: "'SF Mono', 'Fira Code', 'Consolas', monospace",
-    resize: "vertical",
-    boxSizing: "border-box",
-    marginBottom: 12,
-    lineHeight: 1.6,
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+    resize: "vertical" as React.CSSProperties["resize"],
+    boxSizing: "border-box" as React.CSSProperties["boxSizing"],
+    marginBottom: 14,
+    lineHeight: 1.65,
     color: "#cbd5e1",
-    background: "rgba(255,255,255,0.05)",
+    background: "rgba(1,6,18,0.7)",
     outline: "none",
     transition: "border-color 0.15s, box-shadow 0.15s",
-    minHeight: 200,
+    minHeight: 260,
   },
   errorMsg: {
     fontSize: 13,
@@ -409,183 +560,260 @@ const s: Record<string, React.CSSProperties> = {
     marginTop: -6,
   },
   cta: {
+    display: "block",
     width: "100%",
-    padding: "13px 24px",
-    background: "#6366f1",
-    color: "#fff",
-    border: "none",
+    padding: "15px 24px",
+    border: "2px solid rgba(255,255,255,0.15)",
     borderRadius: 8,
-    fontSize: 15,
-    fontWeight: 700,
-    cursor: "pointer",
+    fontSize: 16,
+    fontWeight: 800,
+    color: "#fff",
     letterSpacing: "-0.01em",
-    transition: "background 0.15s, transform 0.1s",
+    textTransform: "uppercase" as React.CSSProperties["textTransform"],
+    transition: "transform 0.12s, box-shadow 0.12s",
     marginBottom: 12,
   },
   formFootnote: {
-    fontSize: 12,
-    color: "#475569",
-    textAlign: "center",
-    lineHeight: 1.4,
+    fontSize: 11,
+    color: "#334155",
+    textAlign: "center" as React.CSSProperties["textAlign"],
+    letterSpacing: "0.01em",
   },
 
-  /* How It Works */
-  howSection: {
-    background: "rgba(0,0,0,0.25)",
-    padding: "96px 48px",
+  /* ── Marquee ── */
+  marqueeOuter: {
+    position: "absolute",
+    top: "12%",
+    left: 0,
+    right: 0,
+    zIndex: 2,
+    borderTop: "2px solid #000",
+    borderBottom: "2px solid #000",
+    background: "#fff",
+    overflow: "hidden",
+    padding: "14px 0",
   },
-  sectionInner: {
-    maxWidth: 1000,
-    margin: "0 auto",
+  marqueeTrack: {
+    display: "flex",
+    whiteSpace: "nowrap" as React.CSSProperties["whiteSpace"],
+    animation: "marquee 36s linear infinite",
   },
-  sectionEyebrow: {
+  marqueeItem: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "0 20px",
     fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    color: "#818cf8",
-    marginBottom: 12,
+    fontWeight: 800,
+    letterSpacing: "0.12em",
+    textTransform: "uppercase" as React.CSSProperties["textTransform"],
+    color: "#000",
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+    whiteSpace: "nowrap" as React.CSSProperties["whiteSpace"],
+  },
+  marqueeDiamond: {
+    fontSize: 7,
+    color: "#2563eb",
+    flexShrink: 0,
+  },
+
+  /* ── Shared section ── */
+  sectionInner: {
+    maxWidth: 1160,
+    margin: "0 auto",
+    padding: "0 48px",
+  },
+  sectionLabel: {
+    fontSize: 10,
+    fontWeight: 800,
+    letterSpacing: "0.16em",
+    textTransform: "uppercase" as React.CSSProperties["textTransform"],
+    color: "#3b82f6",
+    marginBottom: 16,
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
   },
   sectionHeading: {
-    fontSize: 34,
-    fontWeight: 800,
-    letterSpacing: "-0.025em",
+    fontSize: 44,
+    fontWeight: 900,
+    letterSpacing: "-0.035em",
     color: "#f1f5f9",
-    margin: "0 0 48px 0",
-    lineHeight: 1.15,
+    margin: "0 0 52px 0",
+    lineHeight: 1.08,
+  },
+
+  /* ── How It Works ── */
+  howSection: {
+    background: "rgba(1,6,18,0.9)",
+    borderTop: "1px solid rgba(255,255,255,0.06)",
+    padding: "100px 0",
   },
   stepsGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 24,
+    gap: 16,
   },
   stepCard: {
-    padding: "28px",
-    background: "rgba(255,255,255,0.04)",
-    backdropFilter: "blur(8px)",
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.08)",
+    position: "relative",
+    overflow: "hidden",
+    padding: "32px 28px 36px",
+    background: "rgba(8,20,52,0.7)",
+    border: "1.5px solid rgba(255,255,255,0.14)",
+    borderRadius: 10,
+    boxShadow: "4px 4px 0 rgba(255,255,255,0.05)",
   },
-  stepNum: {
-    width: 36,
-    height: 36,
-    background: "rgba(99,102,241,0.2)",
-    color: "#818cf8",
-    borderRadius: 8,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 15,
+  stepNumGhost: {
+    position: "absolute",
+    top: -16,
+    right: -4,
+    fontSize: 130,
+    fontWeight: 900,
+    lineHeight: 1,
+    letterSpacing: "-0.06em",
+    color: "rgba(255,255,255,0.04)",
+    userSelect: "none" as React.CSSProperties["userSelect"],
+    pointerEvents: "none",
+  },
+  stepNumLabel: {
+    position: "relative",
+    fontSize: 11,
     fontWeight: 800,
-    marginBottom: 16,
+    letterSpacing: "0.12em",
+    color: "#3b82f6",
+    marginBottom: 18,
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
   },
   stepTitle: {
-    fontSize: 16,
+    position: "relative",
+    fontSize: 17,
     fontWeight: 700,
-    color: "#f1f5f9",
-    marginBottom: 8,
+    color: "#e2e8f0",
+    marginBottom: 10,
+    lineHeight: 1.3,
+    letterSpacing: "-0.015em",
   },
   stepBody: {
+    position: "relative",
     fontSize: 14,
-    color: "#94a3b8",
-    lineHeight: 1.65,
+    color: "#64748b",
+    lineHeight: 1.7,
+    margin: 0,
   },
 
-  /* Features */
+  /* ── Feature Callouts ── */
   featureSection: {
-    background: "transparent",
-    padding: "96px 48px",
+    background: "rgba(0,0,0,0.35)",
+    borderTop: "1px solid rgba(255,255,255,0.05)",
+    padding: "100px 0",
   },
   featureGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 24,
+    gap: 16,
   },
   featureCard: {
-    padding: "28px 24px",
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "rgba(255,255,255,0.03)",
-    backdropFilter: "blur(8px)",
-  },
-  featureIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    background: "rgba(99,102,241,0.2)",
+    padding: "32px 28px 36px",
+    background: "rgba(6,14,34,0.8)",
+    border: "1.5px solid rgba(255,255,255,0.12)",
+    borderRadius: 10,
+    boxShadow: "4px 4px 0 rgba(59,130,246,0.12)",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: "column" as React.CSSProperties["flexDirection"],
+  },
+  featureTag: {
+    fontSize: 9,
+    fontWeight: 800,
+    letterSpacing: "0.16em",
+    textTransform: "uppercase" as React.CSSProperties["textTransform"],
+    color: "#3b82f6",
     marginBottom: 16,
-    fontSize: 20,
-    color: "#818cf8",
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+    borderBottom: "1px solid rgba(59,130,246,0.2)",
+    paddingBottom: 12,
   },
   featureTitle: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: 700,
-    color: "#f1f5f9",
-    marginBottom: 8,
+    color: "#e2e8f0",
+    marginBottom: 10,
+    lineHeight: 1.3,
+    letterSpacing: "-0.015em",
   },
   featureBody: {
-    fontSize: 13,
-    color: "#94a3b8",
-    lineHeight: 1.65,
+    fontSize: 14,
+    color: "#64748b",
+    lineHeight: 1.7,
+    margin: 0,
   },
 
-  /* Bottom CTA */
+  /* ── Bottom CTA ── */
   bottomCta: {
-    background: "linear-gradient(135deg, rgba(99,102,241,0.9) 0%, rgba(79,70,229,0.9) 100%)",
-    backdropFilter: "blur(8px)",
-    padding: "80px 48px",
+    background: "rgba(1,4,14,0.98)",
+    borderTop: "2px solid rgba(255,255,255,0.08)",
+    padding: "100px 48px",
+    textAlign: "center" as React.CSSProperties["textAlign"],
   },
   bottomCtaInner: {
-    maxWidth: 600,
+    maxWidth: 560,
     margin: "0 auto",
-    textAlign: "center",
   },
   bottomCtaHeading: {
-    fontSize: 34,
-    fontWeight: 800,
-    letterSpacing: "-0.025em",
-    color: "#fff",
-    margin: "0 0 12px 0",
-    lineHeight: 1.2,
+    fontSize: 54,
+    fontWeight: 900,
+    letterSpacing: "-0.04em",
+    color: "#f1f5f9",
+    margin: "0 0 16px 0",
+    lineHeight: 1.05,
   },
   bottomCtaSubhead: {
     fontSize: 16,
-    color: "rgba(255,255,255,0.8)",
-    margin: "0 0 8px 0",
-  },
-
-  /* Trust bar */
-  trustBar: {
-    background: "rgba(0,0,0,0.3)",
-    padding: "20px 48px",
-    textAlign: "center",
-    fontSize: 13,
-    color: "#475569",
+    color: "#64748b",
+    margin: "0 0 36px 0",
     lineHeight: 1.6,
-    borderTop: "1px solid rgba(255,255,255,0.06)",
+  },
+  ctaBottom: {
+    display: "inline-block",
+    padding: "14px 40px",
+    background: "#2563eb",
+    border: "2px solid rgba(255,255,255,0.2)",
+    borderRadius: 8,
+    fontSize: 15,
+    fontWeight: 800,
+    color: "#fff",
+    cursor: "pointer",
+    letterSpacing: "-0.01em",
+    textTransform: "uppercase" as React.CSSProperties["textTransform"],
+    transition: "transform 0.12s, box-shadow 0.12s, background 0.12s",
   },
 
-  /* Footer */
-  footer: {
+  /* ── Trust Bar ── */
+  trustBar: {
     background: "rgba(0,0,0,0.5)",
+    borderTop: "1px solid rgba(255,255,255,0.04)",
+    padding: "20px 48px",
+    textAlign: "center" as React.CSSProperties["textAlign"],
+    fontSize: 12,
+    color: "#334155",
+    lineHeight: 1.65,
+  },
+
+  /* ── Footer ── */
+  footer: {
+    background: "rgba(0,0,0,0.65)",
     backdropFilter: "blur(8px)",
-    padding: "28px 48px",
+    borderTop: "1px solid rgba(255,255,255,0.05)",
+    padding: "26px 48px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTop: "1px solid rgba(255,255,255,0.06)",
   },
   footerWordmark: {
-    fontSize: 16,
-    fontWeight: 700,
-    color: "#f1f5f9",
+    fontSize: 14,
+    fontWeight: 800,
+    color: "#475569",
     letterSpacing: "-0.02em",
   },
   footerMeta: {
-    fontSize: 13,
-    color: "#475569",
+    fontSize: 12,
+    color: "#334155",
   },
 };

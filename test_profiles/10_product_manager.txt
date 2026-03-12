@@ -1,0 +1,42 @@
+Ananya Krishnamurthy
+ananya.k@email.com | (650) 555-0284 | linkedin.com/in/ananyakrishnamurthy
+Palo Alto, CA
+
+EDUCATION
+B.S. Industrial Engineering & Operations Research, UC Berkeley, May 2024
+GPA: 3.7 | Minor: Business Administration
+Relevant Coursework: Product Strategy, Human Factors & UX, Decision Analysis, Probability & Statistics, Supply Chain Modeling
+
+EXPERIENCE
+
+Associate Product Manager Intern — Lumen Labs (B2B SaaS), San Francisco, CA | Jun 2023 – Dec 2023
+- Owned roadmap for a document collaboration feature used by 12,000 business accounts; wrote 8 PRDs and 14 user stories in partnership with design and engineering
+- Defined success metrics (DAU, feature adoption rate, ticket deflection) and built dashboards in Amplitude; surfaced adoption gap in enterprise segment that drove a targeted onboarding change
+- Facilitated 3 discovery sprints with 20+ customer interviews; synthesized findings into opportunity sizing model that reprioritized Q4 backlog
+- Launched redesigned commenting workflow (A/B tested); drove 19% increase in feature retention at 30 days post-launch
+
+Product Strategy Intern — Benchmark Ventures, Menlo Park, CA | Jun 2022 – Aug 2022
+- Conducted market sizing and competitive teardowns for 4 portfolio companies in edtech and vertical SaaS
+- Built a framework for evaluating product-market fit signals across 9 dimensions; used in 2 follow-on investment decisions
+- Presented findings to general partners; one analysis directly influenced a term sheet decision
+
+PROJECTS
+
+CampusConnect — Product design + Figma + user research | Jan 2024
+- Led a 4-person student team to design and validate a university course swap marketplace; recruited 55 beta testers
+- Ran 15 user interviews, synthesized pain points into 3 persona archetypes, iterated prototype across 3 rounds of feedback
+- Built financial model estimating $1.2M TAM within UC Berkeley alone based on course waitlist data
+
+Lean Analytics Book Club — Reading group lead | 2023
+- Facilitated 8-week group study of "Lean Analytics" for 22 student PMs; produced weekly case study notes
+
+TECHNICAL SKILLS
+Product: PRDs, user stories, roadmapping (Linear, Jira), A/B testing, funnel analysis, OKR framing
+Analytics: Amplitude, Mixpanel, SQL (intermediate), Excel, Google Sheets
+Design: Figma (wireframes and mid-fi prototyping), user journey mapping, affinity mapping
+Research: Customer interviews, usability testing, Jobs-to-be-Done framework, NPS analysis
+Other: Python (data scripts), Notion, Confluence, Miro
+
+LEADERSHIP & AWARDS
+UC Berkeley Product Management Club, VP of Programs (2022–2024) — ran 5 speaker events and 2 case competitions
+Haas School of Business Innovation Tournament — 1st Place (product track), 2023

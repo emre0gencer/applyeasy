@@ -13,9 +13,11 @@ from typing import Optional
 
 from groq import Groq
 
+from backend.src.analysis.evidence_extractor import extract_evidence
 from backend.src.models.schemas import (
     Bullet,
     BulletChange,
+    BulletEvidence,
     CandidateProfile,
     EducationEntry,
     ExperienceEntry,
@@ -107,51 +109,100 @@ def _distribute_entry_keywords(
 
 
 def _rephrase_bullets_batch(
-    bullets: list[tuple[str, list[str]]],
+    bullets: list[tuple[str, list[str], "BulletEvidence | None"]],
     role_title: str,
+    domain_signals: "list[str] | None" = None,
+    evidence_style: str = "",
 ) -> list[tuple[str, list[str]]]:
     """
-    Single Groq call to rephrase ALL bullets following best job market practices.
-    bullets = list of (original_text, keywords_to_try)
+    Single Groq call to rewrite ALL bullets using evidence-grounded, recruiter-useful prompting.
+
+    bullets = list of (original_text, keywords_to_try, evidence_signals_or_None)
     Returns list of (revised_text, keywords_added).
+
+    v2 change: The primary rewrite objective is to surface concrete evidence —
+    scope, complexity, ownership, and deliverable specificity.
+    Keywords are secondary: integrated only where they fit the evidence naturally.
     """
     if not bullets:
         return []
 
-    system = (
-        "You are a senior technical resume writer. Rewrite each bullet to be comprehensive, "
-        "technically deep, and tightly tailored to the target role and its specific keywords.\n\n"
+    domain_context = ""
+    if domain_signals:
+        domain_context = f"\nRole domain focus: {', '.join(domain_signals[:3])}"
+    if evidence_style:
+        domain_context += f"\nEvidence this role values: {evidence_style}"
 
-        "HARD RULES:\n"
-        "1. Do NOT invent tools, technologies, metrics, dates, scope, or outcomes absent from the original.\n"
-        "2. MANDATORY keyword integration: each bullet receives its own specific keyword list — "
-        "integrate ALL provided keywords for that bullet where technically accurate. "
-        "Do NOT add keywords from other bullets, do NOT repeat keywords across bullets.\n"
-        "3. Length: 40-55 words per bullet (roughly 2-3 lines). Write complete, substantive sentences — "
-        "not fragments. Every bullet must demonstrate technical depth and specificity.\n"
-        "4. Open with a strong past-tense action verb (e.g. Engineered, Implemented, Designed, Optimized, "
-        "Developed, Automated, Built, Deployed, Integrated, Refactored, Architected, Migrated).\n"
-        "5. Formula per bullet: verb + specific technical method/tool/stack + scope or scale + outcome or impact.\n"
-        "6. Name technologies, libraries, frameworks, and patterns explicitly — never say 'a tool' or 'a library'.\n"
-        "7. Replace vague verbs ('used', 'worked on', 'helped with') with precise technical actions.\n"
-        "8. Vary action verbs — do not reuse the same verb across bullets in the same entry.\n"
-        "9. No first-person pronouns, no filler adjectives ('passionate', 'innovative', 'dynamic').\n"
-        "10. Each bullet must read as independently meaningful to a hiring manager scanning for the target role.\n\n"
+    system = (
+        "You are a senior technical resume writer. Your goal is to make each bullet "
+        "more informative, more specific, and more useful to a recruiter — "
+        "by surfacing real evidence of what was done, how it was done, and what it produced.\n\n"
+
+        "PRIMARY OBJECTIVE — EVIDENCE FIRST:\n"
+        "Surface concrete evidence in each bullet:\n"
+        "  - Scope: end-to-end, user-facing, production-ready, multi-step, workflow-critical\n"
+        "  - Complexity: schema design, validation logic, API integration, state management, "
+        "evaluation workflows, debugging, observability\n"
+        "  - Ownership: designed, built, implemented, validated, optimized, deployed\n"
+        "  - Deliverable: named system/API/pipeline/schema/workflow/layer\n"
+        "Use the provided evidence_signals to understand what's already in the bullet "
+        "and bring it forward more clearly.\n\n"
+
+        "GROUNDED QUANTIFICATION (use freely — these communicate value without inventing numbers):\n"
+        "  - Structural scope: 'end-to-end', 'user-facing', 'transaction-oriented', 'production'\n"
+        "  - Technical complexity: 'validation layer', 'API integration', 'evaluation workflow'\n"
+        "  - Ownership clarity: 'designed', 'built', 'implemented from scratch'\n"
+        "  - Deliverable specificity: 'REST API', 'data pipeline', 'schema with integrity constraints'\n\n"
+
+        "KEYWORDS — SECONDARY:\n"
+        "Integrate provided keywords only where they fit the evidence and add clarity. "
+        "If a keyword does not fit the technical context of this bullet, SKIP IT. "
+        "Never use keywords as padding. Never force a keyword where it sounds unnatural.\n\n"
+
+        "FORMULA: ownership verb + technical method/approach + scope/context + deliverable/outcome\n\n"
+
+        "STYLE RULES:\n"
+        "1. 35-55 words per bullet. Complete sentences — not fragments.\n"
+        "2. Open with a strong past-tense action verb (Designed, Built, Implemented, Engineered, "
+        "Optimized, Deployed, Refactored, Integrated, Evaluated, Automated, Architected, Migrated).\n"
+        "3. Name technologies, frameworks, and patterns explicitly — never say 'a tool' or 'a library'.\n"
+        "4. Vary action verbs — do not reuse the same verb across bullets in the same entry.\n"
+        "5. No first-person pronouns. No filler adjectives (passionate, innovative, dynamic).\n"
+        "6. Prefer denser, more informative bullets over longer keyword-heavy ones.\n"
+        "7. Each bullet must be independently meaningful to a hiring manager scanning the resume.\n\n"
+
+        "ABSOLUTE PROHIBITIONS — Never invent:\n"
+        "  - Percentages, counts, team sizes, latency numbers, revenue figures\n"
+        "  - Tools, technologies, frameworks, or libraries not in the original bullet\n"
+        "  - Scope claims ('large-scale', 'millions of') not grounded in the original\n"
+        "  - Ownership levels ('led a team of 5') not stated in the original\n"
+        "  - Outcomes or results not mentioned in the original\n"
+        "  - Seniority indicators (led, managed) not present in the original\n\n"
 
         "Return ONLY valid JSON: "
         '{"results": [{"revised_text": str, "keywords_added": [str]}]}'
         " — one result per input bullet in the same order."
     )
-    items = [
-    {
-        "index": i,
-        "original": text,
-        "keywords_to_try": kws,
-        "target_role": role_title,
-    }
-    for i, (text, kws) in enumerate(bullets)
-]
-    user_msg = f"Target role: {role_title}\nBullets to rephrase:\n{json.dumps(items)}"
+
+    items = []
+    for i, (text, kws, ev) in enumerate(bullets):
+        item: dict = {
+            "index": i,
+            "original": text,
+            "keywords_to_try": kws,
+            "target_role": role_title,
+        }
+        if ev:
+            item["evidence_signals"] = {
+                "scope": ev.scope_signals[:3],
+                "complexity": ev.complexity_signals[:3],
+                "ownership": ev.ownership_signals[:2],
+                "deliverables": ev.deliverable_signals[:2],
+                "metrics": ev.explicit_metrics[:2],
+            }
+        items.append(item)
+
+    user_msg = f"Target role: {role_title}{domain_context}\nBullets to rewrite:\n{json.dumps(items)}"
 
     resp = _get_client().chat.completions.create(
         model=_QUALITY_MODEL,
@@ -172,7 +223,7 @@ def _rephrase_bullets_batch(
             if i < len(bullets)
         ]
     except (json.JSONDecodeError, AttributeError, IndexError):
-        return [(text, []) for text, _ in bullets]
+        return [(text, []) for text, _, _ev in bullets]
 
 
 def _rephrase_project_bullets(
@@ -180,24 +231,34 @@ def _rephrase_project_bullets(
     project_name: str,
 ) -> list[tuple[str, list[str]]]:
     """
-    Light-touch rephrasing for project bullets.
-    Keywords integrated only where they fit naturally — never forced.
+    Evidence-grounded light-touch rephrasing for project bullets.
+    Keywords integrated only where they fit naturally.
     Uses the fast model (lighter task than experience rephrasing).
+
+    v2: Primary objective shifted from keyword integration to evidence surfacing.
     """
     if not bullets:
         return []
 
     system = (
-        "You are a senior technical resume writer. Lightly improve each project bullet for clarity "
-        "and technical precision while preserving its original scope entirely.\n\n"
+        "You are a senior technical resume writer. Improve each project bullet to surface "
+        "concrete evidence of what was built, how it worked, and what it delivered — "
+        "while preserving the original scope and technical stack entirely.\n\n"
+        "PRIMARY OBJECTIVE — EVIDENCE FIRST:\n"
+        "  - Name the deliverable: system, API, pipeline, schema, workflow, application\n"
+        "  - Surface what was technically interesting: validation, schema design, API integration, "
+        "state management, evaluation, async logic\n"
+        "  - Clarify ownership: designed, built, implemented, integrated, evaluated\n"
+        "  - Indicate scope where visible: end-to-end, user-facing, production, multi-step\n\n"
+        "KEYWORDS — SECONDARY:\n"
+        "Incorporate the provided target keywords ONLY where they fit naturally and add clarity. "
+        "If a keyword does not fit the project's technical context, skip it — do not force it.\n\n"
         "RULES:\n"
         "1. Do NOT invent tools, technologies, metrics, outcomes, or scope not in the original.\n"
-        "2. Incorporate the provided target keywords ONLY where they fit naturally and are "
-        "technically accurate. If a keyword does not fit the project, skip it completely — "
-        "do not force it.\n"
-        "3. Keep length close to the original (25-45 words). Do not bloat.\n"
-        "4. Open with a strong past-tense action verb.\n"
-        "5. Preserve the original technical stack and outcomes exactly.\n"
+        "2. Keep length close to the original (25-45 words). Do not bloat.\n"
+        "3. Open with a strong past-tense action verb.\n"
+        "4. Preserve the original technical stack and outcomes exactly.\n"
+        "5. Prefer a denser, more informative bullet over a longer keyword-heavy one.\n"
         "Return ONLY valid JSON: "
         '{"results": [{"revised_text": str, "keywords_added": [str]}]}'
         " — one result per input bullet in the same order."
@@ -235,20 +296,33 @@ def _generate_summary(
     jd: JobDescription,
     selected_experiences: list[TailoredExperience],
 ) -> str:
-    """Generate a resume summary using llama-3.3-70b-versatile."""
+    """Generate a resume summary using llama-3.3-70b-versatile.
+
+    v2: Uses domain_signals and evidence_style from the JD to make the
+    summary reflect what the role actually values, not just keyword coverage.
+    """
     exp_titles = ", ".join(e.role_title for e in selected_experiences[:3])
     skills_snippet = ", ".join(s.name for s in profile.skills[:10])
     top_kw = ", ".join(_get_high_importance_keywords(jd)[:6])
+    domain_context = ""
+    if jd.domain_signals:
+        domain_context = f"\nRole domain signals: {', '.join(jd.domain_signals[:3])}"
+    if jd.evidence_style:
+        domain_context += f"\nEvidence this role values: {jd.evidence_style}"
 
     system = (
         "Write a 2-sentence resume summary for the given candidate targeting the given role.\n"
         "STRUCTURE:\n"
-        "  Sentence 1: The candidate's years of experience, key technical background, and most relevant skills for this specific role. Incorporate 2-3 target keywords naturally.\n"
-        "  Sentence 2: State the specific technical value the candidate brings to this role — one concrete differentiator or rare combination of skills that makes them distinctly suited for it.\n"
+        "  Sentence 1: The candidate's experience depth, key technical background, and most relevant "
+        "skills for this specific role. Incorporate 2-3 target keywords naturally.\n"
+        "  Sentence 2: State the specific technical value the candidate brings — one concrete "
+        "differentiator that aligns with what the role domain values most "
+        "(reference the role's domain signals and evidence style when relevant).\n"
         "RULES:\n"
         "1. Only reference background elements present in the provided profile data.\n"
         "2. Do NOT fabricate achievements, metrics, or skills not listed.\n"
-        "3. No generic phrases: 'passionate', 'results-driven', 'team player', 'fast learner', 'proven track record', 'excited to', 'eager to'.\n"
+        "3. No generic phrases: 'passionate', 'results-driven', 'team player', 'fast learner', "
+        "'proven track record', 'excited to', 'eager to'.\n"
         "4. Maximum 85 words total. Output only the 2 sentences — no labels, no extra text."
     )
     user_msg = (
@@ -258,6 +332,7 @@ def _generate_summary(
         f"Target role: {jd.role_title} at {jd.company_name or 'the company'}\n"
         f"Target keywords: {top_kw}\n"
         f"Seniority: {jd.seniority_level}"
+        f"{domain_context}"
     )
 
     resp = _get_client().chat.completions.create(
@@ -314,7 +389,8 @@ def _select_and_tailor_experiences(
     role_title = jd.role_title
 
     # Collect bullets that need rephrasing in one pass
-    rephrase_queue: list[tuple[int, int, str, list[str]]] = []
+    # v2: rephrase_queue now includes evidence per bullet
+    rephrase_queue: list[tuple[int, int, str, list[str], "BulletEvidence | None"]] = []
     per_exp_sorted: list[list[ScoredBullet]] = []
 
     for exp_i, scored_entry in enumerate(exp_entries):
@@ -322,9 +398,11 @@ def _select_and_tailor_experiences(
         if idx >= len(profile.experiences):
             per_exp_sorted.append([])
             continue
+
+        # v2: sort by bullet_contribution_score (evidence-aware) instead of pure cosine sim
         sorted_bullets = sorted(
             scored_entry.scored_bullets,
-            key=lambda sb: sb.relevance_score,
+            key=lambda sb: sb.bullet_contribution_score,
             reverse=True,
         )[:_MAX_BULLETS_PER_EXP]
         per_exp_sorted.append(sorted_bullets)
@@ -342,15 +420,25 @@ def _select_and_tailor_experiences(
             candidate_kws, len(sorted_bullets), _kw_counts, max_blocks_per_kw
         )
         for b_i, sb in enumerate(sorted_bullets):
-            rephrase_queue.append((exp_i, b_i, sb.bullet.text, per_bullet_kws[b_i]))
+            # v2: attach evidence (from ranker if present, else extract on-the-fly)
+            evidence = sb.evidence if sb.evidence is not None else extract_evidence(sb.bullet.text)
+            rephrase_queue.append((exp_i, b_i, sb.bullet.text, per_bullet_kws[b_i], evidence))
 
     # Single batch call for all bullets needing rephrasing
-    batch_inputs = [(text, kws) for _, _, text, kws in rephrase_queue]
-    batch_results = _rephrase_bullets_batch(batch_inputs, role_title) if batch_inputs else []
+    # v2: pass evidence context and JD domain signals to the evidence-constrained rewriter
+    batch_inputs = [(text, kws, ev) for _, _, text, kws, ev in rephrase_queue]
+    batch_results = (
+        _rephrase_bullets_batch(
+            batch_inputs, role_title,
+            domain_signals=jd.domain_signals,
+            evidence_style=jd.evidence_style,
+        )
+        if batch_inputs else []
+    )
 
     # Map results back: (exp_i, b_i) → (revised_text, keywords_added)
     rephrase_map: dict[tuple[int, int], tuple[str, list[str]]] = {}
-    for qi, (exp_i, b_i, _original_text, _) in enumerate(rephrase_queue):
+    for qi, (exp_i, b_i, _original_text, _, _ev) in enumerate(rephrase_queue):
         if qi < len(batch_results):
             revised, kws_added = batch_results[qi]
             rephrase_map[(exp_i, b_i)] = (revised, kws_added)

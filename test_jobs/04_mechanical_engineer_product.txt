@@ -1,0 +1,46 @@
+Mechanical Engineer I — Product Development
+Axiom Precision Devices | Minneapolis, MN | Full-Time, On-Site
+
+About Axiom
+Axiom Precision Devices designs and manufactures surgical instruments and implantable device components for orthopedic and spinal surgery OEMs. We are a 200-person contract manufacturing and design company known for tight-tolerance machined components, clean-room assembly, and rigorous design validation. Our engineering team owns programs from concept through production release.
+
+The Role
+We are hiring an entry-level Mechanical Engineer to join our New Product Introduction (NPI) team. You will work under senior engineers on the design, analysis, and validation of machined components and assemblies for medical device customers. This role is hands-on: you will be on the shop floor regularly, working alongside machinists, quality technicians, and program managers.
+
+What You'll Do
+- Support design and development of precision mechanical components (surgical instruments, jigs, and implant interfaces) in SolidWorks
+- Create and revise engineering drawings with complete GD&T callouts following ASME Y14.5 standards
+- Run finite element analysis (FEA) simulations to validate structural performance and iterate on designs before prototyping
+- Participate in design reviews, DFM/DFA analyses, and FMEA sessions with cross-functional teams
+- Support process development and first-article inspection for CNC-machined components (turning, milling, EDM)
+- Perform and document mechanical testing: tensile, fatigue, and functional performance per customer test protocols
+- Maintain engineering documentation in the PLM/ECR system and support regulatory technical file submissions (FDA 510(k) design history files)
+
+What We're Looking For
+Required:
+- Bachelor's degree in Mechanical Engineering or closely related field
+- Proficiency in SolidWorks; ability to produce fully constrained 3D models and production-ready drawings
+- Understanding of GD&T (ASME Y14.5); experience applying tolerances for machined parts
+- Exposure to FEA methods (ANSYS, SolidWorks Simulation, or equivalent); ability to interpret simulation results
+- Familiarity with manufacturing processes: CNC machining, sheet metal, or injection molding
+
+Preferred:
+- Experience or coursework in design for medical devices; familiarity with ISO 13485 or FDA QSR quality systems
+- Hands-on prototyping experience (machine shop, 3D printing, manual machining)
+- Exposure to FMEA methodology
+- CSWA or CSWP certification
+- Internship experience in a manufacturing or product development environment
+
+Personal Characteristics We Value
+- Detail-oriented and methodical; medical devices have zero tolerance for sloppy documentation
+- Comfortable in a shop floor environment; willing to get hands dirty
+- Proactive communicator — raises issues early rather than quietly solving them alone
+
+Compensation & Benefits
+- $68,000–$80,000 depending on experience
+- Annual merit increases + profit-sharing program
+- Comprehensive benefits (medical, dental, vision, FSA, life)
+- Paid relocation assistance for candidates outside the Minneapolis metro
+- Tuition assistance for graduate coursework
+
+To Apply: Resume and a brief description of a design or analysis project you led or substantially contributed to.

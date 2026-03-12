@@ -1,0 +1,46 @@
+Sophie Chen
+sophie.chen@email.com | (312) 555-0174 | linkedin.com/in/sophiechen | github.com/schen-ds
+Chicago, IL
+
+EDUCATION
+M.S. Biostatistics, University of Chicago, May 2023
+GPA: 3.9 | Thesis: "Doubly Robust Estimators for Interrupted Time Series in Observational Health Claims Data"
+
+B.S. Statistics, University of Illinois Urbana-Champaign, May 2021
+GPA: 3.8 | Phi Beta Kappa
+
+EXPERIENCE
+
+Data Science Intern — Northwestern Memorial Health, Chicago, IL | Jun 2022 – Aug 2022
+- Built XGBoost readmission risk model on 2.1M patient claims records (ICD-10, CPT codes, HEDIS measures); achieved AUC 0.83, deployed in 3 hospital units for early intervention triage
+- Designed and executed propensity score matching study to evaluate a care management program (difference-in-differences); reduced 30-day readmissions 12% in matched cohort (p < 0.01)
+- Cleaned, joined, and validated claims and EHR data from 5 disparate source systems using Python (pandas, NumPy) and SQL; flagged 4.2% of records with coding anomalies before analysis
+- Automated weekly KPI reporting pipeline in Python (Airflow), reducing analyst prep time by 9 hours/week; dashboards delivered to 14 hospital partner stakeholders in Tableau
+
+Research Assistant — U of C Department of Public Health Sciences | Sep 2021 – Apr 2022
+- Applied interrupted time series analysis and difference-in-differences to evaluate a state Medicaid policy change across 180K enrollees; results published as working paper
+- Analyzed longitudinal health survey data using R (lme4, survival package); fitted hierarchical models for multi-level claims outcomes
+- Presented technical findings to non-technical clinical audiences; authored 3 internal reports with executive summaries for hospital administration
+
+PROJECTS
+
+No-Show Prediction — Python, scikit-learn, logistic regression | Jan 2023
+- Trained logistic regression and gradient boosting models (LightGBM) on 320K appointment records from a federally qualified health center
+- Used SHAP values to surface top predictors for clinician-facing dashboard; 91% stakeholder adoption within 6 weeks of launch
+
+Survival Analysis — R, Python, Kaplan-Meier, Cox PH | Oct 2022
+- Fitted Cox proportional hazards model to time-to-discharge data (470K hospital stays) adjusting for 18 covariates; tested PH assumption via Schoenfeld residuals
+- Re-implemented in Python (lifelines) to benchmark against R results; achieved coefficient agreement to 4 decimal places
+
+TECHNICAL SKILLS
+Languages: Python, R, SQL
+ML / Stats: scikit-learn, XGBoost, LightGBM, statsmodels, SHAP, lifelines, lme4, survey
+Causal Methods: propensity score matching, difference-in-differences, interrupted time series, instrumental variables
+Healthcare Data: claims data (ICD-10, CPT, HEDIS), EHR extracts, CAHPS surveys, patient-reported outcomes
+Data Engineering: pandas, NumPy, Apache Airflow, BigQuery, dbt (basic), Spark (basic)
+Visualization: Tableau, matplotlib, seaborn, ggplot2
+
+AWARDS & CERTIFICATIONS
+NSF Graduate Research Fellowship (GRFP) Recipient, 2021
+American Statistical Association Student Paper Award, 2023
+AWS Certified Cloud Practitioner, 2022

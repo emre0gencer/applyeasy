@@ -1,0 +1,43 @@
+Backend Software Engineer — New Grad / Early Career
+Meridian Financial Technology | Boston, MA (Hybrid) | Full-Time
+
+About Meridian
+Meridian is a Series B fintech company building real-time payment infrastructure for mid-market banks and credit unions. We process $2B+ in transactions monthly across 140 financial institutions. Our engineering team of 35 moves fast, ships weekly, and owns what it builds end to end.
+
+The Role
+We're hiring a backend engineer to join our Core Payments team. You'll build and maintain the services that move money reliably at scale — think idempotent API design, distributed transaction management, and observability that actually tells you what's wrong. This is not a front-end or full-stack role; we want someone who wants to go deep on backend systems.
+
+What You'll Do
+- Design, build, and maintain REST and async APIs in Python (FastAPI) powering payment initiation, settlement, and reconciliation workflows
+- Work with PostgreSQL and Redis for transactional data storage and caching; optimize queries and design schemas for high write throughput
+- Build and monitor background job pipelines using Celery and RabbitMQ for settlement batch processing
+- Write comprehensive test suites (unit, integration, contract) targeting 85%+ coverage across all owned services
+- Participate in on-call rotation; respond to and post-mortem production incidents
+- Collaborate with product and compliance to implement payment network requirements (ACH, RTP, Fedwire basics)
+- Contribute to internal tooling and developer experience improvements
+
+What We're Looking For
+Required:
+- Bachelor's degree in Computer Science or related technical field (or equivalent practical experience)
+- Proficiency in Python; experience with FastAPI or a comparable async framework
+- Understanding of relational databases (PostgreSQL preferred); ability to write performant SQL queries
+- Familiarity with version control (Git), CI/CD pipelines, and code review practices
+- Ability to write clean, well-tested code and document your work clearly
+
+Preferred / Nice to Have:
+- Experience with containerization (Docker) and deployment on cloud platforms (AWS, GCP, or Azure)
+- Exposure to message queues or event-driven architectures (RabbitMQ, Kafka, SQS)
+- Familiarity with observability tools (Datadog, Grafana, PagerDuty)
+- Experience building or consuming webhook delivery systems
+- Any internship or project experience in fintech, payments, or financial data
+
+What We Offer
+- $105,000–$125,000 base salary (commensurate with experience)
+- Equity participation
+- Comprehensive health, dental, vision
+- $2,000 annual learning & development budget
+- Flexible hybrid schedule (2 days/week in Boston office)
+
+We're an equal-opportunity employer and strongly encourage applications from underrepresented groups in tech.
+
+To apply: Send resume and a brief note on a backend technical challenge you solved.

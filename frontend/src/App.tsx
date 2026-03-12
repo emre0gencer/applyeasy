@@ -29,6 +29,7 @@ export default function App() {
   const [state, setState] = useState<AppState>({ step: "landing" });
 
   const goToJob = useCallback((sessionId: string, rawText: string) => {
+    window.scrollTo(0, 0);
     setState({ step: "job", sessionId, rawText });
   }, []);
 
@@ -122,7 +123,7 @@ const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
     background: "transparent",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    fontFamily: "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   },
   content: {
     position: "relative",
@@ -161,7 +162,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "3px 10px",
     borderRadius: 100,
   },
-  main: { padding: "0 16px 60px" },
+  main: { padding: "0 20px 80px" },
   errorCard: {
     maxWidth: 500,
     margin: "0 auto",

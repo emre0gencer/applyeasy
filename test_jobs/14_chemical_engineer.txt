@@ -1,0 +1,31 @@
+Process Engineer I — Specialty Chemicals
+Vantage Chemical Co. | Houston, TX | Full-Time, On-Site
+
+About Vantage Chemical
+Vantage is a specialty chemicals manufacturer producing polymer additives, surfactants, and performance coatings for industrial and consumer applications. We operate 3 production facilities in Texas and Louisiana with combined capacity of 400M lbs/year. Our process engineering team owns plant optimization, new product scale-up, and capital project execution.
+
+The Role
+We're hiring a Process Engineer I to support operations at our Baytown facility and lead process improvement and capital project work. You'll work alongside experienced engineers in a hands-on plant environment.
+
+What You'll Do
+- Develop and optimize operating procedures for batch and continuous chemical processes; conduct process capability studies and debottlenecking analyses
+- Use Aspen Plus or HYSYS for process simulation and heat and material balance calculations to evaluate process changes and new product introductions
+- Support PHA/HAZOP studies and MOC (Management of Change) processes; ensure changes comply with PSM/OSHA requirements
+- Lead root-cause analysis investigations for process upsets or quality deviations using fishbone diagrams, 5-why, and fault tree methods
+- Manage small capital projects ($100K–$2M): scope development, P&ID review, equipment specification, vendor interaction, commissioning support
+- Analyze production data using PI System (OSIsoft) historian; identify trends and develop KPIs for yield, cycle time, and energy use
+
+Required:
+- Bachelor's degree in Chemical Engineering
+- Understanding of core ChE fundamentals: thermodynamics, reaction kinetics, heat and mass transfer, process control
+- Familiarity with process simulation software (Aspen Plus, HYSYS, or equivalent)
+- Strong analytical skills; ability to use production data to drive engineering decisions
+- Safety-first mindset; understanding of PSM/process safety fundamentals
+
+Preferred:
+- Internship or co-op experience in a chemical, petrochemical, or related manufacturing environment
+- Exposure to PI System or equivalent process historian
+- Familiarity with PHA/HAZOP methodology or Six Sigma tools
+- SolidWorks or AutoCAD experience for equipment specification
+
+Compensation: $72,000–$88,000 base + annual bonus + relocation assistance. PE exam support provided.

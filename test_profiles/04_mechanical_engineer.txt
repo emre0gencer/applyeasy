@@ -1,0 +1,42 @@
+Elena Sorensen
+elena.sorensen@email.com | (312) 555-0519 | linkedin.com/in/elenasorensen
+Chicago, IL
+
+EDUCATION
+B.S. Mechanical Engineering, University of Illinois at Urbana-Champaign, May 2024
+GPA: 3.5 | Tau Beta Pi Engineering Honor Society
+Relevant Coursework: Thermodynamics, Fluid Mechanics, Finite Element Analysis, Manufacturing Processes, Control Systems
+
+EXPERIENCE
+
+Mechanical Engineering Intern — Vantage Industrial Systems, Rockford, IL | Jun 2023 – Aug 2023
+- Designed a jig fixture for an assembly line component using SolidWorks; reduced assembly time by 18% after implementation
+- Ran FEA simulations (ANSYS Mechanical) on a bracket under cyclic loading to validate a 15% material reduction while meeting factor-of-safety requirements
+- Coordinated with manufacturing team to update GD&T specifications on 7 part drawings following ECR process
+
+Product Development Intern — Northbrook HVAC Equipment Co., Northbrook, IL | Jun 2022 – Aug 2022
+- Assisted in prototype testing of a new heat exchanger design; logged temperature and pressure data using LabVIEW and performed thermal efficiency calculations
+- Created an Excel-based tool to automate compressor selection based on application parameters, eliminating 2 hours of manual lookup per quote
+- Supported failure mode analysis (FMEA) for a new commercial air handler product line
+
+PROJECTS
+
+Pneumatic Sorting System — Arduino, SolidWorks, PVC pneumatics | Jan 2024
+- Designed and built a 3-bin pneumatic sorter for a senior capstone project; sorted objects by color using a photoelectric sensor and solenoid valves
+- Managed $800 project budget; fabricated aluminum mounting frame using mill and drill press
+- Achieved 97% sort accuracy in 45 seconds per cycle at final demonstration
+
+Formula SAE — Suspension Design Sub-team | Sep 2021 – May 2023
+- Designed and optimized front upright geometry using SolidWorks and Matlab; reduced unsprung mass by 12%
+- Manufactured 4 suspension components on CNC mill; performed quality checks against design tolerances
+- Competed at FSAE Michigan 2023 (top 40 of 120 teams in autocross event)
+
+TECHNICAL SKILLS
+CAD/CAE: SolidWorks (CSWA certified), ANSYS Mechanical, AutoCAD, GD&T
+Programming: MATLAB, Python (data analysis), LabVIEW, Arduino (C++)
+Manufacturing: CNC milling, 3D printing (FDM), manual lathe, welding (MIG, basic)
+Other: FMEA, DFM/DFA, technical documentation, MS Project
+
+AWARDS & CERTIFICATIONS
+SolidWorks CSWA Certification, 2022
+Grainger College of Engineering Outstanding Senior Project Award finalist, 2024

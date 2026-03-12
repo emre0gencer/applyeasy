@@ -1,0 +1,41 @@
+Beatriz Montoya
+beatriz.montoya@email.com | (713) 555-0239 | linkedin.com/in/beatrizmontoya
+Houston, TX
+
+EDUCATION
+B.S. Chemical Engineering, Rice University, May 2024
+GPA: 3.8 | Departmental Honors
+Relevant Coursework: Thermodynamics, Transport Phenomena, Reaction Kinetics, Process Design, Unit Operations Lab, Chemical Process Safety
+
+EXPERIENCE
+
+Undergraduate Research Assistant — Rice Dept. of Chemical & Biomolecular Engineering | Jan 2023 – May 2024
+- Synthesized ZIF-8 metal-organic framework nanoparticles via solvothermal method; characterized using XRD, BET surface area, and SEM imaging
+- Ran CO2 adsorption isotherm experiments at 3 temperatures; computed Henry's law constants and isosteric heats of adsorption in MATLAB
+- Maintained lab safety records and SDS documentation for 15 chemical reagents
+
+Teaching Assistant — Rice ChBE Thermodynamics (CHBE 301) | Jan 2024 – May 2024
+- Held weekly 90-minute recitation sections for 28 students; graded problem sets and exams
+- Developed 3 worked-example handouts on fugacity and phase equilibrium; posted to Canvas; downloaded 180+ times
+
+Grader — Rice Process Design (CHBE 401) | Sep 2023 – Dec 2023
+- Graded Aspen Plus simulation assignments; provided written feedback to 35 students on unit operation sequencing and energy integration
+
+PROJECTS
+
+Capstone: Natural Gas Sweetening Plant Design — Aspen Plus, HYSYS | Jan–May 2024
+- Co-designed a 50 MMSCFD DEA-based amine sweetening unit; sized absorber and regenerator columns, heat exchangers, and flash drums
+- Performed economic analysis (NPV, IRR) using Aspen Economic Analyzer; project ROI of 14.3%
+- Ensured compliance with EPA 40 CFR Part 63 MACT standards for H2S and CO2 removal
+
+TECHNICAL SKILLS
+Process Simulation: Aspen Plus, Aspen HYSYS, Aspen Economic Analyzer
+Lab: Wet chemistry synthesis, XRD, SEM, BET, GC-MS (introductory), pressure vessel operation
+Programming: MATLAB, Python (NumPy, matplotlib — data analysis)
+Safety: HAZOP basics, process safety management concepts, SDS management
+Other: Microsoft Excel, technical report writing, LaTeX
+
+AWARDS
+Rice University Dean's Honor Roll (all 4 years)
+AIChE Student Chapter, Secretary 2022–2023
+Phi Lambda Upsilon National Chemistry Honor Society

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StatusResponse, getDownloadUrl } from "../api/client";
 import { ChangeSummaryPanel } from "./ChangeSummaryPanel";
+import { computeSuitabilityScore, scoreLabel } from "../utils/scoreUtils";
 
 interface Props {
   runId: string;
@@ -11,46 +12,17 @@ interface Props {
 
 // ── Suitability Score ──────────────────────────────────────────────────────
 
-function computeScore(status: StatusResponse): {
-  score: number;
-  label: string;
-  metrics: { label: string; value: number }[];
-} {
+function SuitabilityScore({ status }: { status: StatusResponse }) {
+  const score = computeSuitabilityScore(status);
+  const label = scoreLabel(score);
   const kwCoverage = status.keyword_coverage ?? 0;
   const expDepth = Math.min((status.experience_count ?? 0) / 3, 1);
   const clarity = status.extraction_confidence ?? 0;
-
-  const rawCalc = kwCoverage * 50 + expDepth * 25 + clarity * 25;
-  const severeFlags = (status.validation_flags ?? []).filter((f) =>
-    f.toLowerCase().includes("truthfulness") || f.toLowerCase().includes("fabricat")
-  ).length;
-  const uncapped = Math.max(0, Math.min(100, Math.round(rawCalc - severeFlags * 10)));
-
-  // Apply display caps: max +35 improvement over raw input; max 70 if raw input < 55
-  const rawInput = status.raw_suitability_score;
-  const score = rawInput !== null && rawInput !== undefined
-    ? Math.min(uncapped, rawInput + 35, rawInput < 55 ? 70 : 100)
-    : uncapped;
-
-  const label =
-    score >= 85 ? "Excellent fit" :
-    score >= 70 ? "Strong match" :
-    score >= 55 ? "Good match" :
-    score >= 40 ? "Moderate fit" : "Weak match";
-
-  return {
-    score,
-    label,
-    metrics: [
-      { label: "Keyword alignment", value: kwCoverage },
-      { label: "Experience depth", value: expDepth },
-      { label: "Profile clarity", value: clarity },
-    ],
-  };
-}
-
-function SuitabilityScore({ status }: { status: StatusResponse }) {
-  const { score, label, metrics } = computeScore(status);
+  const metrics = [
+    { label: "Keyword alignment", value: kwCoverage },
+    { label: "Experience depth", value: expDepth },
+    { label: "Profile clarity", value: clarity },
+  ];
   const [animated, setAnimated] = useState(false);
   const [countedScore, setCountedScore] = useState(0);
 
@@ -59,12 +31,15 @@ function SuitabilityScore({ status }: { status: StatusResponse }) {
     return () => clearTimeout(t);
   }, []);
 
-  // Count the number up from 0 once animation starts
+  // Count the number up from 0 once animation starts.
+  // Step by 2 until within 5 of target, then step by 1 for a smooth finish.
   useEffect(() => {
     if (!animated) return;
     if (countedScore >= score) return;
-    const delay = score - countedScore <= 5 ? 40 : 70;
-    const t = setTimeout(() => setCountedScore((p) => Math.min(p + 1, score)), delay);
+    const remaining = score - countedScore;
+    const step = remaining > 5 ? 2 : 1;
+    const delay = remaining <= 5 ? 30 : 18;
+    const t = setTimeout(() => setCountedScore((p) => Math.min(p + step, score)), delay);
     return () => clearTimeout(t);
   }, [animated, countedScore, score]);
 
@@ -159,7 +134,7 @@ const sc: Record<string, React.CSSProperties> = {
   block: {
     background: "rgba(255,255,255,0.04)",
     borderBottom: "1px solid rgba(255,255,255,0.08)",
-    padding: "20px 32px 22px",
+    padding: "24px 40px 26px",
   },
   topRow: {
     display: "flex",
@@ -532,46 +507,47 @@ export function ResultsStep({ runId, status, onRestart }: Props) {
 
 const s: Record<string, React.CSSProperties> = {
   card: {
-    maxWidth: 640,
+    maxWidth: 800,
     margin: "0 auto",
-    background: "rgba(2,15,36,0.8)",
-    backdropFilter: "blur(16px)",
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.1)",
-    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.4), 0 20px 60px -10px rgba(0,0,0,0.5)",
+    background: "rgba(2,15,36,0.82)",
+    backdropFilter: "blur(20px)",
+    borderRadius: 14,
+    border: "1px solid rgba(255,255,255,0.09)",
+    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.4), 0 24px 64px -12px rgba(0,0,0,0.55)",
     overflow: "hidden",
   },
 
   cardHeader: {
     display: "flex",
     alignItems: "flex-start",
-    gap: 16,
-    padding: "28px 32px 24px",
+    gap: 20,
+    padding: "36px 40px 28px",
   },
   successDot: {
-    width: 36,
-    height: 36,
+    width: 48,
+    height: 48,
     borderRadius: "50%",
     background: "rgba(22,163,74,0.1)",
+    border: "1px solid rgba(22,163,74,0.22)",
     color: "#16a34a",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 700,
     flexShrink: 0,
     marginTop: 2,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 700,
     color: "#f1f5f9",
-    margin: "0 0 4px 0",
-    letterSpacing: "-0.02em",
+    margin: "0 0 5px 0",
+    letterSpacing: "-0.025em",
   },
   subtitle: {
-    fontSize: 13,
-    color: "#94a3b8",
+    fontSize: 14,
+    color: "#64748b",
     lineHeight: 1.5,
     margin: 0,
   },
@@ -579,25 +555,25 @@ const s: Record<string, React.CSSProperties> = {
   divider: {
     height: 1,
     background: "rgba(255,255,255,0.08)",
-    margin: "0 32px",
+    margin: "0 40px",
   },
 
   dlGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
     gap: 12,
-    padding: "24px 32px",
+    padding: "24px 40px",
   },
   dlCard: {
-    borderRadius: 8,
-    padding: "14px 16px",
+    borderRadius: 10,
+    padding: "20px 20px",
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: 16,
     border: "1px solid",
   },
   dlCardPrimary: {
-    background: "rgba(255,255,255,0.06)",
+    background: "rgba(255,255,255,0.055)",
     borderColor: "rgba(255,255,255,0.12)",
   },
   dlCardSecondary: {
@@ -606,18 +582,18 @@ const s: Record<string, React.CSSProperties> = {
   },
   dlCardBody: {
     display: "flex",
-    gap: 10,
+    gap: 12,
     alignItems: "flex-start",
   },
   dlIcon: {
-    fontSize: 20,
+    fontSize: 24,
     lineHeight: 1,
     marginTop: 1,
   },
   dlTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: 700,
-    marginBottom: 2,
+    marginBottom: 3,
     color: "#e2e8f0",
   },
   dlDesc: {
@@ -626,8 +602,9 @@ const s: Record<string, React.CSSProperties> = {
     lineHeight: 1.4,
   },
   dlBtn: {
-    padding: "8px 14px",
-    borderRadius: 6,
+    width: "100%",
+    padding: "13px 14px",
+    borderRadius: 7,
     fontSize: 13,
     fontWeight: 600,
     cursor: "pointer",
@@ -637,8 +614,8 @@ const s: Record<string, React.CSSProperties> = {
   },
   dlBtnPrimary: { background: "#2563eb", color: "#fff" },
   dlBtnPrimaryHover: { background: "#1d4ed8", transform: "translateY(-1px)" },
-  dlBtnSecondary: { background: "rgba(255,255,255,0.08)", color: "#94a3b8" },
-  dlBtnSecondaryHover: { background: "rgba(255,255,255,0.12)" },
+  dlBtnSecondary: { background: "rgba(255,255,255,0.07)", color: "#94a3b8" },
+  dlBtnSecondaryHover: { background: "rgba(255,255,255,0.11)" },
   dlCardLocked: {
     background: "rgba(255,255,255,0.02)",
     borderColor: "rgba(255,255,255,0.07)",
@@ -649,6 +626,7 @@ const s: Record<string, React.CSSProperties> = {
     color: "#fef3c7",
     display: "flex",
     alignItems: "center",
+    justifyContent: "center",
     gap: 6,
     cursor: "pointer",
     boxShadow: "0 1px 3px rgba(120,53,15,0.25)",
@@ -660,8 +638,8 @@ const s: Record<string, React.CSSProperties> = {
   },
   proBadge: {
     position: "absolute",
-    top: 10,
-    right: 10,
+    top: 12,
+    right: 12,
     fontSize: 9,
     fontWeight: 800,
     letterSpacing: "0.1em",
@@ -674,8 +652,8 @@ const s: Record<string, React.CSSProperties> = {
   lockIcon: { fontSize: 11, lineHeight: 1 },
 
   flagsBlock: {
-    margin: "16px 32px",
-    padding: "12px 14px",
+    margin: "16px 40px",
+    padding: "12px 16px",
     borderRadius: 8,
     border: "1px solid",
     background: "rgba(120,53,15,0.2)",
@@ -688,45 +666,45 @@ const s: Record<string, React.CSSProperties> = {
   flagText: { fontSize: 13, lineHeight: 1.5 },
 
   allClear: {
-    margin: "16px 32px",
+    margin: "16px 40px",
     display: "flex",
     alignItems: "center",
     gap: 8,
-    padding: "10px 14px",
+    padding: "10px 16px",
     borderRadius: 8,
     background: "rgba(22,163,74,0.06)",
-    border: "1px solid rgba(22,163,74,0.2)",
+    border: "1px solid rgba(22,163,74,0.18)",
   },
   allClearIcon: { color: "#16a34a", fontWeight: 700, fontSize: 14 },
-  allClearText: { fontSize: 13, color: "#15803d", fontWeight: 500 },
+  allClearText: { fontSize: 13, color: "#4ade80", fontWeight: 500 },
 
   oosAlert: {
-    padding: "16px 32px",
-    background: "#1e0a0a",
-    borderBottom: "1px solid #7f1d1d",
+    padding: "16px 40px",
+    background: "rgba(30,10,10,0.9)",
+    borderBottom: "1px solid rgba(127,29,29,0.6)",
   },
   weakAlert: {
-    padding: "16px 32px",
-    background: "#fef2f2",
-    borderBottom: "1px solid #fecaca",
+    padding: "16px 40px",
+    background: "rgba(239,68,68,0.07)",
+    borderBottom: "1px solid rgba(239,68,68,0.18)",
   },
   weakAlertTop: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 },
-  weakAlertIcon: { fontSize: 14, color: "#dc2626" },
-  weakAlertTitle: { fontSize: 13, color: "#7f1d1d" },
-  weakAlertBody: { fontSize: 13, color: "#991b1b", lineHeight: 1.6, margin: 0 },
+  weakAlertIcon: { fontSize: 14, color: "#f87171" },
+  weakAlertTitle: { fontSize: 13, color: "#fca5a5", fontWeight: 700 },
+  weakAlertBody: { fontSize: 13, color: "#fca5a5", lineHeight: 1.6, margin: 0 },
 
   footer: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "16px 32px 24px",
+    padding: "20px 40px 28px",
   },
   restartBtn: {
-    padding: "9px 18px",
+    padding: "10px 20px",
     background: "transparent",
     color: "#94a3b8",
-    border: "1px solid rgba(255,255,255,0.15)",
-    borderRadius: 7,
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 8,
     fontSize: 13,
     fontWeight: 500,
     cursor: "pointer",

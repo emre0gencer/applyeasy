@@ -1,0 +1,41 @@
+Ryan Castellano
+ryan.castellano@email.com | (919) 555-0472 | linkedin.com/in/ryancastellano | github.com/rcastellano
+Raleigh, NC
+
+EDUCATION
+B.S. Statistics, NC State University, May 2023
+GPA: 3.1
+Relevant Coursework: Statistical Learning, Linear Models, Probability Theory, Database Systems, Python for Data Analysis
+
+EXPERIENCE
+
+Data Analyst — Vertex Retail Analytics, Raleigh, NC | Jul 2023 – Present
+- Build and maintain weekly sales reporting dashboards in Tableau for 6 regional retail clients; automate data pulls from Snowflake using Python scripts
+- Write SQL queries aggregating 50M+ transaction records; optimized 3 slow queries by 70% through index tuning
+- Collaborated with a data scientist to prepare a clean feature dataset for a price elasticity model; handled deduplication, outlier removal, and train/test splitting
+- Delivered monthly performance review decks to client stakeholders; no ML modeling ownership to date
+
+Undergraduate Research Assistant — NC State Dept. of Statistics | Sep 2022 – May 2023
+- Assisted professor with data cleaning and exploratory analysis for a study on ride-share demand patterns; used R and ggplot2
+- Ran logistic regression and decision tree baselines in scikit-learn as part of a class research project on student dropout prediction
+- No production deployment experience
+
+PROJECTS
+
+Spotify Song Popularity Predictor — Python, scikit-learn | Nov 2022
+- Trained a random forest classifier on 18K Spotify tracks to predict whether a song would chart; achieved 71% accuracy on validation set
+- Did not tune hyperparameters systematically; did not deploy or serve the model
+
+NBA Game Outcome Model — Python, pandas, statsmodels | Mar 2023
+- Logistic regression model predicting home team win probability from box score features; AUC of 0.68
+- Notebook shared on GitHub; no infrastructure built around it
+
+TECHNICAL SKILLS
+Languages: Python (pandas, NumPy, scikit-learn — basic), R, SQL (proficient)
+Visualization: Tableau, Matplotlib, ggplot2
+Data: Snowflake, Excel, Google Sheets
+ML: scikit-learn (basic classification/regression), statsmodels; no deep learning experience
+Other: Git, Jupyter Notebook, dbt (introductory)
+
+AWARDS
+NC State Statistics Department Undergraduate Award — Honorable Mention, 2023

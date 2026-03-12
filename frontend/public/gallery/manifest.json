@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "Alex Rivera",
+    "job": "Backend Software Engineer at Meridian Financial Technology",
+    "score": 89,
+    "pdf": "/gallery/resume_01.pdf",
+    "preview": "/gallery/resume_01.png"
+  },
+  {
+    "id": 2,
+    "name": "Sophie Chen",
+    "job": "Data Scientist \u2014 Clinical Analytics at Veridia Health",
+    "score": 89,
+    "pdf": "/gallery/resume_02.pdf",
+    "preview": "/gallery/resume_02.png"
+  },
+  {
+    "id": 3,
+    "name": "Michael Torres",
+    "job": "Investment Banking Analyst, TMT Group at Caldwell & Wren",
+    "score": 86,
+    "pdf": "/gallery/resume_03.pdf",
+    "preview": "/gallery/resume_03.png"
+  },
+  {
+    "id": 4,
+    "name": "Jasmine Park",
+    "job": "Associate Product Manager at Looper (B2B SaaS)",
+    "score": 77,
+    "pdf": "/gallery/resume_04.pdf",
+    "preview": "/gallery/resume_04.png"
+  }
+]

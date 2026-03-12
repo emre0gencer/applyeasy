@@ -1,0 +1,43 @@
+Marcus Delgado
+marcus.delgado@email.com | (617) 555-0142 | linkedin.com/in/marcusdelgado | github.com/mdelgado
+Boston, MA
+
+EDUCATION
+B.S. Computer Science, Northeastern University, May 2024
+GPA: 3.7 | Dean's List (4 semesters)
+Relevant Coursework: Algorithms, Systems Programming, Distributed Systems, Database Design, Machine Learning
+
+EXPERIENCE
+
+Software Engineering Intern — Finley Technologies, Boston, MA | Jun 2023 – Dec 2023
+- Built a REST API using FastAPI and PostgreSQL to serve 40+ internal dashboard endpoints, reducing average response time by 35%
+- Migrated legacy cron job scripts from Bash to Python, added retry logic and alerting via PagerDuty
+- Wrote integration tests with pytest covering 87% of new API surface area
+
+Software Engineering Intern — CloudStack Solutions, Cambridge, MA | Jun 2022 – Aug 2022
+- Developed React components for a B2B SaaS admin dashboard, collaborating with designers using Figma specs
+- Fixed 12 bugs in a Node.js microservice handling webhook delivery; reduced delivery failure rate from 4% to 0.3%
+- Set up CI/CD pipeline using GitHub Actions that cut deploy time from 25 minutes to 6 minutes
+
+PROJECTS
+
+ScheduleBot — Python, FastAPI, PostgreSQL, Discord API | Jan 2024
+- Built a Discord bot that lets student groups schedule events, RSVP, and receive reminders; 200+ active users across 5 servers
+- Implemented conflict detection logic that prevents double-booking across time zones
+- Deployed on a DigitalOcean droplet with Nginx reverse proxy and systemd for auto-restart
+
+CampusEats — React, Node.js, Express, MongoDB | Sep 2023
+- Full-stack web app for rating campus dining options; users can filter by dietary restrictions
+- Implemented JWT authentication and bcrypt password hashing
+- Scraped and normalized dining menu data from 3 university websites using BeautifulSoup
+
+TECHNICAL SKILLS
+Languages: Python, JavaScript, TypeScript, SQL, Bash
+Frameworks: FastAPI, React, Node.js, Express
+Databases: PostgreSQL, MongoDB, Redis
+Tools: Docker, Git, GitHub Actions, Linux, Nginx, Postman
+Cloud: AWS (EC2, S3, RDS), DigitalOcean
+
+LEADERSHIP & AWARDS
+Khoury College ACM Club, Co-Director of Events (2022–2024) — organized 8 technical workshops per semester
+Northeastern Hackathon 2023, 2nd Place — built a real-time carpooling app in 24 hours

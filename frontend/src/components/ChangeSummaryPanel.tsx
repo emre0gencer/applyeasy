@@ -150,7 +150,7 @@ export function ChangeSummaryPanel({ runId }: Props) {
 
 const s: Record<string, React.CSSProperties> = {
   root: {
-    padding: "0 32px 24px",
+    padding: "0 40px 24px",
   },
 
   /* Trigger button */

@@ -1,0 +1,46 @@
+Lucia Ferrante
+lucia.ferrante@email.com | (773) 555-0648 | linkedin.com/in/luciaferrante | luciaferrante.com
+Chicago, IL
+
+EDUCATION
+B.A. Communications & Media Studies, Northwestern University, June 2023
+GPA: 3.5 | Emphasis: Digital Journalism and Strategic Communication
+Relevant Coursework: Content Strategy, SEO & Digital Marketing, Data Journalism, Brand Storytelling, Audience Analytics
+
+EXPERIENCE
+
+Content Strategist — Praxis Digital Agency, Chicago, IL | Aug 2023 – Present
+- Own editorial calendar and content roadmap for 4 B2B SaaS clients across fintech, HR tech, and legal tech verticals
+- Write 8–12 long-form articles, landing pages, and case studies per month; average piece ranks in top 3 Google results within 90 days (tracked via SEMrush)
+- Conducted keyword gap analysis for a cybersecurity client; identified 34 high-intent clusters; new content drove 47% organic traffic growth in 6 months
+- Collaborated with 3 client demand-gen teams to align content calendar with campaign launches and sales cycle stages
+
+Content & SEO Intern — Stackline Commerce Intelligence, Chicago, IL | Jun 2022 – Aug 2022
+- Wrote 18 SEO-optimized blog posts on e-commerce analytics topics; 12 ranked on page 1 within 60 days
+- Conducted competitor content audits using Ahrefs; identified 6 topical authority gaps for the growth team
+- Built a content performance tracker in Google Sheets pulling data from GA4 via API; saved 3 hours of weekly reporting
+
+Campus Journalist — Northwestern Medill, The Daily Northwestern | Sep 2021 – Jun 2023
+- Beat reporter covering technology and innovation; published 40+ articles with average 2,400 unique readers
+- Managed social media amplification of stories across Twitter and Instagram; grew beat's follower count by 310%
+
+PROJECTS
+
+SaaS Glossary Project — Personal SEO experiment | Ongoing
+- Built a 60-article programmatic SEO glossary targeting long-tail SaaS terms; site generates 3,200 organic monthly visitors
+- Monetized via affiliate links and lead-gen referrals; $400–$600 in monthly passive revenue
+
+Content Audit Framework — Open-source template | 2023
+- Created a Google Sheets content audit template downloaded 800+ times via Notion community share
+- Template covers traffic, keyword rankings, backlinks, freshness score, and recommended action per URL
+
+TECHNICAL SKILLS
+Content: Long-form writing, SEO copywriting, case studies, email sequences, landing pages, thought leadership ghostwriting
+SEO: SEMrush, Ahrefs, Google Search Console, keyword research, technical SEO basics, schema markup
+Analytics: GA4, Looker Studio, HubSpot, Salesforce (basic), Excel
+CMS: WordPress, Webflow, Contentful, Ghost
+Other: Figma (content design handoff), Notion, Asana, Slack
+
+AWARDS
+Northwestern Medill Journalism Award — Digital Story of the Year, 2022
+Content Marketing Institute Student Essay Competition — Finalist, 2023

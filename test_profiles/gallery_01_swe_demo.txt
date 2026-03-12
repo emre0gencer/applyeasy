@@ -1,0 +1,47 @@
+Alex Rivera
+alex.rivera@email.com | (617) 555-0198 | linkedin.com/in/alexrivera | github.com/arivera
+Boston, MA
+
+EDUCATION
+B.S. Computer Science, Boston University, May 2022
+GPA: 3.8 | Dean's List (4 semesters)
+Relevant Coursework: Distributed Systems, Database Systems, Algorithms, Networks, Software Engineering
+
+EXPERIENCE
+
+Software Engineer — PayCore Technologies, Boston, MA | Jul 2022 – Present
+- Built idempotent REST APIs using Python (FastAPI) powering payment initiation, settlement, and reconciliation workflows for 22 financial institution clients processing $400M+ in monthly transactions
+- Designed PostgreSQL schemas optimized for high write throughput (10,000+ TPS); implemented Redis caching layer that reduced average read latency by 63%
+- Built and maintained Celery/RabbitMQ background job pipeline for ACH and RTP settlement batch processing; achieved 99.97% task reliability across 5M+ daily jobs
+- Wrote comprehensive unit, integration, and contract test suites maintaining 89% coverage across all owned services
+- Participated in on-call rotation; authored 11 post-mortem reports and reduced MTTR by 38% by instrumenting Datadog APM traces and PagerDuty alert policies
+- Deployed containerized services (Docker) to AWS (EC2, RDS, SQS) using GitHub Actions CI/CD pipelines; rolled out zero-downtime deploys via blue-green deployments
+- Implemented webhook delivery system with exponential backoff and signature verification; reduced webhook failure rate from 2.1% to 0.09%
+
+Software Engineering Intern — Fidelity Investments, Boston, MA | Jun 2021 – Aug 2021
+- Contributed to internal Python (FastAPI) microservice that aggregated trade data across 6 downstream systems; handled 8M+ daily API calls
+- Wrote SQL queries on PostgreSQL data warehouse (3B+ row tables) using indexed views and CTEs; optimized critical report from 42s to 3.1s
+- Set up CI/CD pipeline with GitHub Actions, integrating automated linting, unit tests, and staging deployment; reduced release cycle from 3 days to 4 hours
+
+PROJECTS
+
+DistributedKV — Python, gRPC, Raft consensus | Oct 2023
+- Implemented a fault-tolerant key-value store using the Raft consensus protocol; sustains 4,000 reads/sec across a 3-node cluster
+- Added snapshotting and log compaction to bound memory growth under sustained write load
+
+RateLimiter — Python, Redis, FastAPI | Jun 2022
+- Token-bucket rate limiter as a FastAPI middleware; supports per-client and per-endpoint limits via Redis atomic Lua scripts
+- Benchmarked at sub-1ms overhead (p99) under 5,000 concurrent connections
+
+TECHNICAL SKILLS
+Languages: Python, SQL, Bash, Go (basic)
+Frameworks & APIs: FastAPI, SQLAlchemy, Celery, pydantic, pytest
+Databases: PostgreSQL, Redis, SQLite
+Message Queues: RabbitMQ, Kafka (consumer), AWS SQS
+Cloud & Infrastructure: AWS (EC2, RDS, S3, SQS, Lambda), Docker, GitHub Actions, Nginx
+Observability: Datadog, PagerDuty, Grafana, Prometheus (basic)
+Payments: ACH, RTP, webhook delivery systems, idempotency patterns
+
+LEADERSHIP & AWARDS
+Boston University ACM Chapter, Technical Lead (2020–2022)
+BostonHacks 2021 — 1st Place: built a real-time fraud-signal pipeline in Python + Kafka
