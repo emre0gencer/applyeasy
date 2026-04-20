@@ -1,0 +1,86 @@
+{
+  "run_id": "05cdece2-46c3-4da5-9cc7-c334784d7f06",
+  "profile_name": "Camille Osei",
+  "role_title": "Associate Content Strategist / Associate Content Manager",
+  "company_name": "Fieldwork Media",
+  "bullet_changes": [
+    {
+      "original_text": "Screened 150+ applicants via phone; scheduled 60 hiring manager interviews; maintained ATS records (Bullhorn) with 98% data accuracy",
+      "revised_text": "Maintained accurate records with 98% data accuracy in Bullhorn, ensuring seamless hiring processes for 150+ applicants and 60 hiring manager interviews.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Drafted 8 job postings optimized for Indeed and LinkedIn; average job received 40% more qualified applicants vs. prior templates",
+      "revised_text": "Drafted 8 job postings optimized for Indeed and LinkedIn, resulting in a 40% increase in qualified applicants, demonstrating effective content strategy and writing skills.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Content Strategy",
+        "Writing"
+      ]
+    },
+    {
+      "original_text": "Sourced candidates for 12 open roles across light industrial, administrative, and healthcare support; filled 9 positions within target time-to-fill",
+      "revised_text": "Sourced candidates for 12 open roles across various industries, filling 9 positions within target time-to-fill, utilizing research and recruitment skills.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Research"
+      ]
+    },
+    {
+      "original_text": "Managed well-being and community programming for 45-resident floor; responded to 30+ student concerns and conduct incidents over 2 years",
+      "revised_text": "Responded to 30+ student concerns and conduct incidents over 2 years, while managing well-being and community programming for a 45-resident floor, showcasing strong community management skills.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Planned and executed 12 community events per year with average 22-person attendance",
+      "revised_text": "Planned and executed 12 community events per year with an average 22-person attendance, applying event planning and content creation skills to engage the community.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Content Creation"
+      ]
+    },
+    {
+      "original_text": "Trained in conflict mediation and crisis de-escalation; co-facilitated 3 bias incident response discussions",
+      "revised_text": "Co-facilitated 3 bias incident response discussions after training in conflict mediation and crisis de-escalation, demonstrating ability to navigate complex community issues.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Conducted meta-analysis of 30 peer-reviewed studies on structured interview validity and demographic score gaps",
+      "revised_text": "Conducted a meta-analysis of 30 peer-reviewed studies on structured interview validity and demographic score gaps, providing evidence of existing biases.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Designed a 4-panel blind scoring rubric for a simulated hiring process; tested with 18 student evaluators; reduced inter-rater variance by 34%",
+      "revised_text": "Designed a 4-panel blind scoring rubric for a simulated hiring process, implemented and tested with 18 student evaluators, achieving a 34% reduction in inter-rater variance.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "blind scoring rubric",
+        "inter-rater variance"
+      ]
+    },
+    {
+      "original_text": "Presented findings to faculty panel; recommended for submission to OSU Undergraduate Research Journal",
+      "revised_text": "Presented research findings to a faculty panel and recommended the project for submission to the OSU Undergraduate Research Journal.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    }
+  ],
+  "keywords_integrated": [
+    "Content Strategy",
+    "Writing",
+    "Research",
+    "Content Creation",
+    "blind scoring rubric",
+    "inter-rater variance"
+  ],
+  "keyword_coverage": 1.0,
+  "validation_flags": [
+    "4 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-12T10:17:22.087443"
+}

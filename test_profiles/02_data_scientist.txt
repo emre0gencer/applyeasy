@@ -34,7 +34,7 @@ NYC Taxi Demand Forecasting — Python, Prophet, SQL | Oct 2023
 - Forecasted hourly taxi demand by zone using Meta's Prophet with US holiday regressors
 - Pulled and aggregated 3 years of TLC trip record data from BigQuery (120M rows)
 - Achieved 11% lower MAPE than baseline moving-average forecast
-
+2
 TECHNICAL SKILLS
 Languages: Python, R, SQL
 ML Libraries: scikit-learn, XGBoost, LightGBM, PyTorch, statsmodels, SHAP

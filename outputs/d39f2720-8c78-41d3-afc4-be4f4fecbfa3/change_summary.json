@@ -1,0 +1,110 @@
+{
+  "run_id": "d39f2720-8c78-41d3-afc4-be4f4fecbfa3",
+  "profile_name": "Emre Gencer",
+  "role_title": "Machine Learning/AI Tool Development Engineer",
+  "company_name": "AMD",
+  "bullet_changes": [
+    {
+      "original_text": "Published a research article, “The Role of AI-Enhanced Medical Computer Vision in Diagnostic Automation,” analyzing how CNNs and Vision Transformers enable diagnostic automation in medical imaging.",
+      "revised_text": "Published a research article analyzing the role of Artificial Intelligence and Machine Learning in diagnostic automation using CNNs and Vision Transformers.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Machine Learning",
+        "Artificial Intelligence"
+      ]
+    },
+    {
+      "original_text": "Conducted structured analysis of model behavior and research findings, strengthening quantitative reasoning, documentation, and insight communication skills.",
+      "revised_text": "Conducted structured analysis of model behavior using Python and JavaScript, strengthening quantitative reasoning and documentation skills.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "JavaScript"
+      ]
+    },
+    {
+      "original_text": "Compared CNN and Vision Transformer architectures to identify performance tradeoffs, application-specific strengths, and practical considerations for real-world use.",
+      "revised_text": "Compared CNN and Vision Transformer architectures using C++ and PyTorch, identifying performance tradeoffs and application-specific strengths.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "C++",
+        "PyTorch"
+      ]
+    },
+    {
+      "original_text": "Built and evaluated ML workflows in Python using the TensorFlow framework on large-scale datasets to support fraud detection model iteration and threshold tuning, improving recall by 3.6% at a fixed false positive rate.",
+      "revised_text": "Built and evaluated Machine Learning workflows using Python and Artificial Intelligence techniques with the TensorFlow framework, improving recall by 3.6%.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Machine Learning",
+        "Artificial Intelligence"
+      ]
+    },
+    {
+      "original_text": "Translated findings into stakeholder-ready summaries and a SWOT/strategy brief linking ML capabilities to product risk and innovation priorities.",
+      "revised_text": "Translated findings into stakeholder-ready summaries using Python and JavaScript, linking Machine Learning capabilities to product risk and innovation priorities.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "JavaScript"
+      ]
+    },
+    {
+      "original_text": "Explored patterns and anomalies in high-volume transaction data to identify predictive signals and improve model performance.",
+      "revised_text": "Explored patterns and anomalies in high-volume transaction data using C++ and PyTorch, identifying predictive signals to improve model performance.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "C++",
+        "PyTorch"
+      ]
+    },
+    {
+      "original_text": "Developed application features across routes, controllers, models, and views using MVC architecture, connecting backend business logic with user-facing functionality; built and tested relational data workflows emphasizing maintainability and correctness",
+      "revised_text": "Designed and implemented application features across routes, controllers, models, and views using MVC architecture, integrating backend business logic with user-facing functionality; developed and tested relational data workflows emphasizing maintainability and correctness.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Strengthened experience with web application development concepts directly relevant to modern JavaScript environments, including component-based thinking, backend integration, and database-backed feature design.",
+      "revised_text": "Enhanced expertise in web application development concepts directly applicable to modern JavaScript environments, including component-based thinking, backend integration, and database-backed feature design.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "JavaScript"
+      ]
+    },
+    {
+      "original_text": "Developed Python workflows using psycopg2 to automate querying and data analysis across multiple datasets, completely covering 10 user stories.",
+      "revised_text": "Automated querying and data analysis across multiple datasets using Python workflows and psycopg2, covering 10 user stories.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Implemented triggers and constraints to maintain data integrity and support analytical reporting.",
+      "revised_text": "Designed and implemented triggers and constraints to ensure data integrity and support analytical reporting.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    }
+  ],
+  "keywords_integrated": [
+    "Machine Learning",
+    "Artificial Intelligence",
+    "Python",
+    "JavaScript",
+    "C++",
+    "PyTorch",
+    "Machine Learning",
+    "Artificial Intelligence",
+    "Python",
+    "JavaScript",
+    "C++",
+    "PyTorch",
+    "JavaScript"
+  ],
+  "keyword_coverage": 1.0,
+  "validation_flags": [
+    "3 potential truthfulness warning(s) — review change summary",
+    "7 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-11T14:43:31.680444"
+}

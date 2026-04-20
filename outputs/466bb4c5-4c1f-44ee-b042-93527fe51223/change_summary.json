@@ -1,0 +1,82 @@
+{
+  "run_id": "466bb4c5-4c1f-44ee-b042-93527fe51223",
+  "profile_name": "Marcus Delgado",
+  "role_title": "Machine Learning Engineer — Recommendations",
+  "company_name": "Cartex",
+  "bullet_changes": [
+    {
+      "original_text": "Built a REST API using FastAPI and PostgreSQL to serve 40+ internal dashboard endpoints, reducing average response time by 35%",
+      "revised_text": "Built a production-ready REST API using FastAPI and PostgreSQL to serve internal dashboard endpoints",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "SQL"
+      ]
+    },
+    {
+      "original_text": "Wrote integration tests with pytest covering 87% of new API surface area",
+      "revised_text": "Wrote integration tests with pytest to cover the API surface area",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "FastAPI"
+      ]
+    },
+    {
+      "original_text": "Migrated legacy cron job scripts from Bash to Python, added retry logic and alerting via PagerDuty",
+      "revised_text": "Migrated legacy cron job scripts from Bash to Python, adding retry logic and alerting via PagerDuty",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Fixed 12 bugs in a Node.js microservice handling webhook delivery; reduced delivery failure rate from 4% to 0.3%",
+      "revised_text": "Fixed bugs in a Node.js microservice handling webhook delivery",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Set up CI/CD pipeline using GitHub Actions that cut deploy time from 25 minutes to 6 minutes",
+      "revised_text": "Set up a CI/CD pipeline using GitHub Actions",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Developed React components for a B2B SaaS admin dashboard, collaborating with designers using Figma specs",
+      "revised_text": "Developed React components for a B2B SaaS admin dashboard",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Built a Discord bot that lets student groups schedule events, RSVP, and receive reminders; 200+ active users across 5 servers",
+      "revised_text": "Designed and built a Discord bot that lets student groups schedule events, RSVP, and receive reminders, serving 200+ active users across 5 servers",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Implemented conflict detection logic that prevents double-booking across time zones",
+      "revised_text": "Implemented conflict detection logic that prevents double-booking across time zones, ensuring seamless scheduling",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Deployed on a DigitalOcean droplet with Nginx reverse proxy and systemd for auto-restart",
+      "revised_text": "Deployed the bot on a DigitalOcean droplet with Nginx reverse proxy and systemd for auto-restart, ensuring high availability",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "high availability"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "Python",
+    "SQL",
+    "FastAPI",
+    "high availability"
+  ],
+  "keyword_coverage": 0.43,
+  "validation_flags": [
+    "Low keyword coverage: 43% of required terms present",
+    "3 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-12T08:44:04.663384"
+}

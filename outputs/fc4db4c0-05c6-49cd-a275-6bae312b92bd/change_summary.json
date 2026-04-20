@@ -1,0 +1,65 @@
+{
+  "run_id": "fc4db4c0-05c6-49cd-a275-6bae312b92bd",
+  "profile_name": "",
+  "role_title": "Data Scientist",
+  "company_name": "Unknown",
+  "bullet_changes": [
+    {
+      "original_text": "Built Python APIs and used PostgreSQL for backend development.",
+      "revised_text": "Engineered Python APIs leveraging PostgreSQL for scalable backend development, integrating Python and R for data analysis.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "R",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "original_text": "Built Python-based API workflows with database-backed validation and data handling logic for backend application flows.",
+      "revised_text": "Architected Python-based API workflows with database-backed validation and data handling logic, utilizing Tableau for data visualization and backend application flows.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Tableau",
+        "Python"
+      ]
+    },
+    {
+      "original_text": "Contributed to machine-learning workflows for fraud-risk analysis, including data preparation, model experimentation, and evaluation of classification behavior.",
+      "revised_text": "Developed machine-learning workflows for fraud-risk analysis, including data preparation, model experimentation, and evaluation of classification behavior, enhancing predictive modeling capabilities.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Built Python-based API workflows with database-backed validation and data handling logic for backend application flows.",
+      "revised_text": "Developed Python-based API workflows with database-backed validation and data handling logic to streamline backend application flows.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Contributed to machine-learning workflows for fraud-risk analysis, including data preparation, model experimentation, and evaluation of classification behavior.",
+      "revised_text": "Collaborated on machine-learning workflows for fraud-risk analysis, encompassing data preparation, model experimentation, and evaluation of classification behavior.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Designed a relational data model and SQL query workflow for multi-entity transactional records, emphasizing integrity, organization, and usable data access.",
+      "revised_text": "Designed a relational data model and SQL query workflow for multi-entity transactional records, prioritizing data integrity, organization, and efficient data access.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    }
+  ],
+  "keywords_integrated": [
+    "Python",
+    "R",
+    "PostgreSQL",
+    "Tableau",
+    "Python"
+  ],
+  "keyword_coverage": 0.67,
+  "validation_flags": [
+    "2 potential truthfulness warning(s) — review change summary",
+    "2 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-12T07:58:49.536515"
+}

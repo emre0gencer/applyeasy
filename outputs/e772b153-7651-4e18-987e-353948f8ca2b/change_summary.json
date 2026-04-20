@@ -1,0 +1,113 @@
+{
+  "run_id": "e772b153-7651-4e18-987e-353948f8ca2b",
+  "profile_name": "Nathan Briggs",
+  "role_title": "Supply Chain Analyst — Planning & Procurement",
+  "company_name": "Torqline Industrial Group",
+  "bullet_changes": [
+    {
+      "original_text": "Built an Excel/Power BI dashboard tracking on-time delivery (OTD) performance across 35 Tier 1 suppliers; OTD visibility improved from weekly reports to daily",
+      "revised_text": "Engineered an Excel and Power BI dashboard to track on-time delivery performance across 35 Tier 1 suppliers, leveraging Supply Chain Management principles to improve OTD visibility from weekly to daily reports.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Supply Chain Management",
+        "Excel",
+        "Power BI"
+      ]
+    },
+    {
+      "original_text": "Analyzed supplier lead time data for 80+ SKUs and identified 14 high-risk single-source components; proposed dual-sourcing strategy adopted by procurement manager",
+      "revised_text": "Analyzed supplier lead time data for 80+ SKUs using SQL and Excel, identifying 14 high-risk single-source components and proposing a dual-sourcing strategy that improved Supply Chain Management efficiency.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Supply Chain Management",
+        "Excel",
+        "SQL"
+      ]
+    },
+    {
+      "original_text": "Assisted in RFQ process for a $4M tooling contract; compiled bid comparisons and scored 8 suppliers against criteria matrix",
+      "revised_text": "Facilitated the RFQ process for a $4M tooling contract, utilizing Six Sigma methodologies to compile bid comparisons and score 8 suppliers against a criteria matrix, ensuring a data-driven Supply Chain Management approach.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Supply Chain Management",
+        "Six Sigma"
+      ]
+    },
+    {
+      "original_text": "Trained 4 new part-time employees on order picking, packing, and carrier label generation procedures",
+      "revised_text": "Developed and implemented training programs for 4 new part-time employees on order picking, packing, and carrier label generation procedures, incorporating Lean Manufacturing principles to optimize warehouse operations.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Lean Manufacturing",
+        "Supply Chain Management"
+      ]
+    },
+    {
+      "original_text": "Processed 80–120 outbound orders per day using NetSuite WMS; maintained 99.2% ship-on-time rate",
+      "revised_text": "Processed 80-120 outbound orders per day using NetSuite WMS, maintaining a 99.2% ship-on-time rate and applying Supply Chain Management best practices to ensure efficient order fulfillment.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Supply Chain Management",
+        "NetSuite WMS"
+      ]
+    },
+    {
+      "original_text": "Supported warehouse slotting analysis for a 150K sq ft DC; recommended 40+ SKU relocations based on velocity and cube data, projected to reduce pick travel by 12%",
+      "revised_text": "Conducted warehouse slotting analysis for a 150K sq ft DC, utilizing Python and Excel to recommend 40+ SKU relocations based on velocity and cube data, projected to reduce pick travel by 12% and improve Supply Chain Management efficiency.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Supply Chain Management",
+        "Python",
+        "Excel"
+      ]
+    },
+    {
+      "original_text": "Assisted cycle count program: counted 2,000+ locations per week, investigated and resolved 35 inventory discrepancies",
+      "revised_text": "Executed cycle count program, counting 2,000+ locations per week and investigating and resolving 35 inventory discrepancies using SAP and SQL, ensuring data accuracy and integrity in Supply Chain Management.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Supply Chain Management",
+        "SAP",
+        "SQL"
+      ]
+    },
+    {
+      "original_text": "Updated routing guides for 6 LTL lanes after carrier rate renegotiation",
+      "revised_text": "Updated routing guides for 6 LTL lanes after carrier rate renegotiation, applying Supply Chain Management principles and utilizing Excel to optimize transportation routes and reduce costs.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Supply Chain Management",
+        "Excel"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "Supply Chain Management",
+    "Excel",
+    "Power BI",
+    "Supply Chain Management",
+    "Excel",
+    "SQL",
+    "Supply Chain Management",
+    "Six Sigma",
+    "Lean Manufacturing",
+    "Supply Chain Management",
+    "Supply Chain Management",
+    "NetSuite WMS",
+    "Supply Chain Management",
+    "Python",
+    "Excel",
+    "Supply Chain Management",
+    "SAP",
+    "SQL",
+    "Supply Chain Management",
+    "Excel"
+  ],
+  "keyword_coverage": 1.0,
+  "validation_flags": [
+    "8 potential truthfulness warning(s) — review change summary",
+    "8 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-11T12:24:21.157575"
+}

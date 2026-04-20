@@ -5,9 +5,13 @@ interface Props {
   runId: string;
 }
 
-function highlightKeywords(text: string, keywords: string[]): React.ReactNode {
+function highlightKeywords(text: string, keywords: string[], originalText: string): React.ReactNode {
   if (!keywords.length) return text;
-  const unique = [...new Set(keywords.map((k) => k.trim()).filter(Boolean))];
+  // Only highlight keywords that are NOT already present in the original text
+  const originalLower = originalText.toLowerCase();
+  const newKeywords = keywords.filter((k) => !originalLower.includes(k.trim().toLowerCase()));
+  if (!newKeywords.length) return text;
+  const unique = [...new Set(newKeywords.map((k) => k.trim()).filter(Boolean))];
   const escaped = unique.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const pattern = new RegExp(`(${escaped.join("|")})`, "gi");
   const parts = text.split(pattern);
@@ -73,7 +77,7 @@ function ChangeCard({ change, index }: { change: BulletChange; index: number }) 
               )}
             </div>
             <p style={s.diffTextAfter}>
-              {highlightKeywords(change.revised_text, change.keywords_added)}
+              {highlightKeywords(change.revised_text, change.keywords_added, change.original_text)}
             </p>
           </div>
         </div>

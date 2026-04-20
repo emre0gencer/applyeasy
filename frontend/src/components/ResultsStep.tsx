@@ -103,13 +103,12 @@ function SuitabilityScore({ status }: { status: StatusResponse }) {
       {/* Before / After comparison strip */}
       {status.raw_suitability_score !== undefined && status.raw_suitability_score !== null && (
         (() => {
-          // Enforce minimum +20 gap between before and after
-          const effectiveRaw = Math.min(status.raw_suitability_score, Math.max(0, score - 20));
+          const rawInput = status.raw_suitability_score;
           return (
             <div style={sc.compareStrip}>
               <div style={sc.compareCol}>
                 <span style={sc.compareCaption}>BEFORE TAILORING</span>
-                <span style={sc.compareNumMuted}>{effectiveRaw}</span>
+                <span style={sc.compareNumMuted}>{rawInput}</span>
               </div>
               <div style={sc.compareArrow}>→</div>
               <div style={sc.compareCol}>
@@ -118,7 +117,7 @@ function SuitabilityScore({ status }: { status: StatusResponse }) {
               </div>
               <div style={sc.compareDelta}>
                 <span style={sc.compareDeltaNum}>
-                  +{Math.max(0, score - effectiveRaw)}
+                  +{Math.max(0, score - rawInput)}
                 </span>
                 <span style={sc.compareDeltaLabel}>pts</span>
               </div>

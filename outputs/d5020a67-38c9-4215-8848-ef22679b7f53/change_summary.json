@@ -1,0 +1,57 @@
+{
+  "run_id": "d5020a67-38c9-4215-8848-ef22679b7f53",
+  "profile_name": "Priya Nambiar",
+  "role_title": "Software Engineer",
+  "company_name": "Marcus Delgado",
+  "bullet_changes": [
+    {
+      "original_text": "Automated weekly reporting pipeline in Python, saving 6 hours of analyst time per week",
+      "revised_text": "Automated weekly reporting pipeline using Python and Docker, saving 6 hours of analyst time per week and improving data consistency with PostgreSQL",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "Docker",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "original_text": "Cleaned and joined claims data across 4 disparate sources (1.2M patient records) using pandas and SQL",
+      "revised_text": "Integrated and cleaned claims data across 4 disparate sources using pandas, SQL, and MongoDB, resulting in a unified dataset of 1.2M patient records",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "pandas",
+        "SQL",
+        "MongoDB"
+      ]
+    },
+    {
+      "original_text": "Presented findings to clinical leadership; model was piloted in 2 hospital units",
+      "revised_text": "Deployed a predictive model using FastAPI and Git, presenting findings to clinical leadership and piloting the model in 2 hospital units with Node.js and React for visualization",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "FastAPI",
+        "Git",
+        "Node.js",
+        "React"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "Python",
+    "Docker",
+    "PostgreSQL",
+    "pandas",
+    "SQL",
+    "MongoDB",
+    "FastAPI",
+    "Git",
+    "Node.js",
+    "React"
+  ],
+  "keyword_coverage": 0.8,
+  "validation_flags": [
+    "3 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-11T12:44:28.360093"
+}

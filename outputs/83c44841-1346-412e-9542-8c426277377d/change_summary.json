@@ -1,0 +1,115 @@
+{
+  "run_id": "83c44841-1346-412e-9542-8c426277377d",
+  "profile_name": "Aisha Okonkwo",
+  "role_title": "Undergraduate Researcher",
+  "company_name": "MIT",
+  "bullet_changes": [
+    {
+      "original_text": "Analyzed single-cell RNA sequencing data (10x Genomics) using Seurat in R; identified 3 candidate marker genes for a macrophage subpopulation",
+      "revised_text": "Analyzed single-cell RNA sequencing data using Seurat in R and Bioinformatics techniques, identifying 3 candidate marker genes for a macrophage subpopulation.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "R",
+        "Seurat",
+        "Bioinformatics"
+      ]
+    },
+    {
+      "original_text": "Developed a Python pipeline (pandas, SciPy) to process and normalize 96-well plate fluorescence data from 40+ assays; reduced analyst processing time by 70%",
+      "revised_text": "Developed a Python pipeline utilizing pandas and SciPy to process and normalize 96-well plate fluorescence data from 40+ assays, reducing analyst processing time by 70% through optimized Bioinformatics workflows.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "pandas",
+        "SciPy",
+        "Bioinformatics"
+      ]
+    },
+    {
+      "original_text": "Designed and executed in vitro experiments characterizing cytokine signaling responses in primary human macrophages under TGF-β stimulation",
+      "revised_text": "Designed and executed in vitro experiments characterizing cytokine signaling responses in primary human macrophages under TGF-β stimulation, applying principles of Biology and Bioinformatics to inform experimental design.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Biology",
+        "Bioinformatics"
+      ]
+    },
+    {
+      "original_text": "Performed CRISPR-Cas9 knockout screens in Jurkat T-cell lines to identify resistance mechanisms to PD-1 checkpoint inhibitors",
+      "revised_text": "Performed CRISPR-Cas9 knockout screens in Jurkat T-cell lines to identify resistance mechanisms to PD-1 checkpoint inhibitors, leveraging Bioinformatics and Biology expertise to analyze genomic data.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "CRISPR-Cas9",
+        "Bioinformatics",
+        "Biology"
+      ]
+    },
+    {
+      "original_text": "Maintained cell culture protocols for 6 cell lines; trained 2 new summer interns on aseptic technique",
+      "revised_text": "Maintained cell culture protocols for 6 cell lines, applying Biology principles to ensure aseptic technique and trained 2 new summer interns on best practices, supporting the research team's Bioinformatics and Biology endeavors.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Biology",
+        "Bioinformatics"
+      ]
+    },
+    {
+      "original_text": "Processed and analyzed NGS library data using custom Python scripts; delivered ranked hit list to senior scientist within agreed timeline",
+      "revised_text": "Processed and analyzed NGS library data using custom Python scripts and Bioinformatics techniques, delivering a ranked hit list to senior scientist within agreed timeline and demonstrating proficiency in Biology and data analysis.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "Bioinformatics",
+        "Biology"
+      ]
+    },
+    {
+      "original_text": "Characterized sensor linearity, sensitivity, and response time; achieved R² = 0.996 over 0–20 mM range",
+      "revised_text": "Characterized sensor linearity, sensitivity, and response time, achieving a high correlation coefficient (R² = 0.996) over a 0-20 mM lactate range",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Fabricated sensor substrates using photolithography in MIT.nano cleanroom",
+      "revised_text": "Fabricated sensor substrates using photolithography in the MIT.nano cleanroom",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Containerized pipeline using Docker for reproducibility; documented on GitHub",
+      "revised_text": "Developed a containerized pipeline using Docker for enhanced reproducibility and deployed it on GitHub for version control",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Docker",
+        "GitHub"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "R",
+    "Seurat",
+    "Bioinformatics",
+    "Python",
+    "pandas",
+    "SciPy",
+    "Bioinformatics",
+    "Biology",
+    "Bioinformatics",
+    "CRISPR-Cas9",
+    "Bioinformatics",
+    "Biology",
+    "Biology",
+    "Bioinformatics",
+    "Python",
+    "Bioinformatics",
+    "Biology",
+    "Docker",
+    "GitHub"
+  ],
+  "keyword_coverage": 0.72,
+  "validation_flags": [
+    "7 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-11T13:21:18.829199"
+}

@@ -1,0 +1,200 @@
+{
+  "run_id": "443df811-e8a4-4434-9f3d-1eb9cad433d9",
+  "profile_name": "Jordan Whitfield",
+  "role_title": "Investment Banking Analyst — Technology, Media & Telecom (TMT)",
+  "company_name": "Caldwell & Wren",
+  "bullet_changes": [
+    {
+      "original_text": "Wrote 2 initiation reports (15–20 pages each) with buy/hold/sell recommendations; one idea adopted by the portfolio manager",
+      "revised_text": "Authored two comprehensive initiation reports using Bloomberg Terminal and CapIQ data, incorporating GAAP financials and TMT industry trends to inform buy/hold/sell recommendations.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Bloomberg Terminal",
+        "CapIQ",
+        "GAAP",
+        "TMT"
+      ]
+    },
+    {
+      "original_text": "Modeled revenue and cost drivers for 8 consumer staples companies using 10-K/Q filings and earnings transcripts",
+      "revised_text": "Modeled revenue and cost drivers for eight consumer staples companies using Excel, Python, and 10-K/Q filings, applying VBA scripts to analyze earnings transcripts and identify key TMT sector trends.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Excel",
+        "Python",
+        "VBA",
+        "TMT"
+      ]
+    },
+    {
+      "original_text": "Maintained a coverage universe tracker updated weekly with price targets, consensus estimates, and earnings dates",
+      "revised_text": "Maintained a weekly coverage universe tracker in Excel, updating price targets, consensus estimates, and earnings dates for TMT sector companies, leveraging Bloomberg Terminal and CapIQ data to inform investment decisions.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Excel",
+        "Bloomberg Terminal",
+        "CapIQ",
+        "TMT"
+      ]
+    },
+    {
+      "original_text": "Conducted comparable company analysis and precedent transaction analysis using CapIQ and Bloomberg",
+      "revised_text": "Conducted comparable company analysis and precedent transaction analysis using CapIQ and Bloomberg Terminal, applying GAAP financials and M&A transaction data to identify key trends and insights in the TMT sector.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "CapIQ",
+        "Bloomberg Terminal",
+        "GAAP",
+        "M&A",
+        "TMT"
+      ]
+    },
+    {
+      "original_text": "Built 3-statement financial models and DCF valuations for 4 M&A transactions in the industrials sector (deal sizes $80M–$350M)",
+      "revised_text": "Developed 3-statement financial models and DCF valuations for four M&A transactions in the industrials sector, utilizing Excel, VBA, and Python to analyze deal sizes and apply TMT sector valuation methodologies.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Excel",
+        "VBA",
+        "Python",
+        "M&A",
+        "TMT"
+      ]
+    },
+    {
+      "original_text": "Supported due diligence on a $200M acquisition: reviewed data room documents, flagged 3 material risks to senior bankers",
+      "revised_text": "Supported due diligence on a $200M acquisition, reviewing data room documents in PowerPoint and flagging material risks to senior bankers, applying knowledge of GAAP financials and TMT industry trends to inform the M&A process.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "PowerPoint",
+        "GAAP",
+        "TMT",
+        "M&A"
+      ]
+    },
+    {
+      "original_text": "Prepared materials for board of directors' quarterly financial review",
+      "revised_text": "Prepared quarterly financial review materials for the board of directors, creating PowerPoint presentations and Excel dashboards that incorporated Bloomberg Terminal and CapIQ data to provide insights on TMT sector performance and M&A activity.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "PowerPoint",
+        "Excel",
+        "Bloomberg Terminal",
+        "CapIQ",
+        "TMT",
+        "M&A"
+      ]
+    },
+    {
+      "original_text": "Built an Excel dashboard that automated fleet cost reporting, reducing manual effort from 5 hours to 30 minutes per month",
+      "revised_text": "Designed an Excel dashboard that automated fleet cost reporting, reducing manual effort by 80% and applying VBA scripts to analyze cost trends, with potential applications in TMT sector companies with significant fleet operations.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Excel",
+        "VBA",
+        "TMT"
+      ]
+    },
+    {
+      "original_text": "Assisted FP&A team with monthly variance analysis; reconciled actuals vs. budget across 6 cost centers",
+      "revised_text": "Assisted the FP&A team with monthly variance analysis, reconciling actuals vs. budget across six cost centers using Excel and applying GAAP financials and TMT industry trends to identify areas for cost optimization and M&A opportunities.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Excel",
+        "GAAP",
+        "TMT",
+        "M&A"
+      ]
+    },
+    {
+      "original_text": "Built 3-statement financial models and DCF valuations for 4 M&A transactions in the industrials sector (deal sizes $80M–$350M)",
+      "revised_text": "Developed 3-statement financial models and DCF valuations for 4 industrials sector M&A transactions, with deal sizes ranging from $80M to $350M.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Prepared pitch books and CIM drafts for 2 live sell-side mandates; presented to Managing Director for review",
+      "revised_text": "Created pitch books and CIM drafts for 2 live sell-side mandates, and presented them to the Managing Director for review.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Conducted comparable company analysis and precedent transaction analysis using CapIQ and Bloomberg",
+      "revised_text": "Conducted comprehensive comparable company analysis and precedent transaction analysis using CapIQ and Bloomberg Terminal.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "comprehensive"
+      ]
+    },
+    {
+      "original_text": "Modeled revenue and cost drivers for 8 consumer staples companies using 10-K/Q filings and earnings transcripts",
+      "revised_text": "Modeled revenue and cost drivers for 8 consumer staples companies using 10-K/Q filings and earnings transcripts, leveraging financial data analysis.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "financial data analysis"
+      ]
+    },
+    {
+      "original_text": "Wrote 2 initiation reports (15–20 pages each) with buy/hold/sell recommendations; one idea adopted by the portfolio manager",
+      "revised_text": "Authored 2 comprehensive initiation reports (15–20 pages each) with buy/hold/sell recommendations, one of which was adopted by the portfolio manager.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Maintained a coverage universe tracker updated weekly with price targets, consensus estimates, and earnings dates",
+      "revised_text": "Developed and maintained a coverage universe tracker updated weekly with price targets, consensus estimates, and earnings dates.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    }
+  ],
+  "keywords_integrated": [
+    "Bloomberg Terminal",
+    "CapIQ",
+    "GAAP",
+    "TMT",
+    "Excel",
+    "Python",
+    "VBA",
+    "TMT",
+    "Excel",
+    "Bloomberg Terminal",
+    "CapIQ",
+    "TMT",
+    "CapIQ",
+    "Bloomberg Terminal",
+    "GAAP",
+    "M&A",
+    "TMT",
+    "Excel",
+    "VBA",
+    "Python",
+    "M&A",
+    "TMT",
+    "PowerPoint",
+    "GAAP",
+    "TMT",
+    "M&A",
+    "PowerPoint",
+    "Excel",
+    "Bloomberg Terminal",
+    "CapIQ",
+    "TMT",
+    "M&A",
+    "Excel",
+    "VBA",
+    "TMT",
+    "Excel",
+    "GAAP",
+    "TMT",
+    "M&A",
+    "comprehensive",
+    "financial data analysis"
+  ],
+  "keyword_coverage": 1.0,
+  "validation_flags": [
+    "5 potential truthfulness warning(s) — review change summary",
+    "11 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-11T13:03:40.882444"
+}

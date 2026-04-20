@@ -10,7 +10,7 @@ We're looking for an entry-level or early-career Data Scientist to join our Clin
 What You'll Do
 - Build and validate predictive models (readmission risk, length-of-stay, no-show prediction) using structured claims and EHR data
 - Design and execute observational study analyses, applying propensity score methods, difference-in-differences, and interrupted time series to evaluate clinical programs
-- Clean, join, and validate large datasets (millions of patient records) from disparate source systems using Python and SQL
+- Clean, join, and validate large datasets (millions of patient records) from disp rate source systems using Python and SQL
 - Communicate findings clearly to non-technical clinical and operational stakeholders through written reports, visualizations, and slide decks
 - Contribute to automated reporting pipelines that deliver weekly KPIs to hospital partners
 - Collaborate with data engineers to scope data requirements and validate pipelines

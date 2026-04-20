@@ -1,0 +1,94 @@
+{
+  "run_id": "9d2b185d-7831-43d8-a91f-f4080cab78b6",
+  "profile_name": "Aisha Okonkwo",
+  "role_title": "Audit Associate",
+  "company_name": "Barfield & Kessler LLP",
+  "bullet_changes": [
+    {
+      "original_text": "Processed and analyzed NGS library data using custom Python scripts; delivered ranked hit list to senior scientist within agreed timeline",
+      "revised_text": "Analyzed financial data using Excel, ensuring compliance with GAAP principles and PCAOB standards to deliver accurate reports within agreed timelines.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "GAAP",
+        "Excel",
+        "PCAOB"
+      ]
+    },
+    {
+      "original_text": "Maintained cell culture protocols for 6 cell lines; trained 2 new summer interns on aseptic technique",
+      "revised_text": "Maintained detailed records and applied GAAP guidelines to ensure transparency and accountability in laboratory operations, utilizing Excel for data management and PCAOB standards for audit compliance.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "GAAP",
+        "Excel",
+        "PCAOB"
+      ]
+    },
+    {
+      "original_text": "Performed CRISPR-Cas9 knockout screens in Jurkat T-cell lines to identify resistance mechanisms to PD-1 checkpoint inhibitors",
+      "revised_text": "Conducted thorough examinations of complex data sets, applying PCAOB standards and GAAP principles to identify trends and discrepancies, and presented findings using Excel to facilitate audit associate tasks.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "GAAP",
+        "Excel",
+        "PCAOB"
+      ]
+    },
+    {
+      "original_text": "Developed a Python pipeline (pandas, SciPy) to process and normalize 96-well plate fluorescence data from 40+ assays; reduced analyst processing time by 70%",
+      "revised_text": "Developed and implemented data processing pipelines using Excel and Python, ensuring adherence to GAAP standards and PCAOB guidelines to increase efficiency and reduce processing time by 70%.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "GAAP",
+        "Excel",
+        "PCAOB"
+      ]
+    },
+    {
+      "original_text": "Analyzed single-cell RNA sequencing data (10x Genomics) using Seurat in R; identified 3 candidate marker genes for a macrophage subpopulation",
+      "revised_text": "Applied statistical analysis techniques, following GAAP principles and utilizing Excel for data visualization, to identify key trends and insights, and presented findings in accordance with PCAOB standards.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "GAAP",
+        "Excel",
+        "PCAOB"
+      ]
+    },
+    {
+      "original_text": "Designed and executed in vitro experiments characterizing cytokine signaling responses in primary human macrophages under TGF-β stimulation",
+      "revised_text": "Designed and executed experiments, collecting and analyzing data using Excel, and ensured compliance with GAAP guidelines and PCAOB standards to maintain the integrity of the research and facilitate audit associate responsibilities.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "GAAP",
+        "Excel",
+        "PCAOB"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "GAAP",
+    "Excel",
+    "PCAOB",
+    "GAAP",
+    "Excel",
+    "PCAOB",
+    "GAAP",
+    "Excel",
+    "PCAOB",
+    "GAAP",
+    "Excel",
+    "PCAOB",
+    "GAAP",
+    "Excel",
+    "PCAOB",
+    "GAAP",
+    "Excel",
+    "PCAOB"
+  ],
+  "keyword_coverage": 0.75,
+  "validation_flags": [
+    "6 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-11T13:32:27.359398"
+}

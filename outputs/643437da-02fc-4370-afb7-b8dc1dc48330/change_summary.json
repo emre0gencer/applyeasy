@@ -1,0 +1,115 @@
+{
+  "run_id": "643437da-02fc-4370-afb7-b8dc1dc48330",
+  "profile_name": "Tomas Reyes",
+  "role_title": "Growth Marketing Associate",
+  "company_name": "Velour",
+  "bullet_changes": [
+    {
+      "original_text": "Managed paid social campaigns (Meta Ads, TikTok Ads) with a combined monthly budget of $35K; optimized targeting to reduce CPA by 22% over 3 months",
+      "revised_text": "Optimized paid social campaigns on Meta Ads and TikTok Ads with a $35K monthly budget, reducing CPA by 22% over 3 months through targeted influencer marketing and DTC e-commerce metrics analysis",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Meta Ads",
+        "TikTok Ads",
+        "Influencer marketing",
+        "DTC e-commerce metrics"
+      ]
+    },
+    {
+      "original_text": "Built weekly performance dashboards in Google Data Studio tracking ROAS, CPC, CPM, and conversion rate",
+      "revised_text": "Developed weekly performance dashboards in Google Data Studio to track key paid social metrics, including ROAS, CPC, and CPM, informing data-driven decisions for future campaigns",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Google Data Studio",
+        "Paid social"
+      ]
+    },
+    {
+      "original_text": "Coordinated 4 influencer partnerships (10K–150K followers), negotiating deliverables and tracking affiliate link performance",
+      "revised_text": "Coordinated influencer partnerships with 4 micro-influencers, leveraging Klaviyo for affiliate link tracking and negotiating deliverables to drive conversions and boost brand awareness through paid social channels",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Influencer marketing",
+        "Klaviyo",
+        "Paid social"
+      ]
+    },
+    {
+      "original_text": "Researched and sourced 15 micro-influencer leads that fit brand aesthetic and audience demographics",
+      "revised_text": "Researched and sourced 15 micro-influencer leads aligning with brand aesthetics and audience demographics, utilizing DTC e-commerce metrics to inform influencer marketing strategies",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Influencer marketing",
+        "DTC e-commerce metrics"
+      ]
+    },
+    {
+      "original_text": "Conducted competitor analysis across 8 brands; summarized findings in a 12-slide deck presented to VP of Marketing",
+      "revised_text": "Conducted competitor analysis across 8 brands, summarizing findings in a 12-slide deck presented to the VP of Marketing, highlighting opportunities for growth through paid social and influencer marketing",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Paid social",
+        "Influencer marketing"
+      ]
+    },
+    {
+      "original_text": "Assisted content calendar planning for Instagram, Twitter, and YouTube (combined 280K followers); scheduled 50+ posts per month using Hootsuite",
+      "revised_text": "Architected content calendar planning for Instagram, Twitter, and YouTube, scheduling 50+ posts per month using Hootsuite and integrating Meta Ads and TikTok Ads for amplified reach",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Meta Ads",
+        "TikTok Ads"
+      ]
+    },
+    {
+      "original_text": "Promoted new campus pop-up locations through organic Instagram and flyer campaigns; drove 200+ first-visit customers in the first 2 weeks",
+      "revised_text": "Promoted new campus pop-up locations through organic Instagram and flyer campaigns, driving 200+ first-visit customers in the first 2 weeks and demonstrating the effectiveness of paid social and influencer marketing tactics",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Paid social",
+        "Influencer marketing"
+      ]
+    },
+    {
+      "original_text": "Organized 3 on-campus tasting events (50–120 attendees each) in coordination with university events office",
+      "revised_text": "Executed 3 on-campus tasting events in coordination with the university events office, leveraging Google Data Studio to track event attendance and feedback, informing future event marketing strategies",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Google Data Studio"
+      ]
+    },
+    {
+      "original_text": "Proposed a TikTok-first content strategy with creator partnerships and a referral loop; judges cited data-backed projections as differentiator",
+      "revised_text": "Developed a TikTok-centric content strategy featuring creator partnerships and a referral loop, which impressed judges with data-driven projections.",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    }
+  ],
+  "keywords_integrated": [
+    "Meta Ads",
+    "TikTok Ads",
+    "Influencer marketing",
+    "DTC e-commerce metrics",
+    "Google Data Studio",
+    "Paid social",
+    "Influencer marketing",
+    "Klaviyo",
+    "Paid social",
+    "Influencer marketing",
+    "DTC e-commerce metrics",
+    "Paid social",
+    "Influencer marketing",
+    "Meta Ads",
+    "TikTok Ads",
+    "Paid social",
+    "Influencer marketing",
+    "Google Data Studio"
+  ],
+  "keyword_coverage": 1.0,
+  "validation_flags": [
+    "2 potential truthfulness warning(s) — review change summary",
+    "8 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-11T13:07:38.037012"
+}

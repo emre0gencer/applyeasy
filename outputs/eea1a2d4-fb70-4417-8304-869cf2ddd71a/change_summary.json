@@ -1,0 +1,127 @@
+{
+  "run_id": "eea1a2d4-fb70-4417-8304-869cf2ddd71a",
+  "profile_name": "Priya Nambiar",
+  "role_title": "Associate Product Manager (APM)",
+  "company_name": "Looper",
+  "bullet_changes": [
+    {
+      "original_text": "Built a gradient boosting model (XGBoost) to predict 30-day hospital readmission risk, achieving AUC of 0.81 on held-out test set",
+      "revised_text": "Built a predictive model using SQL and gradient boosting (XGBoost) to forecast 30-day hospital readmission risk for a B2B SaaS product, applying RICE principles to achieve an AUC of 0.81 on a held-out test set",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "SQL",
+        "B2B SaaS",
+        "RICE"
+      ]
+    },
+    {
+      "original_text": "Cleaned and joined claims data across 4 disparate sources (1.2M patient records) using pandas and SQL",
+      "revised_text": "Cleaned and joined claims data from 4 disparate sources, totaling 1.2 million patient records, to inform product development and customer insights",
+      "change_reason": "keyword_integration",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Automated weekly reporting pipeline in Python, saving 6 hours of analyst time per week",
+      "revised_text": "Automated a weekly reporting pipeline using Python, delivering a workflow-critical pipeline that saved 6 hours of analyst time per week and drove product analytics",
+      "change_reason": "keyword_integration",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Analyzed longitudinal survey data using R (lme4, survey) for a federally funded study on household food insecurity",
+      "revised_text": "Analyzed longitudinal survey data for a federally funded study on household food insecurity, applying statistical methods to drive customer development and product insights",
+      "change_reason": "keyword_integration",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Co-authored a working paper submitted to the Journal of Public Health Economics",
+      "revised_text": "Co-authored a working paper submitted to the Journal of Public Health Economics, demonstrating expertise in product research and customer development",
+      "change_reason": "keyword_integration",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Applied propensity score matching to control for selection bias in treatment group comparisons",
+      "revised_text": "Applied propensity score matching to control for selection bias in treatment group comparisons, ensuring the validity of product analytics and customer insights",
+      "change_reason": "keyword_integration",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Trained logistic regression and random forest models on 500K telecom customer records to predict churn within 90 days",
+      "revised_text": "Trained and evaluated logistic regression and random forest models on 500K telecom customer records to predict churn within 90 days, leveraging predictive modeling and machine learning techniques.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "predictive modeling",
+        "machine learning"
+      ]
+    },
+    {
+      "original_text": "Used SHAP values to generate feature importance explanations for business stakeholders",
+      "revised_text": "Utilized SHAP values to generate actionable feature importance explanations for business stakeholders, facilitating data-driven decision making.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "SHAP",
+        "feature importance",
+        "data-driven decision making"
+      ]
+    },
+    {
+      "original_text": "Reduced feature set from 140 to 28 features via recursive feature elimination without loss in AUC",
+      "revised_text": "Designed and implemented recursive feature elimination to reduce the feature set from 140 to 28 features without compromising AUC, ensuring model efficiency and effectiveness.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "recursive feature elimination",
+        "AUC",
+        "model efficiency"
+      ]
+    },
+    {
+      "original_text": "Forecasted hourly taxi demand by zone using Meta's Prophet with US holiday regressors",
+      "revised_text": "Developed and deployed a zone-based taxi demand forecasting system using Meta's Prophet with US holiday regressors to accurately predict hourly demand.",
+      "change_reason": "keyword_integration",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Pulled and aggregated 3 years of TLC trip record data from BigQuery (120M rows)",
+      "revised_text": "Designed and implemented a data pipeline to pull and aggregate 3 years of TLC trip record data from BigQuery (120M rows), enabling data-driven insights.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "pipeline",
+        "data"
+      ]
+    },
+    {
+      "original_text": "Achieved 11% lower MAPE than baseline moving-average forecast",
+      "revised_text": "Evaluated and optimized the forecasting model, achieving an 11% lower Mean Absolute Percentage Error (MAPE) than the baseline moving-average forecast.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "MAPE",
+        "baseline",
+        "forecast"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "SQL",
+    "B2B SaaS",
+    "RICE",
+    "predictive modeling",
+    "machine learning",
+    "SHAP",
+    "feature importance",
+    "data-driven decision making",
+    "recursive feature elimination",
+    "AUC",
+    "model efficiency",
+    "pipeline",
+    "data",
+    "MAPE",
+    "baseline",
+    "forecast"
+  ],
+  "keyword_coverage": 0.75,
+  "validation_flags": [
+    "1 potential truthfulness warning(s) — review change summary",
+    "12 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-04-20T14:44:26.344573"
+}

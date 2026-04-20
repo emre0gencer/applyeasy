@@ -69,41 +69,57 @@ def _get_all_keywords(jd: JobDescription) -> list[str]:
     return [k.term for k in jd.keywords]
 
 
-def _distribute_entry_keywords(
-    candidate_kws: list[str],
-    num_bullets: int,
-    kw_block_counts: dict[str, int],
-    max_blocks_per_kw: int,
-    kw_per_bullet: int = 2,
-) -> list[list[str]]:
+def _assign_keywords_to_bullets(
+    keywords: list[str],
+    bullets: list[tuple[int, int, str]],  # (exp_i, b_i, text)
+) -> dict[tuple[int, int], list[str]]:
     """
-    Assign unique keywords to each bullet in one entry (experience or project).
+    Globally assign each keyword to the single best-matching bullet across ALL entries.
 
-    Rules:
-    - Each keyword appears at most ONCE within this entry (no intra-block repetition).
-    - Each keyword is only eligible if it has appeared in fewer than
-      max_blocks_per_kw blocks so far (cross-block frequency cap).
-    - After assignment, increments kw_block_counts for keywords used.
+    Each keyword is used exactly once. For each keyword, the best bullet is chosen
+    by word-overlap score between the keyword tokens and bullet text — so keywords
+    land where they are most contextually relevant, not just in sequential order.
 
-    Returns a per-bullet list of keyword assignments.
+    Keywords already present verbatim in a bullet are skipped for that bullet
+    (no point re-adding what's already there); the next-best bullet is tried instead.
+
+    Returns a dict mapping (exp_i, b_i) → list of keywords assigned to that bullet.
     """
-    # Only keywords still under the cross-block frequency cap
-    available = [kw for kw in candidate_kws
-                 if kw_block_counts.get(kw, 0) < max_blocks_per_kw]
+    assignments: dict[tuple[int, int], list[str]] = {(ei, bi): [] for ei, bi, _ in bullets}
+    used_keywords: set[str] = set()
 
-    used_in_entry: set[str] = set()
-    assignments: list[list[str]] = []
+    # Pre-tokenize bullet texts for scoring
+    bullet_words: list[set[str]] = [
+        set(text.lower().split()) for _, _, text in bullets
+    ]
+    bullet_texts_lower: list[str] = [text.lower() for _, _, text in bullets]
 
-    for _ in range(num_bullets):
-        # Keywords not yet assigned in this entry
-        remaining = [kw for kw in available if kw not in used_in_entry]
-        assigned = remaining[:kw_per_bullet]
-        used_in_entry.update(assigned)
-        assignments.append(assigned)
+    for kw in keywords:
+        if kw.lower() in used_keywords:
+            continue
 
-    # Update cross-block counts for all keywords used anywhere in this entry
-    for kw in used_in_entry:
-        kw_block_counts[kw] = kw_block_counts.get(kw, 0) + 1
+        kw_tokens = set(kw.lower().split())
+
+        # Score each bullet: word overlap, penalise bullets that already contain this keyword
+        best_score = -1.0
+        best_idx = -1
+        for bi, (bwords, btext_lower) in enumerate(zip(bullet_words, bullet_texts_lower)):
+            if kw.lower() in btext_lower:
+                continue  # already present — skip
+            if not bwords:
+                continue
+            overlap = len(kw_tokens & bwords) / len(bwords)
+            if overlap > best_score:
+                best_score = overlap
+                best_idx = bi
+
+        # If every bullet already contains the keyword, skip it entirely
+        if best_idx == -1:
+            continue
+
+        key = (bullets[best_idx][0], bullets[best_idx][1])
+        assignments[key].append(kw)
+        used_keywords.add(kw.lower())
 
     return assignments
 
@@ -138,26 +154,23 @@ def _rephrase_bullets_batch(
         "more informative, more specific, and more useful to a recruiter — "
         "by surfacing real evidence of what was done, how it was done, and what it produced.\n\n"
 
-        "PRIMARY OBJECTIVE — EVIDENCE FIRST:\n"
-        "Surface concrete evidence in each bullet:\n"
+        "PRIMARY OBJECTIVE — KEYWORD INTEGRATION:\n"
+        "You MUST weave the provided keywords_to_try into each bullet naturally. "
+        "Every keyword given must appear verbatim in the revised bullet. "
+        "Restructure the sentence as needed to include them while keeping the bullet coherent and professional.\n\n"
+
+        "SECONDARY OBJECTIVE — EVIDENCE:\n"
+        "While integrating keywords, also surface concrete evidence:\n"
         "  - Scope: end-to-end, user-facing, production-ready, multi-step, workflow-critical\n"
-        "  - Complexity: schema design, validation logic, API integration, state management, "
-        "evaluation workflows, debugging, observability\n"
+        "  - Complexity: schema design, validation logic, API integration, state management\n"
         "  - Ownership: designed, built, implemented, validated, optimized, deployed\n"
-        "  - Deliverable: named system/API/pipeline/schema/workflow/layer\n"
-        "Use the provided evidence_signals to understand what's already in the bullet "
-        "and bring it forward more clearly.\n\n"
+        "  - Deliverable: named system/API/pipeline/schema/workflow/layer\n\n"
 
-        "GROUNDED QUANTIFICATION (use freely — these communicate value without inventing numbers):\n"
-        "  - Structural scope: 'end-to-end', 'user-facing', 'transaction-oriented', 'production'\n"
-        "  - Technical complexity: 'validation layer', 'API integration', 'evaluation workflow'\n"
-        "  - Ownership clarity: 'designed', 'built', 'implemented from scratch'\n"
-        "  - Deliverable specificity: 'REST API', 'data pipeline', 'schema with integrity constraints'\n\n"
-
-        "KEYWORDS — SECONDARY:\n"
-        "Integrate provided keywords only where they fit the evidence and add clarity. "
-        "If a keyword does not fit the technical context of this bullet, SKIP IT. "
-        "Never use keywords as padding. Never force a keyword where it sounds unnatural.\n\n"
+        "KEYWORD INTEGRATION RULES:\n"
+        "  - Include every keyword from keywords_to_try verbatim in the revised_text.\n"
+        "  - List every included keyword in keywords_added exactly as given.\n"
+        "  - Fit keywords naturally into the sentence — rephrase around them if needed.\n"
+        "  - Never drop a keyword just because it requires rephrasing.\n\n"
 
         "FORMULA: ownership verb + technical method/approach + scope/context + deliverable/outcome\n\n"
 
@@ -244,15 +257,14 @@ def _rephrase_project_bullets(
         "You are a senior technical resume writer. Improve each project bullet to surface "
         "concrete evidence of what was built, how it worked, and what it delivered — "
         "while preserving the original scope and technical stack entirely.\n\n"
-        "PRIMARY OBJECTIVE — EVIDENCE FIRST:\n"
+        "PRIMARY OBJECTIVE — KEYWORD INTEGRATION:\n"
+        "You MUST include every keyword from keywords_to_try verbatim in the revised bullet. "
+        "Rephrase the sentence as needed to fit them naturally. "
+        "List every included keyword in keywords_added exactly as given.\n\n"
+        "SECONDARY OBJECTIVE — EVIDENCE:\n"
         "  - Name the deliverable: system, API, pipeline, schema, workflow, application\n"
-        "  - Surface what was technically interesting: validation, schema design, API integration, "
-        "state management, evaluation, async logic\n"
-        "  - Clarify ownership: designed, built, implemented, integrated, evaluated\n"
-        "  - Indicate scope where visible: end-to-end, user-facing, production, multi-step\n\n"
-        "KEYWORDS — SECONDARY:\n"
-        "Incorporate the provided target keywords ONLY where they fit naturally and add clarity. "
-        "If a keyword does not fit the project's technical context, skip it — do not force it.\n\n"
+        "  - Surface what was technically interesting: validation, schema design, API integration\n"
+        "  - Clarify ownership: designed, built, implemented, integrated, evaluated\n\n"
         "RULES:\n"
         "1. Do NOT invent tools, technologies, metrics, outcomes, or scope not in the original.\n"
         "2. Keep length close to the original (25-45 words). Do not bloat.\n"
@@ -352,8 +364,6 @@ def _select_and_tailor_experiences(
     jd: JobDescription,
     keyword_integration_budget: list[int],  # mutable counter [remaining]
     keyword_limit: int = 10,
-    kw_block_counts: "dict[str, int] | None" = None,
-    max_blocks_per_kw: int = 99,
 ) -> list[TailoredExperience]:
     """Select top experiences and tailor their bullets using a single batch LLM call."""
     all_exp_entries = [e for e in relevance_map.scored_entries if e.entry_type == "experience"]
@@ -388,18 +398,13 @@ def _select_and_tailor_experiences(
     all_kw = _get_all_keywords(jd)
     role_title = jd.role_title
 
-    # Collect bullets that need rephrasing in one pass
-    # v2: rephrase_queue now includes evidence per bullet
-    rephrase_queue: list[tuple[int, int, str, list[str], "BulletEvidence | None"]] = []
+    # Pass 1: collect sorted bullets per entry
     per_exp_sorted: list[list[ScoredBullet]] = []
-
     for exp_i, scored_entry in enumerate(exp_entries):
         idx = scored_entry.entry_index
         if idx >= len(profile.experiences):
             per_exp_sorted.append([])
             continue
-
-        # v2: sort by bullet_contribution_score (evidence-aware) instead of pure cosine sim
         sorted_bullets = sorted(
             scored_entry.scored_bullets,
             key=lambda sb: sb.bullet_contribution_score,
@@ -407,22 +412,27 @@ def _select_and_tailor_experiences(
         )[:_MAX_BULLETS_PER_EXP]
         per_exp_sorted.append(sorted_bullets)
 
+    # Pass 2: global keyword assignment — each keyword goes to its best-matching bullet
+    # Only non-padded entries are eligible for keyword injection
+    candidate_kws = list(dict.fromkeys(high_kw + all_kw))[:keyword_limit]
+    eligible_bullets: list[tuple[int, int, str]] = []  # (exp_i, b_i, text)
+    for exp_i, sorted_bullets in enumerate(per_exp_sorted):
         if exp_i in padded_set:
-            # Low-relevance padded entry: keep bullets unchanged, no keyword injection
             continue
-
-        # Candidate keyword pool for this entry, high-importance first
-        candidate_kws = list(dict.fromkeys(high_kw + all_kw))[:keyword_limit]
-
-        # Distribute keywords across bullets: each bullet gets its own unique pair
-        _kw_counts = kw_block_counts if kw_block_counts is not None else {}
-        per_bullet_kws = _distribute_entry_keywords(
-            candidate_kws, len(sorted_bullets), _kw_counts, max_blocks_per_kw
-        )
         for b_i, sb in enumerate(sorted_bullets):
-            # v2: attach evidence (from ranker if present, else extract on-the-fly)
+            eligible_bullets.append((exp_i, b_i, sb.bullet.text))
+
+    global_kw_assignments = _assign_keywords_to_bullets(candidate_kws, eligible_bullets)
+
+    # Pass 3: build rephrase queue using global assignments
+    rephrase_queue: list[tuple[int, int, str, list[str], "BulletEvidence | None"]] = []
+    for exp_i, sorted_bullets in enumerate(per_exp_sorted):
+        if exp_i in padded_set:
+            continue
+        for b_i, sb in enumerate(sorted_bullets):
+            assigned_kws = global_kw_assignments.get((exp_i, b_i), [])
             evidence = sb.evidence if sb.evidence is not None else extract_evidence(sb.bullet.text)
-            rephrase_queue.append((exp_i, b_i, sb.bullet.text, per_bullet_kws[b_i], evidence))
+            rephrase_queue.append((exp_i, b_i, sb.bullet.text, assigned_kws, evidence))
 
     # Single batch call for all bullets needing rephrasing
     # v2: pass evidence context and JD domain signals to the evidence-constrained rewriter
@@ -457,7 +467,7 @@ def _select_and_tailor_experiences(
             original_text = sb.bullet.text
             if (exp_i, b_i) in rephrase_map:
                 revised_text, keywords_added = rephrase_map[(exp_i, b_i)]
-                change_reason = "keyword_integration" if keywords_added else "unchanged"
+                change_reason = "keyword_integration" if revised_text != original_text else "unchanged"
             else:
                 revised_text = original_text
                 keywords_added = []
@@ -675,18 +685,22 @@ def _tailor_projects(
     relevance_map: ExperienceRelevanceMap,
     jd: JobDescription,
     keyword_limit: int = 4,
-    kw_block_counts: "dict[str, int] | None" = None,
-    max_blocks_per_kw: int = 99,
+    used_keywords: "set[str] | None" = None,
 ) -> tuple[list[ProjectEntry], list[BulletChange]]:
     """
     Lightly tailor project bullets for moderately relevant projects only.
     Projects below _PROJECT_TAILOR_THRESHOLD are passed through unchanged.
+    Keywords already used in experience bullets are excluded to prevent duplicates.
     Returns (modified project list, change audit entries).
     """
     high_kw = _get_high_importance_keywords(jd)
     all_kw = _get_all_keywords(jd)
-    # Narrow keyword set — lighter touch than experience tailoring, capped by keyword_limit
-    target_kws = list(dict.fromkeys(high_kw + all_kw))[:keyword_limit]
+    already_used = {k.lower() for k in (used_keywords or set())}
+    # Exclude keywords already used in experience bullets
+    target_kws = [
+        kw for kw in list(dict.fromkeys(high_kw + all_kw))[:keyword_limit]
+        if kw.lower() not in already_used
+    ]
 
     proj_scores: dict[int, float] = {
         e.entry_index: e.overall_score
@@ -694,46 +708,52 @@ def _tailor_projects(
         if e.entry_type == "project"
     }
 
+    # Collect all eligible project bullets for global assignment
+    eligible: list[tuple[int, int, str]] = []  # (proj_i, b_i, text)
+    eligible_proj_indices: list[int] = []
+    for i, proj in enumerate(projects):
+        if proj_scores.get(i, 0.0) >= _PROJECT_TAILOR_THRESHOLD and proj.bullets:
+            for b_i, b in enumerate(proj.bullets[:3]):
+                eligible.append((i, b_i, b.text))
+            eligible_proj_indices.append(i)
+
+    proj_kw_assignments = _assign_keywords_to_bullets(target_kws, eligible)
+
     all_changes: list[BulletChange] = []
     tailored_projects: list[ProjectEntry] = []
 
     for i, proj in enumerate(projects):
-        score = proj_scores.get(i, 0.0)
-
-        if score >= _PROJECT_TAILOR_THRESHOLD and proj.bullets:
-            # Distribute keywords per-bullet to avoid intra-project repetition
-            _kw_counts = kw_block_counts if kw_block_counts is not None else {}
-            per_bullet_kws = _distribute_entry_keywords(
-                target_kws, len(proj.bullets[:3]), _kw_counts, max_blocks_per_kw, kw_per_bullet=2
-            )
-            bullets_input = [(b.text, per_bullet_kws[i]) for i, b in enumerate(proj.bullets[:3])]
-            rephrased = _rephrase_project_bullets(bullets_input, proj.name)
-
-            new_bullets: list[Bullet] = []
-            for orig_bullet, (revised, kws_added) in zip(proj.bullets[:3], rephrased):
-                change_reason = "keyword_integration" if kws_added else "unchanged"
-                all_changes.append(BulletChange(
-                    original_text=orig_bullet.text,
-                    revised_text=revised,
-                    change_reason=change_reason,
-                    keywords_added=kws_added,
-                ))
-                new_bullets.append(Bullet(text=revised, source_text=orig_bullet.source_text))
-
-            # Keep bullets beyond first 3 unchanged
-            new_bullets.extend(proj.bullets[3:])
-
-            tailored_projects.append(ProjectEntry(
-                name=proj.name,
-                description=proj.description,
-                technologies=proj.technologies,
-                url=proj.url,
-                date=proj.date,
-                bullets=new_bullets,
-                source_text=proj.source_text,
-            ))
-        else:
+        if i not in eligible_proj_indices:
             tailored_projects.append(proj)
+            continue
+
+        bullets_input = [
+            (b.text, proj_kw_assignments.get((i, b_i), []))
+            for b_i, b in enumerate(proj.bullets[:3])
+        ]
+        rephrased = _rephrase_project_bullets(bullets_input, proj.name)
+
+        new_bullets: list[Bullet] = []
+        for orig_bullet, (revised, kws_added) in zip(proj.bullets[:3], rephrased):
+            change_reason = "keyword_integration" if revised != orig_bullet.text else "unchanged"
+            all_changes.append(BulletChange(
+                original_text=orig_bullet.text,
+                revised_text=revised,
+                change_reason=change_reason,
+                keywords_added=kws_added,
+            ))
+            new_bullets.append(Bullet(text=revised, source_text=orig_bullet.source_text))
+
+        new_bullets.extend(proj.bullets[3:])
+        tailored_projects.append(ProjectEntry(
+            name=proj.name,
+            description=proj.description,
+            technologies=proj.technologies,
+            url=proj.url,
+            date=proj.date,
+            bullets=new_bullets,
+            source_text=proj.source_text,
+        ))
 
     return tailored_projects, all_changes
 
@@ -763,29 +783,9 @@ def tailor_resume(
     keyword_budget = [_MAX_KEYWORD_INTEGRATIONS]
 
     # Compute cross-block keyword frequency cap.
-    # A keyword should appear in at most ceil(total_tailored_blocks / 2) blocks.
-    # Count experiences above threshold + projects above project threshold.
-    all_exp_scored = [e for e in relevance_map.scored_entries if e.entry_type == "experience"]
-    proj_scored = {e.entry_index: e.overall_score
-                   for e in relevance_map.scored_entries if e.entry_type == "project"}
-    n_tailored_exp = min(_MAX_EXPERIENCES,
-                         len([e for e in all_exp_scored if e.overall_score >= _ENTRY_THRESHOLD]))
-    n_tailored_proj = sum(
-        1 for i in range(min(len(profile.projects), 3))
-        if proj_scored.get(i, 0.0) >= _PROJECT_TAILOR_THRESHOLD
-    )
-    total_tailored_blocks = max(n_tailored_exp + n_tailored_proj, 1)
-    # ceil(total / 2): a keyword may appear in at most half the blocks
-    max_blocks_per_kw = (total_tailored_blocks + 1) // 2
-
-    # Shared mutable dict: tracks how many blocks each keyword has already appeared in
-    kw_block_counts: dict[str, int] = {}
-
     tailored_experiences = _select_and_tailor_experiences(
         profile, relevance_map, jd, keyword_budget,
         keyword_limit=keyword_limit,
-        kw_block_counts=kw_block_counts,
-        max_blocks_per_kw=max_blocks_per_kw,
     )
 
     # Generate summary
@@ -795,6 +795,11 @@ def tailor_resume(
     exp_changes: list[BulletChange] = []
     for te in tailored_experiences:
         exp_changes.extend(tb.change for tb in te.bullets)
+
+    # Collect keywords already used in experience bullets so projects don't repeat them
+    exp_used_keywords: set[str] = set()
+    for change in exp_changes:
+        exp_used_keywords.update(k.lower() for k in change.keywords_added)
 
     # Include up to 2 projects; add a 3rd only if page budget allows
     candidate_projects = list(profile.projects[:2])
@@ -807,12 +812,11 @@ def tailor_resume(
         if (used + extra) <= _PAGE_CAPACITY_CHARS * _PAGE_FILL_HARD_LIMIT:
             candidate_projects.append(profile.projects[2])
 
-    # Tailor project bullets — share kw_block_counts so cross-block cap is enforced globally
+    # Tailor project bullets — exclude keywords already used in experience bullets
     projects, proj_changes = _tailor_projects(
         candidate_projects, relevance_map, jd,
         keyword_limit=min(4, keyword_limit),
-        kw_block_counts=kw_block_counts,
-        max_blocks_per_kw=max_blocks_per_kw,
+        used_keywords=exp_used_keywords,
     )
 
     # ── Fill pass: expand project bullets when page is under soft target ─────

@@ -1,0 +1,88 @@
+{
+  "run_id": "a60ca035-841b-45fa-a624-7785bc3f6cdf",
+  "profile_name": "Marcus Delgado",
+  "role_title": "Backend Software Engineer",
+  "company_name": "Meridian Financial Technology",
+  "bullet_changes": [
+    {
+      "original_text": "Built a REST API using FastAPI and PostgreSQL to serve 40+ internal dashboard endpoints, reducing average response time by 35%",
+      "revised_text": "Engineered a high-performance REST API using Python, FastAPI, and PostgreSQL, serving 40+ internal dashboard endpoints with a 35% reduction in average response time",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "FastAPI",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "original_text": "Wrote integration tests with pytest covering 87% of new API surface area",
+      "revised_text": "Implemented comprehensive integration tests with pytest, covering 87% of the new API surface area and ensuring reliability with Python and FastAPI",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "FastAPI",
+        "pytest"
+      ]
+    },
+    {
+      "original_text": "Migrated legacy cron job scripts from Bash to Python, added retry logic and alerting via PagerDuty",
+      "revised_text": "Refactored legacy cron job scripts from Bash to Python, incorporating retry logic and alerting via PagerDuty, leveraging Python for enhanced maintainability",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "PagerDuty"
+      ]
+    },
+    {
+      "original_text": "Developed React components for a B2B SaaS admin dashboard, collaborating with designers using Figma specs",
+      "revised_text": "Architected a backend API using Python and FastAPI to support React components for a B2B SaaS admin dashboard, collaborating with designers using Figma specs",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Python",
+        "FastAPI"
+      ]
+    },
+    {
+      "original_text": "Set up CI/CD pipeline using GitHub Actions that cut deploy time from 25 minutes to 6 minutes",
+      "revised_text": "Deployed a CI/CD pipeline using GitHub Actions, Docker, and Git, reducing deploy time from 25 minutes to 6 minutes and enhancing overall efficiency",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "GitHub Actions",
+        "Docker",
+        "Git"
+      ]
+    },
+    {
+      "original_text": "Fixed 12 bugs in a Node.js microservice handling webhook delivery; reduced delivery failure rate from 4% to 0.3%",
+      "revised_text": "Optimized a Node.js microservice handling webhook delivery, reducing delivery failure rate from 4% to 0.3% and ensuring reliable message queuing with RabbitMQ",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "RabbitMQ",
+        "Node.js"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "Python",
+    "FastAPI",
+    "PostgreSQL",
+    "Python",
+    "FastAPI",
+    "pytest",
+    "Python",
+    "PagerDuty",
+    "Python",
+    "FastAPI",
+    "GitHub Actions",
+    "Docker",
+    "Git",
+    "RabbitMQ",
+    "Node.js"
+  ],
+  "keyword_coverage": 0.86,
+  "validation_flags": [
+    "6 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-11T11:57:08.482423"
+}

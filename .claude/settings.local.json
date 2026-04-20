@@ -2,7 +2,23 @@
   "permissions": {
     "allow": [
       "Bash(python:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(wc -l /Users/emregencer/Desktop/github/applyeasy/applyeasy/backend/src/api/routes/*.py)",
+      "Bash(find /Users/emregencer/Desktop/github/applyeasy/applyeasy -type f \\\\\\( -name \"*.txt\" -o -name \"*.json\" -o -name \"*.py\" \\\\\\) -path \"*/test*\" -o -path \"*/fixture*\" 2>/dev/null | head -20)",
+      "Bash(find /Users/emregencer/Desktop/github/applyeasy/applyeasy -type f \\\\\\( -name \"*.txt\" -o -name \"*.json\" \\\\\\) ! -path \"*/node_modules/*\" ! -path \"*/.git/*\" ! -path \"*/outputs/*\" 2>/dev/null | sort)",
+      "Bash(find /Users/emregencer/Desktop/github/applyeasy/applyeasy/backend/src -type f -name \"*.py\" 2>/dev/null | sort)",
+      "Bash(find /Users/emregencer/Desktop/github/applyeasy/applyeasy/frontend/src -type f \\\\\\( -name \"*.tsx\" -o -name \"*.ts\" \\\\\\) 2>/dev/null | sort)",
+      "Bash(find /Users/emregencer/Desktop/github/applyeasy/applyeasy/backend/tests -type f -name \"*.py\" 2>/dev/null | sort)",
+      "Bash(cd /Users/emregencer/Desktop/github/applyeasy/applyeasy/frontend && npm run build 2>&1 | tail -30)",
+      "Bash(npm run:*)",
+      "Bash(which python:*)",
+      "Bash(source ../.venv/bin/activate)",
+      "Read(//Users/emregencer/**)",
+      "Bash(conda run:*)",
+      "Bash(pip show:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "Bash(wc -l /Users/emregencer/desktop/github/applyeasy/applyeasy/test_profiles/*.txt | tail -1)"
     ]
   }
 }

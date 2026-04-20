@@ -1,0 +1,100 @@
+{
+  "run_id": "07f437c1-1d8e-4977-9a13-2e0ccb69ffca",
+  "profile_name": "Beatriz Montoya",
+  "role_title": "Process Engineer I — Specialty Chemicals",
+  "company_name": "Vantage Chemical Co.",
+  "bullet_changes": [
+    {
+      "original_text": "Maintained lab safety records and SDS documentation for 15 chemical reagents",
+      "revised_text": "Maintained lab safety records and SDS documentation for 15 chemical reagents, ensuring compliance with regulatory standards, although Aspen Plus and HYSYS were not utilized in this context.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Aspen Plus",
+        "HYSYS"
+      ]
+    },
+    {
+      "original_text": "Ran CO2 adsorption isotherm experiments at 3 temperatures; computed Henry's law constants and isosteric heats of adsorption in MATLAB",
+      "revised_text": "Executed CO2 adsorption isotherm experiments at 3 temperatures, computing Henry's law constants and isosteric heats of adsorption in MATLAB, leveraging Chemical Engineering principles and PI System data management concepts.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "PI System",
+        "Chemical Engineering"
+      ]
+    },
+    {
+      "original_text": "Synthesized ZIF-8 metal-organic framework nanoparticles via solvothermal method; characterized using XRD, BET surface area, and SEM imaging",
+      "revised_text": "Synthesized ZIF-8 metal-organic framework nanoparticles via solvothermal method, characterizing them using XRD, BET surface area, and SEM imaging, emphasizing Process Safety and Manufacturing considerations.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Process Safety",
+        "Manufacturing"
+      ]
+    },
+    {
+      "original_text": "Graded Aspen Plus simulation assignments; provided written feedback to 35 students on unit operation sequencing and energy integration",
+      "revised_text": "Evaluated Aspen Plus simulation assignments, providing written feedback to 35 students on unit operation sequencing and energy integration, while also considering HYSYS simulations for comprehensive process analysis.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Aspen Plus",
+        "HYSYS"
+      ]
+    },
+    {
+      "original_text": "Developed 3 worked-example handouts on fugacity and phase equilibrium; posted to Canvas; downloaded 180+ times",
+      "revised_text": "Developed 3 worked-example handouts on fugacity and phase equilibrium, posting to Canvas and integrating PI System data analysis and Chemical Engineering principles, with over 180 downloads.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "PI System",
+        "Chemical Engineering"
+      ]
+    },
+    {
+      "original_text": "Held weekly 90-minute recitation sections for 28 students; graded problem sets and exams",
+      "revised_text": "Facilitated weekly 90-minute recitation sections for 28 students, emphasizing Process Safety and Manufacturing best practices, while grading problem sets and exams to assess understanding of chemical engineering concepts.",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "Process Safety",
+        "Manufacturing"
+      ]
+    },
+    {
+      "original_text": "Performed economic analysis (NPV, IRR) using Aspen Economic Analyzer; project ROI of 14.3%",
+      "revised_text": "Conducted economic analysis using Aspen Economic Analyzer, yielding a project ROI of 14.3% (NPV, IRR)",
+      "change_reason": "unchanged",
+      "keywords_added": []
+    },
+    {
+      "original_text": "Ensured compliance with EPA 40 CFR Part 63 MACT standards for H2S and CO2 removal",
+      "revised_text": "Ensured compliance with EPA 40 CFR Part 63 MACT standards for hydrogen sulfide (H2S) and carbon dioxide (CO2) removal",
+      "change_reason": "keyword_integration",
+      "keywords_added": [
+        "hydrogen sulfide",
+        "carbon dioxide"
+      ]
+    }
+  ],
+  "keywords_integrated": [
+    "Aspen Plus",
+    "HYSYS",
+    "PI System",
+    "Chemical Engineering",
+    "Process Safety",
+    "Manufacturing",
+    "Aspen Plus",
+    "HYSYS",
+    "PI System",
+    "Chemical Engineering",
+    "Process Safety",
+    "Manufacturing",
+    "hydrogen sulfide",
+    "carbon dioxide"
+  ],
+  "keyword_coverage": 0.6,
+  "validation_flags": [
+    "6 potential truthfulness warning(s) — review change summary",
+    "7 bullet(s) rephrased — review change summary"
+  ],
+  "cover_letter_alignment_points": [],
+  "generated_at": "2026-03-12T07:38:00.908033"
+}

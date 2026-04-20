@@ -82,7 +82,6 @@ export function GeneratingStep({ runId, onDone, onFailed, includeCoverLetter = f
   const [animPhase, setAnimPhase] = useState<AnimPhase>("idle");
   const [displayedRaw, setDisplayedRaw] = useState(0);
   const [displayedTailored, setDisplayedTailored] = useState(0);
-  const [pauseDone, setPauseDone] = useState(false);
 
   // Poll pipeline status
   useEffect(() => {
@@ -126,52 +125,38 @@ export function GeneratingStep({ runId, onDone, onFailed, includeCoverLetter = f
     ? computeSuitabilityScore(completedStatus)
     : null;
 
-  // effectiveRaw: raw bar target. Clamp so the two bars have a visible gap,
-  // but only once we know the final score (during pause at the latest).
-  const effectiveRaw = rawScore !== null
-    ? (cappedFinalScore !== null ? Math.min(rawScore, Math.max(0, cappedFinalScore - 20)) : rawScore)
-    : null;
+  // effectiveRaw: raw bar target — always the true raw score, no clamping.
+  const effectiveRaw = rawScore;
 
   // ── Animation effects ──────────────────────────────────────────────────────
 
-  // Start phase1 as soon as scoring_relevance step begins (before rawScore arrives)
+  // Start phase1 only once rawScore is actually known — never count toward a placeholder.
   useEffect(() => {
-    if (scoringStarted && animPhase === "idle") setAnimPhase("phase1");
-  }, [scoringStarted, animPhase]);
+    if (rawAvailable && animPhase === "idle") setAnimPhase("phase1");
+  }, [rawAvailable, animPhase]);
 
-  // Phase 1: counts up from 0 toward effectiveRaw (or 90 placeholder).
-  // When it reaches the target, snaps displayedRaw to exactly effectiveRaw
-  // before entering pause — guarantees no overshoot mismatch vs ResultsStep.
+  // Phase 1: counts up from 0 toward effectiveRaw (always known when phase1 starts).
   useEffect(() => {
-    if (animPhase !== "phase1") return;
-    const target = effectiveRaw !== null ? effectiveRaw : 90;
-    if (displayedRaw >= target) {
-      if (effectiveRaw !== null) {
-        setDisplayedRaw(effectiveRaw); // snap to exact final value
-        setAnimPhase("pause");
-      }
-      // else: hold at 90 until rawScore arrives
+    if (animPhase !== "phase1" || effectiveRaw === null) return;
+    if (displayedRaw >= effectiveRaw) {
+      setDisplayedRaw(effectiveRaw);
+      setAnimPhase("pause");
       return;
     }
     const t = setTimeout(() => setDisplayedRaw((p) => p + 1), 55);
     return () => clearTimeout(t);
   }, [animPhase, displayedRaw, effectiveRaw]);
 
-  // 1-second pause between phases
+  // After a brief pause, advance to phase2 as soon as cappedFinalScore is known.
+  // Both animPhase and cappedFinalScore are deps so this re-fires when either changes.
   useEffect(() => {
-    if (animPhase !== "pause") return;
-    const t = setTimeout(() => setPauseDone(true), 1000);
+    if (animPhase !== "pause" || cappedFinalScore === null) return;
+    const t = setTimeout(() => {
+      setDisplayedTailored(0);
+      setAnimPhase("phase2");
+    }, 300);
     return () => clearTimeout(t);
-  }, [animPhase]);
-
-  // Transition pause → phase2 only once cappedFinalScore is known.
-  // This prevents phase2 from ever counting toward a placeholder that could
-  // be higher than the real final value (which would cause a visible downward snap).
-  useEffect(() => {
-    if (!pauseDone || animPhase !== "pause" || effectiveRaw === null || cappedFinalScore === null) return;
-    setDisplayedTailored(displayedRaw); // start from where phase 1 landed
-    setAnimPhase("phase2");
-  }, [pauseDone, animPhase, effectiveRaw, cappedFinalScore, displayedRaw]);
+  }, [animPhase, cappedFinalScore]);
 
   // Phase 2: counts from displayedRaw toward cappedFinalScore (always known here).
   useEffect(() => {
@@ -236,9 +221,9 @@ export function GeneratingStep({ runId, onDone, onFailed, includeCoverLetter = f
           {/* Header */}
           <div style={sg.header}>
             <span style={sg.headerLabel}>SUITABILITY SCORE</span>
-            {animPhase === "done" && cappedFinalScore !== null && displayedRaw > 0 && (
+            {animPhase === "done" && cappedFinalScore !== null && rawScore !== null && rawScore > 0 && (
               <span style={sg.deltaBadge}>
-                +{Math.max(0, cappedFinalScore - displayedRaw)} pts improvement
+                +{Math.max(0, cappedFinalScore - rawScore)} pts improvement
               </span>
             )}
           </div>
@@ -283,8 +268,7 @@ export function GeneratingStep({ runId, onDone, onFailed, includeCoverLetter = f
               <span style={{ ...sg.halfLabel, color: animPhase === "done" ? "#4ade80" : "#64748b" }}>
                 {animPhase === "done" && cappedFinalScore !== null
                   ? scoreLabel(cappedFinalScore)
-                  : animPhase === "phase2" ? "tailoring…"
-                  : animPhase === "pause" ? "tailoring…"
+                  : (animPhase === "phase2" || animPhase === "pause") ? "loading…"
                   : "calculating…"}
               </span>
             </div>
@@ -298,29 +282,45 @@ export function GeneratingStep({ runId, onDone, onFailed, includeCoverLetter = f
         {STEPS.map((step, i) => {
           const scoringIdx = stepIndex(STEPS, "scoring_relevance");
           // Keep scoring_relevance active (not green) while the score bars are still animating.
-          // It only turns green once animPhase reaches "done" (both bars settled).
-          const animating = animPhase === "phase1" || animPhase === "pause" || animPhase === "phase2";
+          // scoring_relevance stays active during phase1; turns green once raw bar finishes
+          const rawBarActive = animPhase === "phase1";
           const pipelineDone = isCompleted || currentIndex > i;
-          const isDone = (i === scoringIdx && animating) ? false : pipelineDone;
+          const isDone = (i === scoringIdx && rawBarActive) ? false : pipelineDone;
           const isActive = isDone ? false
-            : (i === scoringIdx && animating)
+            : (i === scoringIdx && rawBarActive)
               ? true
               : (!isCompleted && currentIndex === i && status?.status === "running");
           const state: DotState = isDone ? "done" : isActive ? "active" : "pending";
           const isLast = i === STEPS.length - 1;
+
+          // connector between this step and the next: green if BOTH this and next are done
+          const nextIsDone = i < STEPS.length - 1 && (() => {
+            const ni = i + 1;
+            const nPipelineDone = isCompleted || currentIndex > ni;
+            return (ni === scoringIdx && rawBarActive) ? false : nPipelineDone;
+          })();
+          const connectorColor = isDone && nextIsDone
+            ? "#16a34a"
+            : isDone
+            ? "rgba(22,163,74,0.35)"
+            : "rgba(255,255,255,0.1)";
 
           return (
             <div key={step.key} style={s.stepRow}>
               <div style={s.dotCol}>
                 <StepDot state={state} />
                 {!isLast && (
-                  <div style={{ ...s.connector, background: isDone ? "#16a34a" : "rgba(255,255,255,0.12)" }} />
+                  <div style={{
+                    ...s.connector,
+                    background: connectorColor,
+                    transition: "background 0.4s ease",
+                  }} />
                 )}
               </div>
-              <div style={{ ...s.stepText, paddingBottom: isLast ? 0 : 20 }}>
+              <div style={{ ...s.stepText, paddingBottom: isLast ? 0 : 24 }}>
                 <span style={{
                   ...s.stepLabel,
-                  color: isDone ? "#e2e8f0" : isActive ? "#f1f5f9" : "#475569",
+                  color: isDone ? "#e2e8f0" : isActive ? "#f1f5f9" : "#3d4f63",
                   fontWeight: isActive ? 600 : isDone ? 500 : 400,
                 }}>
                   {step.label}
@@ -332,7 +332,7 @@ export function GeneratingStep({ runId, onDone, onFailed, includeCoverLetter = f
                   </span>
                 )}
                 {!isActive && !isDone && (
-                  <span style={{ ...s.stepDetail, color: "#cbd5e1" }}>{step.detail}</span>
+                  <span style={{ ...s.stepDetail, color: "#3d4f63" }}>{step.detail}</span>
                 )}
               </div>
             </div>
@@ -520,10 +520,10 @@ const s: Record<string, React.CSSProperties> = {
     lineHeight: 1,
   },
   stepList: { display: "flex", flexDirection: "column" },
-  stepRow: { display: "flex", alignItems: "flex-start", gap: 14 },
-  dotCol: { display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 },
-  connector: { width: 2, flex: 1, minHeight: 16, borderRadius: 1, marginTop: 2 },
-  stepText: { display: "flex", flexDirection: "column", gap: 2, paddingTop: 4 },
+  stepRow: { display: "flex", alignItems: "stretch", gap: 14 },
+  dotCol: { display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, width: 28 },
+  connector: { width: 2, flex: 1, minHeight: 12, borderRadius: 1, marginTop: -1, marginBottom: -1 },
+  stepText: { display: "flex", flexDirection: "column", gap: 2, paddingTop: 6, flex: 1 },
   stepLabel: { fontSize: 14, lineHeight: 1.4, display: "flex", alignItems: "center", gap: 6 },
   activeDot: { fontSize: 8, color: "#6366f1" },
   stepDetail: { fontSize: 12, lineHeight: 1.4 },
