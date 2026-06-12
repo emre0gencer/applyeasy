@@ -1,18 +1,17 @@
-# AI Resume & Cover Letter Tailoring System
+# ApplyEasy
 
-A constrained-generation pipeline that tailors resumes and cover letters to job descriptions without hallucinating — every output claim traces to the candidate's verified source material.
+An AI-powered resume tailoring app. Upload your profile, paste a job description, and get a tailored resume PDF — with every claim traceable to your source material, no hallucination.
 
 ## Architecture
 
 ```
-Browser (React + Vite)
+Browser (React 18 + Vite)
   ↕ REST API
 FastAPI Backend
   ↓ Background Task
 Pipeline:
   DocumentIngestionEngine → CandidateProfileBuilder → JobDescriptionAnalyzer
-  → RelevanceRanker → ResumeTailoringEngine → CoverLetterGenerator
-  → QualityValidator → PDFRenderer
+  → RelevanceRanker → ResumeTailoringEngine → QualityValidator → PDFRenderer
 ```
 
 ## Setup
@@ -20,14 +19,14 @@ Pipeline:
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+
-- An Anthropic API key
+- A Groq API key (get one at console.groq.com)
 
 ### Backend
 
 ```bash
 cd backend
 pip install -e ".[dev]"
-export ANTHROPIC_API_KEY=your_key_here
+export GROQ_API_KEY=your_key_here
 uvicorn backend.src.api.main:app --reload --port 8000
 ```
 
@@ -52,18 +51,20 @@ pytest tests/ -v
 
 | Variable | Default | Description |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | required | Your Anthropic API key |
+| `GROQ_API_KEY` | required | Your Groq API key |
 | `DB_PATH` | `resume_tool.db` | SQLite database file path |
 | `OUTPUT_DIR` | `outputs` | Directory for generated PDFs |
 
 ## Pipeline Steps
 
-1. **extracting_profile** — PDF/text ingestion + Claude Haiku extraction → `CandidateProfile`
-2. **analyzing_job** — Claude Haiku extraction → `JobDescription`
-3. **scoring_relevance** — sentence-transformers cosine similarity → `ExperienceRelevanceMap`
-4. **tailoring_resume** — selection + constrained Haiku rephrasing + Sonnet summary → `TailoredResume`
-5. **generating_cover_letter** — Sonnet alignment + Sonnet generation → `TailoredCoverLetter`
-6. **rendering_pdfs** — Jinja2 + WeasyPrint → `resume.pdf`, `cover_letter.pdf`, `change_summary.json`
+1. **extracting_profile** — PDF/text ingestion + LLM extraction → `CandidateProfile`
+2. **analyzing_job** — LLM extraction → `JobDescription`
+3. **scoring_relevance** — sentence-transformers (`all-MiniLM-L6-v2`) cosine similarity → `ExperienceRelevanceMap`
+4. **tailoring_resume** — constrained LLM rephrasing → `TailoredResume`
+5. **validating** — deterministic quality checks → `ValidationResult`
+6. **rendering_pdfs** — Jinja2 + xhtml2pdf → `resume.pdf`, `change_summary.json`
+
+> Cover letter generation is currently disabled (`COVER_LETTER_ENABLED = False`).
 
 ## Truthfulness Constraints
 
@@ -72,30 +73,26 @@ pytest tests/ -v
 - Post-generation entity matching checks that named entities in outputs exist in source
 - Change summary logs every modification — downloadable by the user
 
-## Estimated Cost Per Run
-
-~$0.05–0.15 depending on resume/JD length (Haiku for extraction, Sonnet for generation).
-
 ## Project Structure
 
 ```
 backend/
   src/
     api/            FastAPI routes
-    models/         Pydantic schemas (schemas.py — built first)
+    models/         Pydantic schemas
     ingestion/      PDF + text extraction
     extraction/     LLM → CandidateProfile
     analysis/       LLM → JobDescription
     matching/       Embedding-based relevance ranking
-    generation/     Resume tailoring + cover letter
+    generation/     Resume tailoring
     validation/     Quality checks
-    rendering/      Jinja2 + WeasyPrint PDF output
+    rendering/      Jinja2 + xhtml2pdf PDF output
     pipeline/       Orchestrator
     storage/        SQLAlchemy + SQLite
-  templates/        HTML/CSS resume + cover letter templates
+  templates/        HTML/CSS resume templates (classic, polished, traditional)
   tests/            pytest suite with mocked LLM calls
 frontend/
   src/
     api/            Typed fetch client
-    components/     ProfileStep, JobDescriptionStep, GeneratingStep, ResultsStep
+    components/     LandingPage, JobDescriptionStep, GeneratingStep, ResultsStep
 ```
