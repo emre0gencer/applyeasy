@@ -1,8 +1,12 @@
 """
 ResumeTailoringEngine — selection + reorder + constrained LLM rephrasing.
 
-Selection logic is deterministic. Rephrasing uses a single batched Groq call.
-Summary generation uses llama-3.3-70b-versatile for quality.
+Selection logic is deterministic. LLM calls are batched to minimize API cost:
+  - Experience bullets rephrased in one QUALITY call, which ALSO returns the
+    2-sentence summary (folded in; standalone summary call is a fallback only).
+  - All project bullets rephrased in one FAST call (across every eligible project).
+  - Page-fill bullets generated in one FAST call (across every under-filled project).
+  - Skills classification is deterministic (embedding nearest-category) — no LLM.
 """
 
 from __future__ import annotations
@@ -11,9 +15,11 @@ import json
 import os
 from typing import Optional
 
+import numpy as np
 from groq import Groq
 
 from backend.src.analysis.evidence_extractor import extract_evidence
+from backend.src.matching.relevance_ranker import _cosine_sim, _embed
 from backend.src.models.schemas import (
     Bullet,
     BulletChange,
@@ -129,19 +135,24 @@ def _rephrase_bullets_batch(
     role_title: str,
     domain_signals: "list[str] | None" = None,
     evidence_style: str = "",
-) -> list[tuple[str, list[str]]]:
+    summary_context: "dict | None" = None,
+) -> tuple[list[tuple[str, list[str]]], str]:
     """
     Single Groq call to rewrite ALL bullets using evidence-grounded, recruiter-useful prompting.
 
     bullets = list of (original_text, keywords_to_try, evidence_signals_or_None)
-    Returns list of (revised_text, keywords_added).
+    Returns (list of (revised_text, keywords_added), summary).
+
+    When summary_context is provided, the same QUALITY call also writes the
+    2-sentence resume summary (folded in to save a separate QUALITY call); the
+    summary is "" otherwise or if the model omits it.
 
     v2 change: The primary rewrite objective is to surface concrete evidence —
     scope, complexity, ownership, and deliverable specificity.
     Keywords are secondary: integrated only where they fit the evidence naturally.
     """
     if not bullets:
-        return []
+        return [], ""
 
     domain_context = ""
     if domain_signals:
@@ -191,11 +202,27 @@ def _rephrase_bullets_batch(
         "  - Ownership levels ('led a team of 5') not stated in the original\n"
         "  - Outcomes or results not mentioned in the original\n"
         "  - Seniority indicators (led, managed) not present in the original\n\n"
-
-        "Return ONLY valid JSON: "
-        '{"results": [{"revised_text": str, "keywords_added": [str]}]}'
-        " — one result per input bullet in the same order."
     )
+
+    if summary_context:
+        system += (
+            "ALSO WRITE A 2-SENTENCE RESUME SUMMARY for this candidate targeting the role:\n"
+            "  Sentence 1: experience depth, key technical background, and most relevant skills; "
+            "weave in 2-3 target keywords naturally.\n"
+            "  Sentence 2: one concrete technical differentiator aligned with what the role's domain values.\n"
+            "  - Only reference provided profile elements; do NOT fabricate achievements, metrics, or skills.\n"
+            "  - No generic phrases (passionate, results-driven, team player, proven track record, eager to).\n"
+            "  - Maximum 85 words, exactly 2 sentences.\n\n"
+            "Return ONLY valid JSON: "
+            '{"results": [{"revised_text": str, "keywords_added": [str]}], "summary": str}'
+            " — one result per input bullet in the same order."
+        )
+    else:
+        system += (
+            "Return ONLY valid JSON: "
+            '{"results": [{"revised_text": str, "keywords_added": [str]}]}'
+            " — one result per input bullet in the same order."
+        )
 
     items = []
     for i, (text, kws, ev) in enumerate(bullets):
@@ -216,6 +243,17 @@ def _rephrase_bullets_batch(
         items.append(item)
 
     user_msg = f"Target role: {role_title}{domain_context}\nBullets to rewrite:\n{json.dumps(items)}"
+    if summary_context:
+        user_msg += (
+            "\n\nSUMMARY CONTEXT —"
+            f" Candidate: {summary_context.get('name', '')};"
+            f" Recent roles: {summary_context.get('exp_titles', '')};"
+            f" Skills: {summary_context.get('skills', '')};"
+            f" Target role: {summary_context.get('target_role', '')};"
+            f" Target keywords: {summary_context.get('keywords', '')};"
+            f" Seniority: {summary_context.get('seniority', '')}"
+            f"{summary_context.get('domain', '')}"
+        )
 
     resp = _get_client().chat.completions.create(
         model=_QUALITY_MODEL,
@@ -230,27 +268,31 @@ def _rephrase_bullets_batch(
     try:
         data = json.loads(resp.choices[0].message.content)
         results = data.get("results", [])
-        return [
+        parsed = [
             (r.get("revised_text", bullets[i][0]), r.get("keywords_added", []))
             for i, r in enumerate(results)
             if i < len(bullets)
         ]
+        summary = (data.get("summary") or "").strip()
+        return parsed, summary
     except (json.JSONDecodeError, AttributeError, IndexError):
-        return [(text, []) for text, _, _ev in bullets]
+        return [(text, []) for text, _, _ev in bullets], ""
 
 
-def _rephrase_project_bullets(
-    bullets: list[tuple[str, list[str]]],
-    project_name: str,
+def _rephrase_project_bullets_batch(
+    items: list[tuple[str, str, list[str]]],  # (project_name, original_text, keywords_to_try)
 ) -> list[tuple[str, list[str]]]:
     """
-    Evidence-grounded light-touch rephrasing for project bullets.
-    Keywords integrated only where they fit naturally.
-    Uses the fast model (lighter task than experience rephrasing).
+    Single Groq call to rephrase project bullets across ALL eligible projects.
+
+    Each item carries its own project name, so the model gets exactly the same
+    per-bullet context it had when this ran as one call per project — but in a
+    single batched request (N projects → 1 call). Returns (revised_text,
+    keywords_added) aligned 1:1 with the input order.
 
     v2: Primary objective shifted from keyword integration to evidence surfacing.
     """
-    if not bullets:
+    if not items:
         return []
 
     system = (
@@ -271,15 +313,19 @@ def _rephrase_project_bullets(
         "3. Open with a strong past-tense action verb.\n"
         "4. Preserve the original technical stack and outcomes exactly.\n"
         "5. Prefer a denser, more informative bullet over a longer keyword-heavy one.\n"
+        "6. Each bullet belongs to the project named in its 'project' field — use that for context only.\n"
         "Return ONLY valid JSON: "
         '{"results": [{"revised_text": str, "keywords_added": [str]}]}'
         " — one result per input bullet in the same order."
     )
-    items = [
+    payload = [
         {"index": i, "original": text, "keywords_to_try": kws, "project": project_name}
-        for i, (text, kws) in enumerate(bullets)
+        for i, (project_name, text, kws) in enumerate(items)
     ]
-    user_msg = f"Project: {project_name}\nBullets:\n{json.dumps(items)}"
+    user_msg = (
+        "Rephrase each project bullet below. Each carries its project name for context.\n"
+        f"Bullets:\n{json.dumps(payload)}"
+    )
 
     resp = _get_client().chat.completions.create(
         model=_FAST_MODEL,
@@ -295,12 +341,12 @@ def _rephrase_project_bullets(
         data = json.loads(resp.choices[0].message.content)
         results = data.get("results", [])
         return [
-            (r.get("revised_text", bullets[i][0]), r.get("keywords_added", []))
+            (r.get("revised_text", items[i][1]), r.get("keywords_added", []))
             for i, r in enumerate(results)
-            if i < len(bullets)
+            if i < len(items)
         ]
     except (json.JSONDecodeError, AttributeError, IndexError):
-        return [(text, []) for text, _ in bullets]
+        return [(text, []) for _pname, text, _kws in items]
 
 
 def _generate_summary(
@@ -364,8 +410,14 @@ def _select_and_tailor_experiences(
     jd: JobDescription,
     keyword_integration_budget: list[int],  # mutable counter [remaining]
     keyword_limit: int = 10,
-) -> list[TailoredExperience]:
-    """Select top experiences and tailor their bullets using a single batch LLM call."""
+) -> tuple[list[TailoredExperience], str]:
+    """Select top experiences and tailor their bullets using a single batch LLM call.
+
+    The same QUALITY batch call also returns the resume summary (folded in to
+    avoid a separate QUALITY call); returns (experiences, summary). The summary
+    may be "" if there were no bullets to rephrase or the model omitted it — the
+    caller falls back to a standalone summary generation in that case.
+    """
     all_exp_entries = [e for e in relevance_map.scored_entries if e.entry_type == "experience"]
     above_threshold = [e for e in all_exp_entries if e.overall_score >= _ENTRY_THRESHOLD]
     below_threshold = [e for e in all_exp_entries if e.overall_score < _ENTRY_THRESHOLD]
@@ -434,17 +486,40 @@ def _select_and_tailor_experiences(
             evidence = sb.evidence if sb.evidence is not None else extract_evidence(sb.bullet.text)
             rephrase_queue.append((exp_i, b_i, sb.bullet.text, assigned_kws, evidence))
 
-    # Single batch call for all bullets needing rephrasing
+    # Build summary context so the batched QUALITY call can also write the summary
+    # (Opt 5: folds the standalone summary call into this one).
+    selected_titles = [
+        profile.experiences[e.entry_index].role_title
+        for e in exp_entries
+        if e.entry_index < len(profile.experiences)
+    ]
+    summary_domain = ""
+    if jd.domain_signals:
+        summary_domain = f"; Role domain signals: {', '.join(jd.domain_signals[:3])}"
+    if jd.evidence_style:
+        summary_domain += f"; Evidence this role values: {jd.evidence_style}"
+    summary_context = {
+        "name": profile.name,
+        "exp_titles": ", ".join(selected_titles[:3]),
+        "skills": ", ".join(s.name for s in profile.skills[:10]),
+        "target_role": f"{jd.role_title} at {jd.company_name or 'the company'}",
+        "keywords": ", ".join(_get_high_importance_keywords(jd)[:6]),
+        "seniority": jd.seniority_level,
+        "domain": summary_domain,
+    }
+
+    # Single batch call for all bullets needing rephrasing — also returns the summary.
     # v2: pass evidence context and JD domain signals to the evidence-constrained rewriter
     batch_inputs = [(text, kws, ev) for _, _, text, kws, ev in rephrase_queue]
-    batch_results = (
-        _rephrase_bullets_batch(
+    if batch_inputs:
+        batch_results, summary = _rephrase_bullets_batch(
             batch_inputs, role_title,
             domain_signals=jd.domain_signals,
             evidence_style=jd.evidence_style,
+            summary_context=summary_context,
         )
-        if batch_inputs else []
-    )
+    else:
+        batch_results, summary = [], ""
 
     # Map results back: (exp_i, b_i) → (revised_text, keywords_added)
     rephrase_map: dict[tuple[int, int], tuple[str, list[str]]] = {}
@@ -494,7 +569,7 @@ def _select_and_tailor_experiences(
             bullets=tailored_bullets,
         ))
 
-    return tailored_experiences
+    return tailored_experiences, summary
 
 
 def _estimate_chars(
@@ -540,49 +615,56 @@ def _project_chars(proj: ProjectEntry) -> int:
     return sum(len(p) for p in parts if p)
 
 
-def _generate_extra_project_bullets(
-    proj: ProjectEntry,
-    n_new: int,
+def _generate_extra_project_bullets_batch(
+    requests: list[tuple[int, ProjectEntry, int]],  # (proj_index, project, n_new)
     jd: JobDescription,
-    existing_bullets: list[str],
-) -> list[Bullet]:
+) -> dict[int, list[Bullet]]:
     """
-    Generate up to n_new additional bullets for a project.
-    Grounded exclusively in the project's source_text, description, technologies,
-    and existing bullets — never invents new facts.
-    Used only during the fill pass when the page is under the soft target.
+    Generate extra grounded bullets for several under-filled projects in ONE call
+    (was one FAST call per project). Each bullet is grounded exclusively in its
+    project's source_text/description/technologies/existing bullets — never invents
+    new facts. Returns {proj_index: [Bullet, ...]} capped at the requested n_new.
     """
-    if n_new <= 0:
-        return []
+    requests = [(pi, p, n) for pi, p, n in requests if n > 0]
+    if not requests:
+        return {}
 
     high_kw = _get_high_importance_keywords(jd)
     all_kw = _get_all_keywords(jd)
     target_kws = list(dict.fromkeys(high_kw + all_kw))[:4]
-    techs = ", ".join(proj.technologies[:6]) if proj.technologies else ""
-    source_context = (proj.source_text or proj.description or "")[:600]
 
     system = (
-        "You are a senior technical resume writer. Generate additional resume bullet points "
-        "for the given project, grounded ONLY in the information explicitly provided "
+        "You are a senior technical resume writer. For each project below, generate additional "
+        "resume bullet points grounded ONLY in the information explicitly provided for THAT project "
         "(source description, technologies, existing bullets). "
         "Do NOT invent new tools, metrics, outcomes, or any claim not already implied.\n\n"
         "RULES:\n"
-        "1. Each bullet must cover a distinct aspect not already described by the existing bullets.\n"
+        "1. Each new bullet must cover a distinct aspect not already in that project's existing bullets.\n"
         "2. 30-50 words per bullet. Open with a strong past-tense action verb.\n"
         "3. Integrate the provided target keywords only where they fit naturally.\n"
         "4. Never duplicate or restate an existing bullet.\n"
-        "5. If you cannot produce a grounded, distinct bullet, return fewer than requested.\n"
-        "Return ONLY valid JSON: {\"bullets\": [\"bullet text\", ...]}"
+        "5. Generate exactly the requested count per project; if you cannot produce a grounded, "
+        "distinct bullet, return fewer for that project.\n"
+        "6. Keep each project's bullets under its own 'index'.\n"
+        "Return ONLY valid JSON: "
+        '{"projects": [{"index": int, "bullets": ["bullet text", ...]}]}'
     )
-    existing_str = "\n".join(f"- {b}" for b in existing_bullets)
+
+    payload = [
+        {
+            "index": pi,
+            "project": proj.name,
+            "technologies": proj.technologies[:6],
+            "source_description": (proj.source_text or proj.description or "")[:600],
+            "existing_bullets": [b.text for b in proj.bullets],
+            "n_new": n_new,
+        }
+        for pi, proj, n_new in requests
+    ]
     user_msg = (
-        f"Project: {proj.name}\n"
-        f"Technologies: {techs}\n"
-        f"Source description: {source_context}\n"
-        f"Existing bullets:\n{existing_str}\n"
         f"Target role: {jd.role_title}\n"
         f"Target keywords to try: {target_kws}\n"
-        f"Generate {n_new} additional bullet(s)."
+        f"Projects:\n{json.dumps(payload)}"
     )
 
     resp = _get_client().chat.completions.create(
@@ -595,12 +677,53 @@ def _generate_extra_project_bullets(
         temperature=0,
     )
 
+    n_by_index = {pi: n for pi, _p, n in requests}
+    out: dict[int, list[Bullet]] = {}
     try:
         data = json.loads(resp.choices[0].message.content)
-        raw = data.get("bullets", [])
-        return [Bullet(text=b.strip(), source_text="generated") for b in raw[:n_new] if b.strip()]
-    except (json.JSONDecodeError, AttributeError):
-        return []
+        for entry in data.get("projects", []):
+            pi = entry.get("index")
+            if pi not in n_by_index:
+                continue
+            raw = entry.get("bullets", []) or []
+            bullets = [
+                Bullet(text=b.strip(), source_text="generated")
+                for b in raw[:n_by_index[pi]]
+                if isinstance(b, str) and b.strip()
+            ]
+            if bullets:
+                out[pi] = bullets
+        return out
+    except (json.JSONDecodeError, AttributeError, TypeError):
+        return {}
+
+
+# Soft-skill / generic terms that should never enter the skills section.
+_SOFT_SKILL_STOPWORDS = {
+    "communication", "teamwork", "team work", "collaboration", "leadership",
+    "problem solving", "problem-solving", "time management", "adaptability",
+    "creativity", "critical thinking", "interpersonal", "organization",
+    "detail oriented", "detail-oriented", "self motivated", "self-motivated",
+    "work ethic", "fast learner", "team player", "passion", "passionate",
+    "motivated", "flexible", "responsibility", "initiative", "willingness",
+    "enthusiasm", "multitasking", "attention to detail", "results driven",
+    "results-driven", "proactive", "hardworking", "hard working",
+}
+
+_CATEGORY_SIM_THRESHOLD = 0.25  # cosine floor to attach a keyword to a category
+
+
+def _looks_like_skill(kw: str) -> bool:
+    """Heuristic include/exclude filter (replaces the LLM's yes/no judgement)."""
+    k = kw.strip().lower()
+    if not k or len(k) > 40:
+        return False
+    if k in _SOFT_SKILL_STOPWORDS:
+        return False
+    # Genuine tools/languages/frameworks are short; long phrases are usually prose.
+    if len(k.split()) > 3:
+        return False
+    return True
 
 
 def _add_keywords_to_skills(
@@ -610,64 +733,78 @@ def _add_keywords_to_skills(
 ) -> list[Skill]:
     """
     Classify newly integrated keywords into the resume's existing skill categories
-    and return an augmented skills list.  Only genuine technical skills/tools/
+    and return an augmented skills list. Only genuine technical skills/tools/
     technologies are included; soft-skill terms and generic concepts are skipped.
     Already-present skills are never duplicated.
+
+    Opt 4: deterministic — no LLM call. Inclusion is decided by a stoplist/heuristic
+    and each kept keyword is assigned to the nearest existing category by cosine
+    similarity against that category's skill-name centroid (reusing the embedding
+    model already loaded for relevance ranking).
     """
     if not keywords_added:
         return existing_skills
 
     existing_names_lower = {s.name.lower() for s in existing_skills}
-    # Deduplicate while preserving order
-    unique_new = list(dict.fromkeys(k for k in keywords_added if k.lower() not in existing_names_lower))
+    unique_new = list(dict.fromkeys(
+        k for k in keywords_added
+        if k.lower() not in existing_names_lower and _looks_like_skill(k)
+    ))
     if not unique_new:
         return existing_skills
 
-    existing_categories = list(dict.fromkeys(s.category for s in existing_skills if s.category))
+    # Group existing skills by category to build per-category centroids.
+    cat_to_names: dict[str, list[str]] = {}
+    for s in existing_skills:
+        if s.category and s.name:
+            cat_to_names.setdefault(s.category, []).append(s.name)
 
-    system = (
-        "You are classifying technical keywords into skill categories for a resume skills section.\n\n"
-        "For each keyword decide:\n"
-        "1. Is it a genuine technical skill, tool, language, framework, platform, or methodology "
-        "   worth listing in a skills section? (yes → include: true; no → include: false)\n"
-        "2. Which existing category does it belong to? Use the closest match from the provided "
-        "   category list. If none fit, use 'Other'.\n\n"
-        "EXCLUDE: soft skills, action verbs, adjectives, vague concepts.\n"
-        "INCLUDE: tools (Jira, Docker), languages (Java, C++), frameworks (Agile, Scrum), "
-        "   platforms (AWS, GCP), protocols, libraries.\n"
-        "Return ONLY valid JSON: "
-        '{"assignments": [{"keyword": str, "category": str, "include": bool}]}'
-    )
-    user_msg = (
-        f"Existing skill categories: {existing_categories}\n"
-        f"Target role: {jd.role_title}\n"
-        f"Keywords to classify: {unique_new}"
-    )
+    # No categories to match against → append everything under "Other".
+    if not cat_to_names:
+        return existing_skills + [
+            Skill(name=kw, category="Other", source_text="keyword_integration")
+            for kw in unique_new
+        ]
 
-    resp = _get_client().chat.completions.create(
-        model=_FAST_MODEL,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": user_msg},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0,
-    )
+    categories = list(cat_to_names.keys())
+    member_names = [n for c in categories for n in cat_to_names[c]]
 
     try:
-        data = json.loads(resp.choices[0].message.content)
-        seen = set(existing_names_lower)
-        additions: list[Skill] = []
-        for a in data.get("assignments", []):
-            kw = (a.get("keyword") or "").strip()
-            cat = (a.get("category") or "Other").strip()
-            include = a.get("include", False)
-            if include and kw and kw.lower() not in seen:
-                additions.append(Skill(name=kw, category=cat, source_text="keyword_integration"))
-                seen.add(kw.lower())
-        return existing_skills + additions
-    except (json.JSONDecodeError, AttributeError, KeyError):
-        return existing_skills
+        member_vecs = _embed(member_names)   # normalized (M, d)
+        kw_vecs = _embed(unique_new)         # normalized (K, d)
+    except Exception:
+        # Embedding unavailable → keep keywords but don't guess categories.
+        return existing_skills + [
+            Skill(name=kw, category="Other", source_text="keyword_integration")
+            for kw in unique_new
+        ]
+
+    # Per-category centroid = renormalized mean of its members' vectors.
+    centroids: dict[str, np.ndarray] = {}
+    offset = 0
+    for c in categories:
+        n = len(cat_to_names[c])
+        vecs = member_vecs[offset:offset + n]
+        offset += n
+        centroid = vecs.mean(axis=0)
+        norm = float(np.linalg.norm(centroid))
+        centroids[c] = centroid / norm if norm > 0 else centroid
+
+    seen = set(existing_names_lower)
+    additions: list[Skill] = []
+    for kw, kwv in zip(unique_new, kw_vecs):
+        if kw.lower() in seen:
+            continue
+        best_cat, best_sim = "Other", -1.0
+        for c in categories:
+            sim = _cosine_sim(kwv, centroids[c])
+            if sim > best_sim:
+                best_sim, best_cat = sim, c
+        category = best_cat if best_sim >= _CATEGORY_SIM_THRESHOLD else "Other"
+        additions.append(Skill(name=kw, category=category, source_text="keyword_integration"))
+        seen.add(kw.lower())
+
+    return existing_skills + additions
 
 
 def _compute_keyword_coverage(resume_text: str, jd: JobDescription) -> float:
@@ -719,6 +856,23 @@ def _tailor_projects(
 
     proj_kw_assignments = _assign_keywords_to_bullets(target_kws, eligible)
 
+    # Build ONE global queue of every eligible project bullet, then rephrase them
+    # all in a single batched call (was one call per project — the priciest-scaling
+    # loop in the pipeline). Each item carries its project name for context.
+    queue: list[tuple[int, int]] = []  # (proj_i, b_i) in batch order
+    batch_items: list[tuple[str, str, list[str]]] = []  # (project_name, text, keywords)
+    for i in eligible_proj_indices:
+        proj = projects[i]
+        for b_i, b in enumerate(proj.bullets[:3]):
+            queue.append((i, b_i))
+            batch_items.append((proj.name, b.text, proj_kw_assignments.get((i, b_i), [])))
+
+    batch_results = _rephrase_project_bullets_batch(batch_items)
+    rephrase_map: dict[tuple[int, int], tuple[str, list[str]]] = {}
+    for qi, key in enumerate(queue):
+        if qi < len(batch_results):
+            rephrase_map[key] = batch_results[qi]
+
     all_changes: list[BulletChange] = []
     tailored_projects: list[ProjectEntry] = []
 
@@ -727,14 +881,9 @@ def _tailor_projects(
             tailored_projects.append(proj)
             continue
 
-        bullets_input = [
-            (b.text, proj_kw_assignments.get((i, b_i), []))
-            for b_i, b in enumerate(proj.bullets[:3])
-        ]
-        rephrased = _rephrase_project_bullets(bullets_input, proj.name)
-
         new_bullets: list[Bullet] = []
-        for orig_bullet, (revised, kws_added) in zip(proj.bullets[:3], rephrased):
+        for b_i, orig_bullet in enumerate(proj.bullets[:3]):
+            revised, kws_added = rephrase_map.get((i, b_i), (orig_bullet.text, []))
             change_reason = "keyword_integration" if revised != orig_bullet.text else "unchanged"
             all_changes.append(BulletChange(
                 original_text=orig_bullet.text,
@@ -783,13 +932,16 @@ def tailor_resume(
     keyword_budget = [_MAX_KEYWORD_INTEGRATIONS]
 
     # Compute cross-block keyword frequency cap.
-    tailored_experiences = _select_and_tailor_experiences(
+    # The batched experience call also returns the summary (Opt 5).
+    tailored_experiences, summary = _select_and_tailor_experiences(
         profile, relevance_map, jd, keyword_budget,
         keyword_limit=keyword_limit,
     )
 
-    # Generate summary
-    summary = _generate_summary(profile, jd, tailored_experiences)
+    # Fall back to a standalone summary call only if the folded one came back empty
+    # (e.g. no experience bullets were rephrased, or the model omitted the field).
+    if not summary:
+        summary = _generate_summary(profile, jd, tailored_experiences)
 
     # Collect experience bullet changes for the audit trail
     exp_changes: list[BulletChange] = []
@@ -830,20 +982,28 @@ def tailor_resume(
     if estimated < _PAGE_CAPACITY_CHARS * _PAGE_FILL_SOFT_TARGET:
         hard_ceiling = int(_PAGE_CAPACITY_CHARS * _PAGE_FILL_HARD_LIMIT)
         remaining_budget = hard_ceiling - estimated
-        expanded: list[ProjectEntry] = []
 
+        # Opt 2: request extra bullets for every under-filled project in ONE call,
+        # then apply them with the same sequential budget trimming as before.
+        fill_requests = [
+            (pi, proj, 3 - len(proj.bullets))  # max 3 bullets total per project
+            for pi, proj in enumerate(projects)
+            if (3 - len(proj.bullets)) > 0
+        ]
+        generated = (
+            _generate_extra_project_bullets_batch(fill_requests, jd)
+            if fill_requests else {}
+        )
+
+        expanded: list[ProjectEntry] = []
         for pi, proj in enumerate(projects):
-            current_count = len(proj.bullets)
-            slots = 3 - current_count  # max 3 bullets total per project
-            if slots <= 0 or remaining_budget <= 0:
+            candidates = generated.get(pi, []) if remaining_budget > 0 else []
+            if not candidates:
                 expanded.append(proj)
                 continue
 
-            existing_texts = [b.text for b in proj.bullets]
-            new_bullets = _generate_extra_project_bullets(proj, slots, jd, existing_texts)
-
             added: list[Bullet] = []
-            for nb in new_bullets:
+            for nb in candidates:
                 cost = len(nb.text)
                 if remaining_budget - cost < 0:
                     break
@@ -862,10 +1022,6 @@ def tailor_resume(
                 ))
             else:
                 expanded.append(proj)
-
-            if remaining_budget <= 0:
-                expanded.extend(projects[pi + 1:])
-                break
 
         projects = expanded
     # ─────────────────────────────────────────────────────────────────────────

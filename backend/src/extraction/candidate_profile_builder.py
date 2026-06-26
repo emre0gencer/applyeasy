@@ -2,8 +2,10 @@
 CandidateProfileBuilder — LLM extraction → structured CandidateProfile.
 
 Uses Groq (llama-3.1-8b-instant) with JSON mode to enforce schema constraints.
-Merges 6 extraction calls into 2 to stay within free-tier RPM limits.
-Every extracted entity MUST reference verbatim source_text.
+Extracts everything in a single combined call to halve input-token cost (the full
+resume was previously sent twice); falls back to a 2-call split if the merged
+response is empty/unparseable. Every extracted entity MUST reference verbatim
+source_text.
 """
 
 from __future__ import annotations
@@ -90,6 +92,20 @@ _SUPPLEMENTAL_SCHEMA_HINT = (
     '"awards": [{"title": str, "issuer": str, "date": str, "description": str, "source_text": str}], '
     '"leadership_items": [str]}'
 )
+
+# Single-call schema: every field from both the core and supplemental hints.
+_COMBINED_SCHEMA_HINT = (
+    '{"contact": {"name": str, "email": str, "phone": str, "linkedin": str, "github": str, "location": str, "summary": str}, '
+    '"experiences": [{"company": str, "role_title": str, "start_date": str, "end_date": str, '
+    '"location": str, "bullets": [{"text": str, "source_text": str}], "source_text": str}], '
+    '"education": [{"institution": str, "degree": str, "field_of_study": str, '
+    '"graduation_date": str, "gpa": str, "honors": [str], "coursework": str, "source_text": str}], '
+    '"projects": [{"name": str, "description": str, "technologies": [str], "url": str, "date": str, '
+    '"bullets": [{"text": str, "source_text": str}], "source_text": str}], '
+    '"skills": [{"name": str, "category": str, "source_text": str}], '
+    '"awards": [{"title": str, "issuer": str, "date": str, "description": str, "source_text": str}], '
+    '"leadership_items": [str]}'
+)
 # leadership_items: flat single-string descriptions of leadership roles, awards, hackathon results,
 # language proficiencies, and notable activities — each a complete standalone bullet sentence.
 
@@ -116,6 +132,19 @@ def _extract_supplemental(raw_text: str) -> dict:
     return _call_extraction(_SYSTEM_PROMPT, user_msg, _SUPPLEMENTAL_SCHEMA_HINT)
 
 
+def _extract_combined(raw_text: str) -> dict:
+    """Single call: extract everything (contact, experiences, education, projects,
+    skills, awards, leadership) in one request — avoids sending the full resume twice."""
+    user_msg = (
+        "Extract ALL of the following from the text: contact information, work "
+        "experiences, education, projects, skills/technologies, awards/certifications, "
+        "and leadership/activities. The text may be a resume, freeform background dump, "
+        "or any combination of professional/academic information.\n\n"
+        f"{raw_text}"
+    )
+    return _call_extraction(_SYSTEM_PROMPT, user_msg, _COMBINED_SCHEMA_HINT)
+
+
 _LINKEDIN_RE = re.compile(
     r"(?:https?://)?(?:www\.)?linkedin\.com/in/[\w\-]+/?",
     re.IGNORECASE,
@@ -137,14 +166,21 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
     """
     Extract a structured CandidateProfile from an IngestedDocument.
     Accepts any format: resume, freeform professional/academic dump, or mixed.
-    Uses 2 batched LLM calls — both receive the full raw text for maximum coverage.
+    Uses a single combined LLM call (the full raw text is sent once); if that
+    response is empty/unparseable it falls back to the original 2-call split.
     Links (LinkedIn, GitHub) are also detected via regex as a reliable fallback.
     """
     raw_text = doc.raw_text
     summary_text = doc.sections.get("summary", "")
 
-    core = _extract_core(raw_text)
-    supplemental = _extract_supplemental(raw_text)
+    combined = _extract_combined(raw_text)
+    if combined and any(k in combined for k in ("contact", "experiences", "education")):
+        # Merged call succeeded — both views read from the same dict.
+        core = supplemental = combined
+    else:
+        # JSON-mode reliability guard: fall back to the two-call split.
+        core = _extract_core(raw_text)
+        supplemental = _extract_supplemental(raw_text)
 
     contact_data: dict[str, Any] = core.get("contact", {})
 

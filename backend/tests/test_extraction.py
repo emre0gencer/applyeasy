@@ -41,60 +41,59 @@ def _make_json_response(data: dict) -> MagicMock:
 
 class TestCandidateProfileBuilder:
 
-    def test_build_profile_structure(self):
-        """Profile builder returns a CandidateProfile with expected fields."""
-        doc = ingest_text(_load_fixture("sample_profile.txt"))
-
-        # Call 1: core (contact + experiences + education)
-        core_response = _make_json_response({
-            "contact": {
-                "name": "Jane Smith",
-                "email": "jane.smith@email.com",
-                "phone": "(555) 123-4567",
-                "linkedin": "linkedin.com/in/janesmith",
+    # All fields extracted in a single combined call.
+    _COMBINED_PROFILE = {
+        "contact": {
+            "name": "Jane Smith",
+            "email": "jane.smith@email.com",
+            "phone": "(555) 123-4567",
+            "linkedin": "linkedin.com/in/janesmith",
+            "location": "San Francisco, CA",
+        },
+        "experiences": [
+            {
+                "company": "Acme Corp",
+                "role_title": "Senior Software Engineer",
+                "start_date": "Jan 2022",
+                "end_date": "Present",
                 "location": "San Francisco, CA",
-            },
-            "experiences": [
-                {
-                    "company": "Acme Corp",
-                    "role_title": "Senior Software Engineer",
-                    "start_date": "Jan 2022",
-                    "end_date": "Present",
-                    "location": "San Francisco, CA",
-                    "bullets": [
-                        {"text": "Built Kafka pipeline processing 2M events/day",
-                         "source_text": "Built Kafka pipeline processing 2M events/day"},
-                    ],
-                    "source_text": "Senior Software Engineer | Acme Corp | Jan 2022 – Present",
-                }
-            ],
-            "education": [
-                {
-                    "institution": "University of California, Berkeley",
-                    "degree": "B.S.",
-                    "field_of_study": "Computer Science",
-                    "graduation_date": "May 2020",
-                    "gpa": "3.7",
-                    "source_text": "B.S. Computer Science | UC Berkeley | May 2020",
-                }
-            ],
-        })
+                "bullets": [
+                    {"text": "Built Kafka pipeline processing 2M events/day",
+                     "source_text": "Built Kafka pipeline processing 2M events/day"},
+                ],
+                "source_text": "Senior Software Engineer | Acme Corp | Jan 2022 – Present",
+            }
+        ],
+        "education": [
+            {
+                "institution": "University of California, Berkeley",
+                "degree": "B.S.",
+                "field_of_study": "Computer Science",
+                "graduation_date": "May 2020",
+                "gpa": "3.7",
+                "source_text": "B.S. Computer Science | UC Berkeley | May 2020",
+            }
+        ],
+        "projects": [],
+        "skills": [
+            {"name": "Python", "category": "languages", "source_text": "Python"},
+            {"name": "FastAPI", "category": "frameworks", "source_text": "FastAPI"},
+        ],
+        "awards": [],
+    }
 
-        # Call 2: supplemental (projects + skills + awards)
-        supplemental_response = _make_json_response({
-            "projects": [],
-            "skills": [
-                {"name": "Python", "category": "languages", "source_text": "Python"},
-                {"name": "FastAPI", "category": "frameworks", "source_text": "FastAPI"},
-            ],
-            "awards": [],
-        })
+    def test_build_profile_structure(self):
+        """Profile builder returns a CandidateProfile from a single combined call."""
+        doc = ingest_text(_load_fixture("sample_profile.txt"))
+        combined_response = _make_json_response(self._COMBINED_PROFILE)
 
         with patch("backend.src.extraction.candidate_profile_builder._client") as mock_client:
-            mock_client.chat.completions.create.side_effect = [core_response, supplemental_response]
+            mock_client.chat.completions.create.return_value = combined_response
             from backend.src.extraction.candidate_profile_builder import build_candidate_profile
             profile = build_candidate_profile(doc)
 
+        # Exactly one extraction call when the merged response is well-formed.
+        assert mock_client.chat.completions.create.call_count == 1
         assert isinstance(profile, CandidateProfile)
         assert profile.name == "Jane Smith"
         assert profile.email == "jane.smith@email.com"
@@ -103,6 +102,34 @@ class TestCandidateProfileBuilder:
         assert len(profile.experiences[0].bullets) == 1
         assert len(profile.education) == 1
         assert len(profile.skills) == 2
+
+    def test_build_profile_falls_back_to_two_calls(self):
+        """If the combined call returns garbage, fall back to core + supplemental."""
+        doc = ingest_text(_load_fixture("sample_profile.txt"))
+
+        bad_combined = _make_json_response({})  # unparseable/empty merged result
+        core_response = _make_json_response({
+            "contact": {"name": "Jane Smith", "email": "jane.smith@email.com"},
+            "experiences": [],
+            "education": [],
+        })
+        supplemental_response = _make_json_response({
+            "projects": [],
+            "skills": [{"name": "Python", "category": "languages", "source_text": "Python"}],
+            "awards": [],
+        })
+
+        with patch("backend.src.extraction.candidate_profile_builder._client") as mock_client:
+            mock_client.chat.completions.create.side_effect = [
+                bad_combined, core_response, supplemental_response,
+            ]
+            from backend.src.extraction.candidate_profile_builder import build_candidate_profile
+            profile = build_candidate_profile(doc)
+
+        # Combined attempt + the two fallback calls = 3 total.
+        assert mock_client.chat.completions.create.call_count == 3
+        assert profile.name == "Jane Smith"
+        assert len(profile.skills) == 1
 
     def test_profile_id_is_uuid(self):
         """Profile gets a unique ID."""
