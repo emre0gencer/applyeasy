@@ -12,11 +12,18 @@ build/
 .venv/
 venv/
 
-# Database
+# Database (SQLite + WAL sidecar files)
 *.db
+*.db-wal
+*.db-shm
 
-# Generated outputs
+# Generated outputs (contains user PII — never commit)
+/outputs/
 backend/outputs/
+
+# Test fixtures (may contain PII)
+/test_profiles/
+/test_jobs/
 
 # Reference file
 example/example_resume.pdf

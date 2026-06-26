@@ -34,7 +34,7 @@ _FAST_MODEL = "llama-3.1-8b-instant"
 def _get_client() -> "Groq":
     global _client
     if _client is None:
-        _client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        _client = Groq(api_key=os.getenv("GROQ_API_KEY"), timeout=30.0, max_retries=2)
     return _client
 
 

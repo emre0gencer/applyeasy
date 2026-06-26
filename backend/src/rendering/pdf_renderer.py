@@ -171,9 +171,10 @@ def _group_skills(resume: TailoredResume) -> dict[str, list[str]]:
 
 # ── Public render functions ──────────────────────────────────────────────────
 
-_FIT_SCALE_START = 1.0
-_FIT_SCALE_STEP  = 0.04
-_FIT_SCALE_MIN   = 0.72   # ~7.5pt body at minimum — still readable
+_FIT_SCALE_MAX        = 1.0
+_FIT_SCALE_MIN        = 0.72   # ~7.5pt body at minimum — still readable
+_FIT_BISECT_ITERS     = 4      # binary-search steps after the initial full-size render
+_FIT_SCALE_TOLERANCE  = 0.02   # stop early once the search window is this tight
 
 
 def render_resume_pdf(
@@ -184,8 +185,10 @@ def render_resume_pdf(
     """Render resume to PDF, shrinking fonts/spacing until it fits on 1 page.
 
     The @page margins (defined in 'in') are never altered. Only the CSS pt
-    values (font sizes, margins between entries, etc.) are scaled down in 4%
-    steps from 100% to a floor of 72%.  All content is preserved.
+    values (font sizes, margins between entries, etc.) are scaled down toward a
+    floor of 72%. We binary-search for the *largest* scale that still fits on one
+    page (≤5 renders) instead of linearly stepping (was up to 8 renders). All
+    content is preserved.
     """
     output_dir = _OUTPUT_DIR / run_id
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -194,18 +197,35 @@ def render_resume_pdf(
     base_css = _load_resume_css(template_id)
     context = {"resume": resume, "grouped_skills": _group_skills(resume)}
 
-    scale = _FIT_SCALE_START
-    pdf_bytes: bytes = b""
-
-    while scale >= _FIT_SCALE_MIN - 1e-4:
+    def _render_at(scale: float) -> bytes:
         scaled_css = _scale_css_pt_values(base_css, scale)
         html = _render_resume_html(template_id, context.copy(), scaled_css)
-        pdf_bytes = _html_to_pdf_bytes(html)
-        if _count_pdf_pages(pdf_bytes) <= 1:
-            break
-        scale -= _FIT_SCALE_STEP
+        return _html_to_pdf_bytes(html)
 
-    output_path.write_bytes(pdf_bytes)
+    # Fast path: most resumes fit at full size.
+    pdf_bytes = _render_at(_FIT_SCALE_MAX)
+    if _count_pdf_pages(pdf_bytes) <= 1:
+        output_path.write_bytes(pdf_bytes)
+        return str(output_path)
+
+    # Binary-search the largest scale in [MIN, MAX) that fits on one page.
+    # `best` always holds the smallest-scale (guaranteed-most-likely-to-fit)
+    # render seen so far, so we never write a >1-page PDF if the floor fits.
+    lo, hi = _FIT_SCALE_MIN, _FIT_SCALE_MAX
+    best_bytes = _render_at(_FIT_SCALE_MIN)
+
+    for _ in range(_FIT_BISECT_ITERS):
+        if hi - lo <= _FIT_SCALE_TOLERANCE:
+            break
+        mid = (lo + hi) / 2
+        candidate = _render_at(mid)
+        if _count_pdf_pages(candidate) <= 1:
+            best_bytes = candidate
+            lo = mid          # fits — try larger
+        else:
+            hi = mid          # too big — shrink
+
+    output_path.write_bytes(best_bytes)
     return str(output_path)
 
 

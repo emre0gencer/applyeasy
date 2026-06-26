@@ -4,18 +4,19 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from backend.src.api.ownership import owns
 from backend.src.storage.database import get_db, get_run_record
 
 router = APIRouter()
 
 
-def _get_completed_run(run_id: str, db: Session):
+def _get_completed_run(run_id: str, request: Request, db: Session):
     record = get_run_record(db, run_id)
-    if not record:
+    if not record or not owns(record.owner_id, request):
         raise HTTPException(status_code=404, detail="Run not found")
     if record.status != "completed":
         raise HTTPException(
@@ -26,8 +27,8 @@ def _get_completed_run(run_id: str, db: Session):
 
 
 @router.get("/download/{run_id}/resume")
-def download_resume(run_id: str, db: Session = Depends(get_db)) -> FileResponse:
-    record = _get_completed_run(run_id, db)
+def download_resume(run_id: str, request: Request, db: Session = Depends(get_db)) -> FileResponse:
+    record = _get_completed_run(run_id, request, db)
     path = record.resume_pdf_path
     if not path or not Path(path).exists():
         raise HTTPException(status_code=404, detail="Resume PDF not found")
@@ -39,8 +40,8 @@ def download_resume(run_id: str, db: Session = Depends(get_db)) -> FileResponse:
 
 
 @router.get("/download/{run_id}/cover-letter")
-def download_cover_letter(run_id: str, db: Session = Depends(get_db)) -> FileResponse:
-    record = _get_completed_run(run_id, db)
+def download_cover_letter(run_id: str, request: Request, db: Session = Depends(get_db)) -> FileResponse:
+    record = _get_completed_run(run_id, request, db)
     path = record.cover_letter_pdf_path
     if not path or not Path(path).exists():
         raise HTTPException(status_code=404, detail="Cover letter PDF not found")
@@ -52,8 +53,8 @@ def download_cover_letter(run_id: str, db: Session = Depends(get_db)) -> FileRes
 
 
 @router.get("/download/{run_id}/summary")
-def download_summary(run_id: str, db: Session = Depends(get_db)) -> FileResponse:
-    record = _get_completed_run(run_id, db)
+def download_summary(run_id: str, request: Request, db: Session = Depends(get_db)) -> FileResponse:
+    record = _get_completed_run(run_id, request, db)
     path = record.summary_path
     if not path or not Path(path).exists():
         raise HTTPException(status_code=404, detail="Change summary not found")

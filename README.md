@@ -24,9 +24,16 @@ Pipeline:
 ### Backend
 
 ```bash
+# Install dependencies (run from the backend/ directory)
 cd backend
 pip install -e ".[dev]"
-export GROQ_API_KEY=your_key_here
+cd ..
+
+# IMPORTANT: run the server from the REPO ROOT, not from backend/.
+# The code imports the package as `backend.src.*`, which only resolves when the
+# repo root is the working directory. Default OUTPUT_DIR/DB_PATH also resolve
+# relative to this directory.
+export GROQ_API_KEY=your_key_here     # or put it in backend/.env
 uvicorn backend.src.api.main:app --reload --port 8000
 ```
 
@@ -43,8 +50,8 @@ Open http://localhost:5173
 ### Run Tests
 
 ```bash
-cd backend
-pytest tests/ -v
+# Run from the REPO ROOT (tests import `backend.src.*`)
+pytest backend/tests -v
 ```
 
 ## Environment Variables

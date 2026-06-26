@@ -6,11 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Backend
 ```bash
-cd backend
-pip install -e ".[dev]"                          # Install dependencies
+cd backend && pip install -e ".[dev]" && cd ..   # Install deps (then return to repo root)
+
+# Run EVERYTHING below from the repo root — the code imports `backend.src.*`,
+# which only resolves when the repo root is the working directory. Running from
+# inside backend/ raises ModuleNotFoundError: No module named 'backend'.
 uvicorn backend.src.api.main:app --reload --port 8000  # Run dev server
-pytest tests/ -v                                 # Run all tests
-pytest tests/test_tailoring.py -v               # Run a single test file
+pytest backend/tests -v                          # Run all tests
+pytest backend/tests/test_tailoring.py -v        # Run a single test file
 ```
 
 ### Frontend

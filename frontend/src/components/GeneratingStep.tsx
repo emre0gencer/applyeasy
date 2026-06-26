@@ -87,15 +87,36 @@ export function GeneratingStep({ runId, onDone, onFailed, includeCoverLetter = f
   useEffect(() => {
     let cancelled = false;
 
+    // Safety limits so a dead/hung backend never strands the user on this screen.
+    const POLL_INTERVAL_MS = 2000;
+    const MAX_WALL_CLOCK_MS = 3 * 60 * 1000;   // give up after 3 minutes total
+    const MAX_CONSECUTIVE_ERRORS = 5;          // give up after 5 straight fetch failures
+
     async function poll() {
+      const startedAt = Date.now();
+      let consecutiveErrors = 0;
+
       while (!cancelled) {
         try {
           const s = await getStatus(runId);
+          consecutiveErrors = 0;
           if (!cancelled) setStatus(s);
           if (s.status === "completed") { if (!cancelled) setCompletedStatus(s); return; }
           if (s.status === "failed")    { if (!cancelled) onFailed(s.error_message ?? "Generation failed"); return; }
-        } catch { /* keep polling */ }
-        await new Promise((r) => setTimeout(r, 2000));
+        } catch {
+          consecutiveErrors += 1;
+          if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+            if (!cancelled) onFailed("Lost connection to the server. Please try again.");
+            return;
+          }
+        }
+
+        if (Date.now() - startedAt > MAX_WALL_CLOCK_MS) {
+          if (!cancelled) onFailed("This is taking longer than expected. Please try again.");
+          return;
+        }
+
+        await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
       }
     }
 

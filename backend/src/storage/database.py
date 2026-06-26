@@ -7,13 +7,30 @@ import os
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import create_engine, Column, String, Text, Float, Integer, DateTime, text
+from sqlalchemy import create_engine, event, Column, String, Text, Float, Integer, DateTime, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 DB_PATH = os.environ.get("DB_PATH", "resume_tool.db")
 DATABASE_URL = f"sqlite:///{DB_PATH}"
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+# timeout: wait up to 30s for a lock instead of failing immediately under
+# concurrent background-task writes + status polls.
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False, "timeout": 30},
+)
+
+
+@event.listens_for(engine, "connect")
+def _set_sqlite_pragmas(dbapi_conn, _connection_record):
+    """Enable WAL mode + a busy timeout so concurrent readers/writers don't
+    hit 'database is locked'. WAL lets the status poller read while a run writes."""
+    cursor = dbapi_conn.cursor()
+    cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA busy_timeout=30000")
+    cursor.close()
+
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -28,6 +45,7 @@ class SessionRecord(Base):
     session_id = Column(String, primary_key=True)
     raw_text = Column(Text, nullable=False)
     source_format = Column(String, default="text")   # "pdf" | "text"
+    owner_id = Column(String, nullable=True)          # opaque per-browser owner token
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -37,6 +55,7 @@ class RunRecord(Base):
 
     run_id = Column(String, primary_key=True)
     session_id = Column(String, nullable=False)
+    owner_id = Column(String, nullable=True)           # inherited from the owning session
     status = Column(String, default="pending")         # pending|running|completed|failed
     progress_step = Column(String, default="")
     progress_message = Column(String, default="")
@@ -62,6 +81,8 @@ def init_db() -> None:
             "ALTER TABLE runs ADD COLUMN keyword_coverage FLOAT",
             "ALTER TABLE runs ADD COLUMN experience_count INTEGER",
             "ALTER TABLE runs ADD COLUMN raw_suitability_score INTEGER",
+            "ALTER TABLE sessions ADD COLUMN owner_id VARCHAR",
+            "ALTER TABLE runs ADD COLUMN owner_id VARCHAR",
         ]:
             try:
                 conn.execute(text(stmt))
@@ -82,11 +103,18 @@ def get_db():
 # Helper functions
 # ---------------------------------------------------------------------------
 
-def create_session_record(db: Session, session_id: str, raw_text: str, source_format: str) -> SessionRecord:
+def create_session_record(
+    db: Session,
+    session_id: str,
+    raw_text: str,
+    source_format: str,
+    owner_id: Optional[str] = None,
+) -> SessionRecord:
     record = SessionRecord(
         session_id=session_id,
         raw_text=raw_text,
         source_format=source_format,
+        owner_id=owner_id,
     )
     db.add(record)
     db.commit()
@@ -98,10 +126,17 @@ def get_session_record(db: Session, session_id: str) -> Optional[SessionRecord]:
     return db.query(SessionRecord).filter(SessionRecord.session_id == session_id).first()
 
 
-def create_run_record(db: Session, run_id: str, session_id: str, job_description: str) -> RunRecord:
+def create_run_record(
+    db: Session,
+    run_id: str,
+    session_id: str,
+    job_description: str,
+    owner_id: Optional[str] = None,
+) -> RunRecord:
     record = RunRecord(
         run_id=run_id,
         session_id=session_id,
+        owner_id=owner_id,
         status="pending",
         progress_step="extracting_profile",
         job_description=job_description,

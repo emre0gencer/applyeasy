@@ -40,17 +40,19 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+// All requests include credentials so the HttpOnly ownership cookie set on
+// /upload is sent back on /generate, /status, and /download (IDOR protection).
 export async function uploadFile(file: File): Promise<UploadResponse> {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await fetch(`${BASE}/upload`, { method: "POST", body: formData });
+  const res = await fetch(`${BASE}/upload`, { method: "POST", body: formData, credentials: "include" });
   return handleResponse<UploadResponse>(res);
 }
 
 export async function uploadText(text: string): Promise<UploadResponse> {
   const formData = new FormData();
   formData.append("text", text);
-  const res = await fetch(`${BASE}/upload`, { method: "POST", body: formData });
+  const res = await fetch(`${BASE}/upload`, { method: "POST", body: formData, credentials: "include" });
   return handleResponse<UploadResponse>(res);
 }
 
@@ -63,6 +65,7 @@ export async function startGeneration(
   const res = await fetch(`${BASE}/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({
       session_id: sessionId,
       job_description: jobDescription,
@@ -74,7 +77,7 @@ export async function startGeneration(
 }
 
 export async function getStatus(runId: string): Promise<StatusResponse> {
-  const res = await fetch(`${BASE}/status/${runId}`);
+  const res = await fetch(`${BASE}/status/${runId}`, { credentials: "include" });
   return handleResponse<StatusResponse>(res);
 }
 
@@ -99,6 +102,6 @@ export interface ChangeSummary {
 }
 
 export async function fetchChangeSummary(runId: string): Promise<ChangeSummary> {
-  const res = await fetch(getDownloadUrl(runId, "summary"));
+  const res = await fetch(getDownloadUrl(runId, "summary"), { credentials: "include" });
   return handleResponse<ChangeSummary>(res);
 }

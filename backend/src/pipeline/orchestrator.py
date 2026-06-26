@@ -5,11 +5,17 @@ Runs as a FastAPI BackgroundTask. Updates SQLite run state at each step.
 
 from __future__ import annotations
 
-import json
-import traceback
+import logging
 from typing import Optional
 
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
+
+# Defensive input caps — keep LLM prompts inside context limits regardless of
+# how the text entered the system. Oversized inputs are truncated, not rejected.
+_MAX_RAW_TEXT_CHARS = 60_000
+_MAX_JD_CHARS = 20_000
 
 from backend.src.analysis.job_description_analyzer import analyze_job_description
 from backend.src.extraction.candidate_profile_builder import build_candidate_profile
@@ -52,15 +58,16 @@ def run_pipeline(run_id: str, raw_text: str, job_description: str, template_id: 
     db = SessionLocal()
     try:
         _execute_pipeline(db, run_id, raw_text, job_description, template_id, include_cover_letter)
-    except Exception as exc:
-        tb = traceback.format_exc()
+    except Exception:
+        # Log the full traceback server-side; never expose internals to the client.
+        logger.exception("Pipeline failed for run_id=%s", run_id)
         update_run_progress(
             db,
             run_id,
             status="failed",
             progress_step="failed",
             progress_message="Pipeline failed",
-            error_message=f"{exc}\n\n{tb}",
+            error_message="Generation failed due to an internal error. Please try again.",
         )
     finally:
         db.close()
@@ -74,6 +81,11 @@ def _execute_pipeline(
     template_id: str = "classic",
     include_cover_letter: bool = False,
 ) -> None:
+    # Defensive truncation so a pathological input can't blow the LLM context
+    # window (the API boundary also caps these, but the pipeline owns its own safety).
+    raw_text = raw_text[:_MAX_RAW_TEXT_CHARS]
+    job_description = job_description[:_MAX_JD_CHARS]
+
     # ── Step 1: Extract candidate profile ──────────────────────────────────
     _step(db, run_id, "extracting_profile")
     doc = ingest_text(raw_text)
