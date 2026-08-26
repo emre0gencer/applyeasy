@@ -49,8 +49,8 @@ Seven sequential steps, each updating `RunRecord.progress_step` in SQLite:
 | `analyzing_job` | `job_description_analyzer` | `JobDescription` |
 | `scoring_relevance` | `relevance_ranker` | `ExperienceRelevanceMap` (cosine similarity) |
 | `tailoring_resume` | `resume_tailoring_engine` | `TailoredResume` |
-| `generating_cover_letter` | `cover_letter_generator` | disabled (`COVER_LETTER_ENABLED = False`) |
-| `validating` | `quality_validator` | `ValidationResult` |
+| `generating_cover_letter` | `cover_letter_generator` | `TailoredCoverLetter` (Pro + explicitly requested) |
+| `validating` | `quality_validator` + optional Pro `resume_repair` | `ValidationResult` |
 | `rendering_pdfs` | `pdf_renderer` | PDF files written to `outputs/{run_id}/` |
 
 ### Frontend State Machine (`frontend/src/App.tsx`)
@@ -95,8 +95,17 @@ Two SQLite tables via SQLAlchemy ORM:
 ## Key Constraints & Gotchas
 
 - **LLM is Groq**, not Anthropic. Set `GROQ_API_KEY`.
-- **Cover letter is disabled** (`COVER_LETTER_ENABLED = False` in orchestrator). The code exists but is inactive.
+- **Cover letter is Pro-gated** by `PipelineProfile.cover_letter_enabled` and only runs when explicitly requested.
 - **xhtml2pdf has no flexbox** — always use floats + clearfix for multi-column layouts in templates.
 - Bullet word target: 40–55 words. Char cap: 380. Page char capacity: 3600.
+- Projects are selected by JD relevance. A selected project with relevance ≥0.28
+  targets at least 2 evidence-grounded bullets before the optional page-fill pass;
+  never invent a second claim when its source cannot support one.
+- Bullet creativity means varying evidence angle, action verb, and sentence
+  structure while staying source-grounded. It never permits invented metrics,
+  technologies, scope, ownership, or outcomes.
+- Pipeline tier flows `GenerateRequest.tier` → `PipelineProfile` → orchestrator.
+  Standard preserves the current low-cost path; Pro uses quality models for
+  extraction/JD/projects and enables one validation-driven repair pass.
 - `template_id` flows: `GenerateRequest.template_id` → `run_pipeline()` → `render_resume_pdf()`. Default is `"classic"`.
 - `outputs/` and `test_profiles/` / `test_jobs/` directories are untracked but present locally.

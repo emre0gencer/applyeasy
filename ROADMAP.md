@@ -5,6 +5,7 @@
 items are folded into Track D below).
 
 **Created:** 2026-08-25
+**Last updated:** 2026-08-25 — Phase 2 complete; project-depth and creative-range policy added
 **Status legend:** ☐ open · ◐ in progress · ☑ done
 
 ---
@@ -81,6 +82,8 @@ role has no dates", no "this bullet has no outcome".
 | Input standardization | **Normalize + review screen.** Keep the freeform paste, add a normalization pass into a canonical profile document, then let the user review and correct before generation. |
 | Pro budget | **~8–12 LLM calls, ≤45s.** 70B on extraction and JD analysis, plus one repair loop. No N-best sampling, no separate judge model. |
 | Pro features | Cover letter revived · multi-variant output · editable review + targeted regenerate. |
+| Relevant project depth | **At least two grounded bullets per selected project scoring ≥0.28.** This is a content-quality floor, not a page-fill side effect. If source evidence cannot support a distinct second claim, generation returns fewer and validation explicitly flags the project rather than fabricating one. |
+| Bullet creative range | **Editorial creativity, factual conservatism.** Prompts vary evidence angle (architecture, implementation, integration, reliability/quality, grounded user value), opening verbs, and sentence structure. Creativity never licenses invented tools, metrics, scope, ownership, or outcomes. |
 
 **Budget reconciliation:** multi-variant output is implemented as *composition
 strategies over the same grounded content* (different section ordering and
@@ -128,12 +131,13 @@ emit a PDF with relevance-ordered entries or mixed date formats.
   **automatic repair is deferred to B5**. Regex-rewriting the prose here would
   trade a convention defect for a grammar defect — an LLM should do the rewrite.
 
-## Track B — Pro pipeline
+## Track B — Pro pipeline  — ◐ PHASE 2 COMPLETE 2026-08-25
 
-- ☐ **B1. `PipelineProfile`** (`backend/src/pipeline/profiles.py`) — per-run
+- ☑ **B1. `PipelineProfile`** (`backend/src/pipeline/profiles.py`) — per-run
   config: model per stage, repair loop on/off, normalization on/off, cover
   letter on/off, variant count. `standard` and `pro` presets. Threaded from
-  `GenerateRequest.tier` → `run_pipeline()`.
+  `GenerateRequest.tier` → API validation → `run_pipeline()` → extraction, JD
+  analysis, resume rewriting, project generation, normalization, and repair.
 - ☐ **B2. Input normalization pass** — raw text → canonical profile document,
   with explicit gap detection (missing dates, bullet-less roles, outcome-less
   bullets) surfaced as structured findings rather than silently absorbed.
@@ -143,12 +147,17 @@ emit a PDF with relevance-ordered entries or mixed date formats.
 - ☐ **B4. 70B extraction + JD analysis** under the Pro profile, with
   **keyword canonicalization** (collapse "React"/"React.js"/"ReactJS" to one
   canonical term) so coverage metrics stop double-counting.
-- ☐ **B5. Repair loop** — after `validate()`, route repairable flags (verb
+- ☑ **B5. Repair loop** — after `validate()`, route repairable flags (verb
   repetition, hedges, redundancy, generic phrases, thin evidence) back as one
   targeted rewrite call carrying the specific complaint per bullet. Max 1 pass,
   then re-validate. **This is the change that makes validation mean something.**
-- ☐ **B6. Fail loudly on empty extraction** — replace the five silent `{}`
-  fallbacks with a detected-and-flagged failure. Closes audit #13.
+- ☑ **B6. Fail loudly on empty structured input stages** — candidate extraction
+  retries its split fallback, then raises a user-safe `ProfileExtractionError`
+  instead of completing with a blank profile; unusable JD analysis raises
+  `JobAnalysisError`. The orchestrator distinguishes these expected failures
+  from internal errors. Local rewrite parse failures remain safe degradations:
+  they preserve original content, and the validation/repair path catches weak
+  results rather than failing an otherwise usable run. Closes audit #13.
 - ☐ **B7. Cover letter revival** — template-matched to the resume's
   `template_id`, one-page fit, `temperature=0`, single shared prohibited-phrase
   list. Closes audit #11.
@@ -207,6 +216,21 @@ categories instead of 4 canonical ones; RenderCV's "4 years 2 months" CV time
 spans; and its stock month abbreviations mixing widths (`Jan`/`June`/`Sept`),
 which reintroduces the exact date drift Track A removed.
 
+## Cross-track content generation — ☑ FOUNDATION DELIVERED 2026-08-25
+
+- ☑ Projects are ranked by JD relevance before the two-project selection cap;
+  source order is now only the stable tie-breaker.
+- ☑ Relevant selected projects target a two-bullet minimum before optional page
+  fill. Sparse resumes may request a third bullet in the same batched call.
+- ☑ Generated project bullets retain their real project source text in the audit
+  trail instead of the placeholder `"generated"`.
+- ☑ Experience rewrite, project rewrite, project expansion, and Pro repair prompts
+  all share the creative-range policy: distinct evidence angles, varied verbs,
+  and varied sentence architecture under strict grounding rules.
+- ☑ Deterministic quality checks now include project bullets for generic phrases,
+  redundancy, thin evidence, repeated verbs, vague quantifiers, truthfulness,
+  keyword coverage, and the relevant-project depth floor.
+
 ## Track D — Carried-over audit items
 
 Still open from `AUDIT_REPORT.md`, verified against the code on 2026-08-25:
@@ -235,9 +259,11 @@ Still open from `AUDIT_REPORT.md`, verified against the code on 2026-08-25:
 
 ## Sequencing
 
-**Phase 1 (now):** Track A end to end. Free, benefits both tiers, fixes five
-defect classes, and gives the repair loop something to act on.
-**Phase 2:** B1 → B6 → B5 (profile plumbing, honest failures, repair loop).
-**Phase 3:** B2 → B3 (normalization + review screen) and B4.
+**Phase 1 — ☑ complete:** Track A end to end. Free, benefits both tiers, fixes
+five defect classes, and gives the repair loop something to act on.
+**Phase 2 — ☑ complete:** B1 → B6 → B5 (profile plumbing, honest failures,
+one complaint-directed repair pass), plus the new project-depth and
+creative-range decisions above.
+**Phase 3 — next:** B2 → B3 (normalization + review screen) and B4.
 **Phase 4:** Track C (page fit), then B7 → B8 → B9.
 **Ongoing:** Track D, prioritising D1 and D2.
