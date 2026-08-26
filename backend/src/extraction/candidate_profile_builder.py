@@ -27,6 +27,7 @@ from backend.src.models.schemas import (
     Skill,
 )
 from backend.src.ingestion.document_ingestion_engine import IngestedDocument
+from backend.src.pipeline.errors import ProfileExtractionError
 
 _client: "Groq | None" = None
 
@@ -56,10 +57,15 @@ RULES:
 9. When extracting bullets/descriptions, use the exact wording from the source."""
 
 
-def _call_extraction(system: str, user_msg: str, schema_hint: str) -> dict:
+def _call_extraction(
+    system: str,
+    user_msg: str,
+    schema_hint: str,
+    model: str = _FAST_MODEL,
+) -> dict:
     """Call Groq with JSON mode and return parsed dict."""
     resp = _get_client().chat.completions.create(
-        model=_FAST_MODEL,
+        model=model,
         messages=[
             {
                 "role": "system",
@@ -110,7 +116,7 @@ _COMBINED_SCHEMA_HINT = (
 # language proficiencies, and notable activities — each a complete standalone bullet sentence.
 
 
-def _extract_core(raw_text: str) -> dict:
+def _extract_core(raw_text: str, model: str = _FAST_MODEL) -> dict:
     """Single call: extract contact info, experiences, and education from any input format."""
     user_msg = (
         "Extract all contact information, work experiences, and education entries "
@@ -118,10 +124,10 @@ def _extract_core(raw_text: str) -> dict:
         "or any combination of professional/academic information.\n\n"
         f"{raw_text}"
     )
-    return _call_extraction(_SYSTEM_PROMPT, user_msg, _CORE_SCHEMA_HINT)
+    return _call_extraction(_SYSTEM_PROMPT, user_msg, _CORE_SCHEMA_HINT, model)
 
 
-def _extract_supplemental(raw_text: str) -> dict:
+def _extract_supplemental(raw_text: str, model: str = _FAST_MODEL) -> dict:
     """Single call: extract projects, skills, and awards from any input format."""
     user_msg = (
         "Extract all projects, skills/technologies, and awards/certifications "
@@ -129,10 +135,10 @@ def _extract_supplemental(raw_text: str) -> dict:
         "or any combination of professional/academic information.\n\n"
         f"{raw_text}"
     )
-    return _call_extraction(_SYSTEM_PROMPT, user_msg, _SUPPLEMENTAL_SCHEMA_HINT)
+    return _call_extraction(_SYSTEM_PROMPT, user_msg, _SUPPLEMENTAL_SCHEMA_HINT, model)
 
 
-def _extract_combined(raw_text: str) -> dict:
+def _extract_combined(raw_text: str, model: str = _FAST_MODEL) -> dict:
     """Single call: extract everything (contact, experiences, education, projects,
     skills, awards, leadership) in one request — avoids sending the full resume twice."""
     user_msg = (
@@ -142,7 +148,7 @@ def _extract_combined(raw_text: str) -> dict:
         "or any combination of professional/academic information.\n\n"
         f"{raw_text}"
     )
-    return _call_extraction(_SYSTEM_PROMPT, user_msg, _COMBINED_SCHEMA_HINT)
+    return _call_extraction(_SYSTEM_PROMPT, user_msg, _COMBINED_SCHEMA_HINT, model)
 
 
 _LINKEDIN_RE = re.compile(
@@ -162,7 +168,21 @@ def _scan_links(raw_text: str) -> tuple[str | None, str | None]:
     return linkedin, github
 
 
-def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
+def _has_extraction_content(data: dict) -> bool:
+    """Whether a structured response contains at least one usable value."""
+    contact = data.get("contact")
+    if isinstance(contact, dict) and any(contact.values()):
+        return True
+    return any(
+        isinstance(data.get(key), list) and bool(data[key])
+        for key in ("experiences", "education", "projects", "skills", "awards")
+    )
+
+
+def build_candidate_profile(
+    doc: IngestedDocument,
+    model: str = _FAST_MODEL,
+) -> CandidateProfile:
     """
     Extract a structured CandidateProfile from an IngestedDocument.
     Accepts any format: resume, freeform professional/academic dump, or mixed.
@@ -173,14 +193,17 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
     raw_text = doc.raw_text
     summary_text = doc.sections.get("summary", "")
 
-    combined = _extract_combined(raw_text)
-    if combined and any(k in combined for k in ("contact", "experiences", "education")):
+    combined = _extract_combined(raw_text, model)
+    if _has_extraction_content(combined):
         # Merged call succeeded — both views read from the same dict.
         core = supplemental = combined
     else:
         # JSON-mode reliability guard: fall back to the two-call split.
-        core = _extract_core(raw_text)
-        supplemental = _extract_supplemental(raw_text)
+        core = _extract_core(raw_text, model)
+        supplemental = _extract_supplemental(raw_text, model)
+
+    if not (_has_extraction_content(core) or _has_extraction_content(supplemental)):
+        raise ProfileExtractionError("Profile extraction returned no usable fields")
 
     contact_data: dict[str, Any] = core.get("contact", {})
 
@@ -266,7 +289,7 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
 
     summary = contact_data.get("summary") or summary_text or None
 
-    return CandidateProfile(
+    profile = CandidateProfile(
         name=contact_data.get("name", ""),
         email=contact_data.get("email"),
         phone=contact_data.get("phone"),
@@ -284,3 +307,12 @@ def build_candidate_profile(doc: IngestedDocument) -> CandidateProfile:
         extraction_confidence=doc.confidence,
         raw_text=raw_text,
     )
+    if not any((
+        profile.name,
+        profile.experiences,
+        profile.education,
+        profile.projects,
+        profile.skills,
+    )):
+        raise ProfileExtractionError("Profile extraction produced an empty profile")
+    return profile

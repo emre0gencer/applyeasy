@@ -138,6 +138,31 @@ class TestCandidateProfileBuilder:
         profile = CandidateProfile()
         assert uuid.UUID(profile.profile_id)  # doesn't raise
 
+    def test_empty_extraction_fails_loudly(self):
+        """Three empty structured responses must not become a blank success."""
+        doc = ingest_text(_load_fixture("sample_profile.txt"))
+        empty = _make_json_response({})
+
+        with patch("backend.src.extraction.candidate_profile_builder._client") as mock_client:
+            mock_client.chat.completions.create.side_effect = [empty, empty, empty]
+            from backend.src.extraction.candidate_profile_builder import build_candidate_profile
+            from backend.src.pipeline.errors import ProfileExtractionError
+
+            with pytest.raises(ProfileExtractionError):
+                build_candidate_profile(doc)
+
+    def test_selected_extraction_model_is_used(self):
+        doc = ingest_text(_load_fixture("sample_profile.txt"))
+        combined_response = _make_json_response(self._COMBINED_PROFILE)
+
+        with patch("backend.src.extraction.candidate_profile_builder._client") as mock_client:
+            mock_client.chat.completions.create.return_value = combined_response
+            from backend.src.extraction.candidate_profile_builder import build_candidate_profile
+
+            build_candidate_profile(doc, model="pro-model")
+
+        assert mock_client.chat.completions.create.call_args.kwargs["model"] == "pro-model"
+
 
 # ---------------------------------------------------------------------------
 # JobDescriptionAnalyzer tests
@@ -204,3 +229,12 @@ class TestJobDescriptionAnalyzer:
             from backend.src.analysis.job_description_analyzer import analyze_job_description
             jd = analyze_job_description(jd_text)
         assert jd.raw_text == jd_text
+
+    def test_empty_job_analysis_fails_loudly(self):
+        with patch("backend.src.analysis.job_description_analyzer._client") as mock_client:
+            mock_client.chat.completions.create.return_value = _make_json_response({})
+            from backend.src.analysis.job_description_analyzer import analyze_job_description
+            from backend.src.pipeline.errors import JobAnalysisError
+
+            with pytest.raises(JobAnalysisError):
+                analyze_job_description("A complete job description " * 10)

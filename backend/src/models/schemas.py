@@ -47,6 +47,7 @@ class ProjectEntry(BaseModel):
     date: Optional[str] = None        # year or date string
     bullets: list[Bullet] = []
     source_text: str = ""
+    relevance_score: float = 0.0
 
 
 class Skill(BaseModel):
@@ -167,7 +168,7 @@ class ExperienceRelevanceMap(BaseModel):
 class BulletChange(BaseModel):
     original_text: str
     revised_text: str
-    change_reason: str     # "keyword_integration" | "reorder" | "unchanged"
+    change_reason: str     # keyword_integration | project_expansion | quality_repair | unchanged
     keywords_added: list[str] = []
 
 
@@ -264,6 +265,7 @@ class GenerateRequest(BaseModel):
     job_description: str
     template_id: str = "classic"
     include_cover_letter: bool = False
+    tier: str = "standard"
 
 
 class GenerateResponse(BaseModel):
@@ -294,6 +296,7 @@ PROGRESS_STEPS = [
     "scoring_relevance",
     "tailoring_resume",
     "generating_cover_letter",
+    "validating",
     "rendering_pdfs",
     "completed",
 ]
@@ -304,6 +307,7 @@ PROGRESS_MESSAGES: dict[str, str] = {
     "scoring_relevance":        "Scoring experience relevance...",
     "tailoring_resume":         "Tailoring resume...",
     "generating_cover_letter":  "Drafting cover letter...",
+    "validating":               "Checking and refining content quality...",
     "rendering_pdfs":           "Rendering PDFs...",
     "completed":                "Done",
 }

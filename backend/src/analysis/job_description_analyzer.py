@@ -18,6 +18,7 @@ from backend.src.models.schemas import (
     KeywordEntry,
     RequirementEntry,
 )
+from backend.src.pipeline.errors import JobAnalysisError
 
 _client: "Groq | None" = None
 
@@ -65,10 +66,13 @@ _SYSTEM_PROMPT = (
 )
 
 
-def analyze_job_description(jd_text: str) -> JobDescription:
+def analyze_job_description(
+    jd_text: str,
+    model: str = _FAST_MODEL,
+) -> JobDescription:
     """Extract a structured JobDescription from raw job posting text."""
     resp = _get_client().chat.completions.create(
-        model=_FAST_MODEL,
+        model=model,
         messages=[
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user", "content": f"Analyze this job description:\n\n{jd_text}"},
@@ -79,8 +83,13 @@ def analyze_job_description(jd_text: str) -> JobDescription:
 
     try:
         data: dict = json.loads(resp.choices[0].message.content)
-    except (json.JSONDecodeError, AttributeError):
-        data = {}
+    except (json.JSONDecodeError, AttributeError) as exc:
+        raise JobAnalysisError("Job analysis returned invalid JSON") from exc
+
+    if not isinstance(data, dict) or not any(
+        data.get(key) for key in ("role_title", "requirements", "responsibilities", "keywords")
+    ):
+        raise JobAnalysisError("Job analysis returned no usable fields")
 
     requirements = [
         RequirementEntry(
