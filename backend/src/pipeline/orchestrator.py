@@ -20,10 +20,13 @@ _MAX_JD_CHARS = 20_000
 from backend.src.analysis.job_description_analyzer import analyze_job_description
 from backend.src.extraction.candidate_profile_builder import build_candidate_profile
 from backend.src.generation.cover_letter_generator import generate_cover_letter
+from backend.src.generation.resume_repair import repair_resume
 from backend.src.generation.resume_tailoring_engine import tailor_resume
 from backend.src.ingestion.document_ingestion_engine import ingest_text
 from backend.src.matching.relevance_ranker import rank_relevance
 from backend.src.models.schemas import PROGRESS_MESSAGES, TailoredCoverLetter
+from backend.src.pipeline.errors import PipelineStageError
+from backend.src.pipeline.profiles import get_pipeline_profile
 
 from backend.src.rendering.pdf_renderer import (
     render_change_summary,
@@ -50,14 +53,39 @@ def _step(
     )
 
 
-def run_pipeline(run_id: str, raw_text: str, job_description: str, template_id: str = "classic", include_cover_letter: bool = False) -> None:
+def run_pipeline(
+    run_id: str,
+    raw_text: str,
+    job_description: str,
+    template_id: str = "classic",
+    include_cover_letter: bool = False,
+    tier: str = "standard",
+) -> None:
     """
     Full generation pipeline. Called as a background task.
     Uses its own DB session (background tasks don't share the request session).
     """
     db = SessionLocal()
     try:
-        _execute_pipeline(db, run_id, raw_text, job_description, template_id, include_cover_letter)
+        _execute_pipeline(
+            db,
+            run_id,
+            raw_text,
+            job_description,
+            template_id,
+            include_cover_letter,
+            tier,
+        )
+    except PipelineStageError as exc:
+        logger.warning("Pipeline input stage failed for run_id=%s: %s", run_id, exc)
+        update_run_progress(
+            db,
+            run_id,
+            status="failed",
+            progress_step="failed",
+            progress_message="Generation needs more information",
+            error_message=exc.public_message,
+        )
     except Exception:
         # Log the full traceback server-side; never expose internals to the client.
         logger.exception("Pipeline failed for run_id=%s", run_id)
@@ -80,16 +108,19 @@ def _execute_pipeline(
     job_description: str,
     template_id: str = "classic",
     include_cover_letter: bool = False,
+    tier: str = "standard",
 ) -> None:
     # Defensive truncation so a pathological input can't blow the LLM context
     # window (the API boundary also caps these, but the pipeline owns its own safety).
     raw_text = raw_text[:_MAX_RAW_TEXT_CHARS]
     job_description = job_description[:_MAX_JD_CHARS]
+    pipeline_profile = get_pipeline_profile(tier)
+    include_cover_letter = include_cover_letter and pipeline_profile.cover_letter_enabled
 
     # ── Step 1: Extract candidate profile ──────────────────────────────────
     _step(db, run_id, "extracting_profile")
     doc = ingest_text(raw_text)
-    profile = build_candidate_profile(doc)
+    profile = build_candidate_profile(doc, model=pipeline_profile.extraction_model)
     update_run_progress(
         db,
         run_id,
@@ -101,7 +132,9 @@ def _execute_pipeline(
 
     # ── Step 2: Analyze job description ────────────────────────────────────
     _step(db, run_id, "analyzing_job")
-    jd = analyze_job_description(job_description)
+    jd = analyze_job_description(
+        job_description, model=pipeline_profile.job_analysis_model
+    )
 
     # ── Step 3: Score relevance ─────────────────────────────────────────────
     _step(db, run_id, "scoring_relevance")
@@ -121,7 +154,15 @@ def _execute_pipeline(
 
     # ── Step 4: Tailor resume ───────────────────────────────────────────────
     _step(db, run_id, "tailoring_resume")
-    tailored_resume = tailor_resume(profile, jd, relevance_map, raw_score=raw_score)
+    tailored_resume = tailor_resume(
+        profile,
+        jd,
+        relevance_map,
+        raw_score=raw_score,
+        bullet_model=pipeline_profile.bullet_model,
+        project_model=pipeline_profile.project_model,
+        normalize_output=pipeline_profile.normalization_enabled,
+    )
     # Persist partial score data immediately so the frontend can animate
     # the match score counter before the full pipeline completes.
     update_run_progress(
@@ -142,7 +183,29 @@ def _execute_pipeline(
 
     # ── Step 6: Validate ────────────────────────────────────────────────────
     # v2: pass score_breakdown so evidence quality flags can reference sub-scores
-    validation = validate(tailored_resume, cover_letter, profile, jd, score_breakdown=score_breakdown)
+    _step(db, run_id, "validating")
+    validation = validate(
+        tailored_resume,
+        cover_letter,
+        profile,
+        jd,
+        score_breakdown=score_breakdown,
+    )
+    if pipeline_profile.repair_enabled and validation.evidence_quality_flags:
+        tailored_resume = repair_resume(
+            tailored_resume,
+            profile,
+            jd,
+            validation.evidence_quality_flags,
+            model=pipeline_profile.repair_model,
+        )
+        validation = validate(
+            tailored_resume,
+            cover_letter,
+            profile,
+            jd,
+            score_breakdown=score_breakdown,
+        )
 
     # ── Step 7: Render PDFs ─────────────────────────────────────────────────
     _step(db, run_id, "rendering_pdfs")

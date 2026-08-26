@@ -60,7 +60,8 @@ export async function startGeneration(
   sessionId: string,
   jobDescription: string,
   templateId: string = "classic",
-  includeCoverLetter: boolean = false
+  includeCoverLetter: boolean = false,
+  tier: "standard" | "pro" = "standard"
 ): Promise<GenerateResponse> {
   const res = await fetch(`${BASE}/generate`, {
     method: "POST",
@@ -71,6 +72,7 @@ export async function startGeneration(
       job_description: jobDescription,
       template_id: templateId,
       include_cover_letter: includeCoverLetter,
+      tier,
     }),
   });
   return handleResponse<GenerateResponse>(res);
