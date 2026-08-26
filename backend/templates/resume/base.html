@@ -105,18 +105,19 @@
 {% endif %}
 
 <!-- ── Leadership & Awards ── -->
-{% if resume.leadership_items or resume.awards %}
+{# leadership_awards merges both lists and drops awards already named in a
+   leadership line — see _leadership_and_awards. Rendering one OR the other
+   here used to silently discard every award when both were present. #}
+{% if leadership_awards %}
 <div class="section-heading">Leadership &amp; Awards</div>
 <ul class="bullets">
-  {% if resume.leadership_items %}
-    {% for item in resume.leadership_items %}
-    <li>{{ item | strip_bullet }}</li>
-    {% endfor %}
-  {% else %}
-    {% for award in resume.awards %}
-    <li><b>{{ award.title }}</b>{% if award.issuer %} — {{ award.issuer }}{% endif %}{% if award.date %} ({{ award.date }}){% endif %}{% if award.description %}: {{ award.description }}{% endif %}</li>
-    {% endfor %}
-  {% endif %}
+  {% for item in leadership_awards %}
+    {% if item.kind == 'award' %}
+    <li><b>{{ item.title }}</b>{% if item.issuer %} — {{ item.issuer }}{% endif %}{% if item.date %} ({{ item.date }}){% endif %}{% if item.description %}: {{ item.description }}{% endif %}</li>
+    {% else %}
+    <li>{{ item.text | strip_bullet }}</li>
+    {% endif %}
+  {% endfor %}
 </ul>
 {% endif %}
 

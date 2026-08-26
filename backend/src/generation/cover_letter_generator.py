@@ -18,6 +18,7 @@ from backend.src.models.schemas import (
     TailoredCoverLetter,
     TailoredResume,
 )
+from backend.src.validation.style_rules import GENERIC_PHRASES
 
 _client: "Groq | None" = None
 
@@ -32,21 +33,10 @@ def _get_client() -> "Groq":
     return _client
 
 
-_PROHIBITED_PHRASES = [
-    "excited to apply",
-    "passionate about",
-    "perfect fit",
-    "team player",
-    "fast learner",
-    "proven track record",
-    "seeking an opportunity",
-    "highly motivated",
-    "self-starter",
-    "go-getter",
-    "synergy",
-    "leverage my skills",
-    "hit the ground running",
-]
+# Shared with quality_validator so the generator can never be told to avoid a
+# different set of phrases than the validator flags.
+_PROHIBITED_PHRASES = list(GENERIC_PHRASES)
+
 
 _ALIGNMENT_SCHEMA_HINT = (
     '{"alignment_points": [{"candidate_evidence": str, "job_requirement": str, "connection_explanation": str}], '

@@ -49,6 +49,12 @@ from backend.src.models.schemas import (
     TailoredResume,
     ValidationResult,
 )
+from backend.src.normalization.ordering import (
+    normalize_education,
+    normalize_experiences,
+    normalize_projects,
+)
+from backend.src.normalization.skills import normalize_skills, order_skill_groups
 
 _TEMPLATE_DIR = Path(__file__).parent.parent.parent / "templates"
 _OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "outputs"))
@@ -158,15 +164,72 @@ def _html_to_pdf(html: str, output_path: Path) -> None:
         raise RuntimeError(f"PDF generation failed with {result.err} errors")
 
 
+def _normalize_for_presentation(resume: TailoredResume) -> TailoredResume:
+    """Canonicalize dates, entry order, and skill categories before rendering.
+
+    `tailor_resume` already applies these, but the renderer is the last common
+    path every PDF passes through — the gallery script builds resumes directly,
+    and planned variant/edit flows will too. Doing it here means no caller can
+    produce a PDF with relevance-ordered entries or mixed date formats. The
+    functions are idempotent, so applying them twice costs nothing.
+    """
+    return resume.model_copy(update={
+        "experiences": normalize_experiences(resume.experiences),
+        "education": normalize_education(resume.education),
+        "projects": normalize_projects(resume.projects),
+        "skills": normalize_skills(resume.skills),
+    })
+
+
+def _leadership_and_awards(resume: TailoredResume) -> list[dict]:
+    """Combine leadership items and awards into one deduplicated section.
+
+    The template previously rendered `leadership_items` *or* `awards` — so a
+    candidate with both silently lost every award. They are merged here rather
+    than in the template because the two lists overlap: extraction is told to
+    fold "awards, hackathon results, language proficiencies" into
+    `leadership_items`, so an award often already has a line. An award whose
+    title is already named in a leadership line is dropped as a duplicate.
+
+    Items are returned as dicts rather than pre-rendered HTML so the template
+    keeps doing the escaping.
+    """
+    items: list[dict] = []
+    leadership_text: list[str] = []
+
+    for raw in resume.leadership_items:
+        text = (raw or "").strip()
+        if not text:
+            continue
+        leadership_text.append(text.lower())
+        items.append({"kind": "text", "text": text})
+
+    for award in resume.awards:
+        title = (award.title or "").strip()
+        if not title:
+            continue
+        if any(title.lower() in line for line in leadership_text):
+            continue
+        items.append({
+            "kind": "award",
+            "title": title,
+            "issuer": award.issuer,
+            "date": award.date,
+            "description": award.description,
+        })
+
+    return items
+
+
 def _group_skills(resume: TailoredResume) -> dict[str, list[str]]:
-    """Group skills by category for template rendering."""
+    """Group skills by canonical category, in canonical display order."""
     grouped: dict[str, list[str]] = {}
     for skill in resume.skills:
         cat = skill.category or "Other"
         if cat not in grouped:
             grouped[cat] = []
         grouped[cat].append(skill.name)
-    return grouped
+    return order_skill_groups(grouped)
 
 
 # ── Public render functions ──────────────────────────────────────────────────
@@ -194,8 +257,13 @@ def render_resume_pdf(
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "resume.pdf"
 
+    resume = _normalize_for_presentation(resume)
     base_css = _load_resume_css(template_id)
-    context = {"resume": resume, "grouped_skills": _group_skills(resume)}
+    context = {
+        "resume": resume,
+        "grouped_skills": _group_skills(resume),
+        "leadership_awards": _leadership_and_awards(resume),
+    }
 
     def _render_at(scale: float) -> bytes:
         scaled_css = _scale_css_pt_values(base_css, scale)

@@ -21,25 +21,18 @@ from backend.src.models.schemas import (
     TailoredResume,
     ValidationResult,
 )
+from backend.src.validation.style_rules import (
+    GENERIC_PHRASES,
+    find_hedges,
+    find_repeated_verbs,
+    has_third_person_pronoun,
+    opens_with_name,
+)
 
-_GENERIC_PHRASES = [
-    "excited to apply",
-    "passionate about",
-    "perfect fit",
-    "team player",
-    "fast learner",
-    "proven track record",
-    "seeking an opportunity",
-    "highly motivated",
-    "self-starter",
-    "go-getter",
-    "synergy",
-    "leverage my skills",
-    "hit the ground running",
-    "results-driven",
-    "detail-oriented",
-    "hardworking",
-]
+# Blocklists and prose detectors live in style_rules so the cover-letter
+# generator and the repair loop share exactly one definition of each rule.
+_GENERIC_PHRASES = list(GENERIC_PHRASES)
+
 
 # Approximate characters per page (single-column resume at 11pt)
 _CHARS_PER_PAGE = 3200
@@ -313,6 +306,62 @@ def _check_evidence_quality(resume: TailoredResume) -> list[str]:
     return flags
 
 
+def _check_verb_variety(resume: TailoredResume) -> list[str]:
+    """Flag entries that open two or more bullets with the same action verb.
+
+    The rewrite prompt already forbids this; nothing checked it, and every
+    shipped gallery sample violated it. Reported per entry because that is the
+    scope the rule is written at, and the scope a repair pass would fix.
+    """
+    flags: list[str] = []
+    for exp in resume.experiences:
+        repeated = find_repeated_verbs([tb.text for tb in exp.bullets])
+        for verb, count in sorted(repeated.items()):
+            flags.append(
+                f"Repeated opening verb in {exp.role_title or 'entry'}: "
+                f"'{verb.capitalize()}' opens {count} bullets"
+            )
+    return flags
+
+
+def _check_hedge_phrases(resume: TailoredResume) -> list[str]:
+    """Flag vague quantifiers standing in for numbers the source never had.
+
+    The anti-fabrication rules correctly stop the model inventing metrics, but
+    its fallback is 'a large volume of monthly transactions' rather than simply
+    omitting the claim. Flagging these lets a repair pass ask for the concrete
+    detail that IS in the source, or for the hedge to be dropped.
+    """
+    flags: list[str] = []
+    for exp in resume.experiences:
+        for tb in exp.bullets:
+            hedges = find_hedges(tb.text)
+            if hedges:
+                flags.append(
+                    f"Vague quantifier in bullet ({', '.join(hedges)}): "
+                    f"'{tb.text[:70]}...'"
+                )
+    return flags
+
+
+def _check_summary_voice(resume: TailoredResume) -> list[str]:
+    """Flag third-person resume summaries.
+
+    A resume summary is written in implied first person. All four shipped
+    samples opened with the candidate's own name and continued in third person.
+    """
+    summary = resume.summary or ""
+    if not summary:
+        return []
+
+    flags: list[str] = []
+    if opens_with_name(summary, resume.name):
+        flags.append("Summary opens with the candidate's name (should be implied first person)")
+    if has_third_person_pronoun(summary):
+        flags.append("Summary refers to the candidate in the third person")
+    return flags
+
+
 def _check_robustness(resume: TailoredResume) -> list[str]:
     """
     Detect bullets where keyword count increased significantly but evidence
@@ -413,6 +462,11 @@ def validate(
     # 11. Robustness check (keyword gain without evidence gain)
     robustness_flags = _check_robustness(resume)
     evidence_flags.extend(robustness_flags)
+
+    # 12. Style rules that the prompts state but nothing previously enforced
+    evidence_flags.extend(_check_verb_variety(resume))
+    evidence_flags.extend(_check_hedge_phrases(resume))
+    evidence_flags.extend(_check_summary_voice(resume))
     # ─────────────────────────────────────────────────────────────────────
 
     all_flags = list(dict.fromkeys(flags))  # deduplicate, preserve order

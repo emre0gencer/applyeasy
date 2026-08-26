@@ -14,6 +14,9 @@ dependencies = [
     "PyMuPDF>=1.24",
     "sentence-transformers>=3.0",
     "xhtml2pdf>=0.2.11",
+    "rendercv>=2.8",
+    "rendercv-fonts>=0.5",
+    "typst>=0.13",
     "jinja2>=3.1",
     "sqlalchemy>=2.0",
     "pydantic>=2.7",
@@ -36,3 +39,6 @@ include = ["backend*"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+    "slow: compiles real PDFs through Typst (seconds, not milliseconds)",
+]

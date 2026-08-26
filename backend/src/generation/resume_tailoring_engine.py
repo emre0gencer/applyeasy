@@ -38,6 +38,12 @@ from backend.src.models.schemas import (
     TailoredExperience,
     TailoredResume,
 )
+from backend.src.normalization.ordering import (
+    normalize_education,
+    normalize_experiences,
+    normalize_projects,
+)
+from backend.src.normalization.skills import normalize_skills
 
 _client: "Groq | None" = None
 
@@ -210,6 +216,12 @@ def _rephrase_bullets_batch(
             "  Sentence 1: experience depth, key technical background, and most relevant skills; "
             "weave in 2-3 target keywords naturally.\n"
             "  Sentence 2: one concrete technical differentiator aligned with what the role's domain values.\n"
+            "  VOICE — the rule most often broken:\n"
+            "    - Write in implied first person, opening with the professional descriptor, e.g.\n"
+            "      'Backend engineer with three years building payment infrastructure...'\n"
+            "    - NEVER write the candidate's name in the summary.\n"
+            "    - NEVER use he, she, they, or any third-person pronoun.\n"
+            "    - NEVER use I, my, or me either — the subject stays implied.\n"
             "  - Only reference provided profile elements; do NOT fabricate achievements, metrics, or skills.\n"
             "  - No generic phrases (passionate, results-driven, team player, proven track record, eager to).\n"
             "  - Maximum 85 words, exactly 2 sentences.\n\n"
@@ -246,7 +258,6 @@ def _rephrase_bullets_batch(
     if summary_context:
         user_msg += (
             "\n\nSUMMARY CONTEXT —"
-            f" Candidate: {summary_context.get('name', '')};"
             f" Recent roles: {summary_context.get('exp_titles', '')};"
             f" Skills: {summary_context.get('skills', '')};"
             f" Target role: {summary_context.get('target_role', '')};"
@@ -376,6 +387,12 @@ def _generate_summary(
         "  Sentence 2: State the specific technical value the candidate brings — one concrete "
         "differentiator that aligns with what the role domain values most "
         "(reference the role's domain signals and evidence style when relevant).\n"
+        "VOICE:\n"
+        "  - Write in implied first person, opening with the professional descriptor "
+        "(e.g. 'Backend engineer with three years building payment infrastructure...').\n"
+        "  - NEVER write the candidate's name in the summary.\n"
+        "  - NEVER use he, she, they, or any third-person pronoun.\n"
+        "  - NEVER use I, my, or me either — the subject stays implied.\n"
         "RULES:\n"
         "1. Only reference background elements present in the provided profile data.\n"
         "2. Do NOT fabricate achievements, metrics, or skills not listed.\n"
@@ -383,8 +400,10 @@ def _generate_summary(
         "'proven track record', 'excited to', 'eager to'.\n"
         "4. Maximum 85 words total. Output only the 2 sentences — no labels, no extra text."
     )
+    # The candidate's name is deliberately withheld — supplying it is what
+    # produced "Alex Rivera has experience as a Software Engineer..." in every
+    # shipped sample. The summary never needs to name its subject.
     user_msg = (
-        f"Candidate name: {profile.name}\n"
         f"Recent roles: {exp_titles}\n"
         f"Skills: {skills_snippet}\n"
         f"Target role: {jd.role_title} at {jd.company_name or 'the company'}\n"
@@ -498,8 +517,9 @@ def _select_and_tailor_experiences(
         summary_domain = f"; Role domain signals: {', '.join(jd.domain_signals[:3])}"
     if jd.evidence_style:
         summary_domain += f"; Evidence this role values: {jd.evidence_style}"
+    # No "name" key — see _generate_summary. A summary that names its own
+    # subject reads as a third-party write-up, not a resume.
     summary_context = {
-        "name": profile.name,
         "exp_titles": ", ".join(selected_titles[:3]),
         "skills": ", ".join(s.name for s in profile.skills[:10]),
         "target_role": f"{jd.role_title} at {jd.company_name or 'the company'}",
@@ -1037,7 +1057,26 @@ def tailor_resume(
     all_added_keywords: list[str] = []
     for change in all_changes:
         all_added_keywords.extend(change.keywords_added)
-    augmented_skills = _add_keywords_to_skills(all_added_keywords, profile.skills, jd)
+    # Canonicalize categories BEFORE augmenting: _add_keywords_to_skills assigns
+    # each new keyword to the nearest existing category by embedding centroid, so
+    # it should be choosing between canonical buckets, not the model's ad-hoc
+    # labels. Normalizing again afterwards catches anything it filed under "Other"
+    # and drops duplicates.
+    augmented_skills = _add_keywords_to_skills(
+        all_added_keywords, normalize_skills(profile.skills), jd
+    )
+    # ─────────────────────────────────────────────────────────────────────────
+
+    # ── Presentation normalization ───────────────────────────────────────────
+    # Selection above is relevance-driven, which is right. Presentation is
+    # date-driven, which it was not: entries used to render in relevance order,
+    # so two of four shipped samples broke reverse-chronological convention.
+    # Dates are canonicalized here too, so one document never mixes "Jun 2022"
+    # with "June 2022".
+    tailored_experiences = normalize_experiences(tailored_experiences)
+    projects = normalize_projects(projects)
+    education = normalize_education(profile.education)
+    augmented_skills = normalize_skills(augmented_skills)
     # ─────────────────────────────────────────────────────────────────────────
 
     # Build full resume text for keyword coverage check.
@@ -1063,7 +1102,7 @@ def tailor_resume(
         location=profile.location,
         summary=summary,
         experiences=tailored_experiences,
-        education=profile.education,
+        education=education,
         projects=projects,
         skills=augmented_skills,
         awards=profile.awards,
