@@ -64,7 +64,7 @@ def _check_truthfulness(
     # Check resume bullets
     for exp in resume.experiences:
         for tb in exp.bullets:
-            if tb.change.change_reason == "keyword_integration":
+            if tb.change.change_reason != "unchanged":
                 entities_in_revised = _extract_named_entities(tb.text)
                 entities_in_source = _extract_named_entities(tb.source_text)
                 new_entities = entities_in_revised - entities_in_source
@@ -73,6 +73,25 @@ def _check_truthfulness(
                         f"Possible fabricated entity in rephrased bullet: {new_entities} "
                         f"(not in source: '{tb.source_text[:80]}')"
                     )
+
+    for project in resume.projects:
+        source = " ".join(
+            part for part in (
+                project.source_text,
+                project.description,
+                " ".join(project.technologies),
+            ) if part
+        )
+        if not source:
+            continue
+        source_entities = _extract_named_entities(source)
+        for bullet in project.bullets:
+            new_entities = _extract_named_entities(bullet.text) - source_entities
+            if new_entities:
+                warnings.append(
+                    f"Possible fabricated entity in project '{project.name}': {new_entities} "
+                    f"(not in project source)"
+                )
 
     # Check cover letter entities against full profile source
     cl_entities = _extract_named_entities(cover_letter.generated_text)
@@ -102,6 +121,9 @@ def _check_keyword_coverage(
     for exp in resume.experiences:
         parts.append(exp.role_title)
         parts.extend(tb.text for tb in exp.bullets)
+    for project in resume.projects:
+        parts.append(project.name)
+        parts.extend(bullet.text for bullet in project.bullets)
     for s in resume.skills:
         parts.append(s.name)
     full_text = " ".join(parts).lower()
@@ -256,6 +278,12 @@ def _check_resume_generic_phrases(resume: TailoredResume) -> list[str]:
             for phrase in _GENERIC_PHRASES:
                 if phrase in text_lower:
                     found.add(phrase)
+    for project in resume.projects:
+        for bullet in project.bullets:
+            text_lower = bullet.text.lower()
+            for phrase in _GENERIC_PHRASES:
+                if phrase in text_lower:
+                    found.add(phrase)
     return sorted(found)
 
 
@@ -269,6 +297,8 @@ def _check_bullet_redundancy(resume: TailoredResume) -> list[str]:
     for exp in resume.experiences:
         for tb in exp.bullets:
             all_bullets.append(tb.text)
+    for project in resume.projects:
+        all_bullets.extend(bullet.text for bullet in project.bullets)
 
     for i in range(len(all_bullets)):
         for j in range(i + 1, len(all_bullets)):
@@ -303,6 +333,16 @@ def _check_evidence_quality(resume: TailoredResume) -> list[str]:
                         f"Long bullet ({word_count}w) with low evidence signals "
                         f"(strength={evidence.evidence_strength:.2f}): '{tb.text[:80]}...'"
                     )
+    for project in resume.projects:
+        for bullet in project.bullets:
+            word_count = len(bullet.text.split())
+            if word_count > 50:
+                evidence = extract_evidence(bullet.text)
+                if evidence.evidence_strength < 0.20:
+                    flags.append(
+                        f"Long project bullet ({word_count}w) with low evidence signals "
+                        f"(strength={evidence.evidence_strength:.2f}): '{bullet.text[:80]}...'"
+                    )
     return flags
 
 
@@ -319,6 +359,13 @@ def _check_verb_variety(resume: TailoredResume) -> list[str]:
         for verb, count in sorted(repeated.items()):
             flags.append(
                 f"Repeated opening verb in {exp.role_title or 'entry'}: "
+                f"'{verb.capitalize()}' opens {count} bullets"
+            )
+    for project in resume.projects:
+        repeated = find_repeated_verbs([bullet.text for bullet in project.bullets])
+        for verb, count in sorted(repeated.items()):
+            flags.append(
+                f"Repeated opening verb in project {project.name or 'entry'}: "
                 f"'{verb.capitalize()}' opens {count} bullets"
             )
     return flags
@@ -341,7 +388,24 @@ def _check_hedge_phrases(resume: TailoredResume) -> list[str]:
                     f"Vague quantifier in bullet ({', '.join(hedges)}): "
                     f"'{tb.text[:70]}...'"
                 )
+    for project in resume.projects:
+        for bullet in project.bullets:
+            hedges = find_hedges(bullet.text)
+            if hedges:
+                flags.append(
+                    f"Vague quantifier in project bullet ({', '.join(hedges)}): "
+                    f"'{bullet.text[:70]}...'"
+                )
     return flags
+
+
+def _check_relevant_project_depth(resume: TailoredResume) -> list[str]:
+    """Relevant selected projects should carry at least two distinct bullets."""
+    return [
+        f"Relevant project '{project.name}' has fewer than two grounded bullets"
+        for project in resume.projects
+        if project.relevance_score >= 0.28 and len(project.bullets) < 2
+    ]
 
 
 def _check_summary_voice(resume: TailoredResume) -> list[str]:
@@ -467,6 +531,9 @@ def validate(
     evidence_flags.extend(_check_verb_variety(resume))
     evidence_flags.extend(_check_hedge_phrases(resume))
     evidence_flags.extend(_check_summary_voice(resume))
+    project_depth_flags = _check_relevant_project_depth(resume)
+    evidence_flags.extend(project_depth_flags)
+    flags.extend(project_depth_flags)
     # ─────────────────────────────────────────────────────────────────────
 
     all_flags = list(dict.fromkeys(flags))  # deduplicate, preserve order

@@ -142,6 +142,7 @@ def _rephrase_bullets_batch(
     domain_signals: "list[str] | None" = None,
     evidence_style: str = "",
     summary_context: "dict | None" = None,
+    model: str = _QUALITY_MODEL,
 ) -> tuple[list[tuple[str, list[str]]], str]:
     """
     Single Groq call to rewrite ALL bullets using evidence-grounded, recruiter-useful prompting.
@@ -200,6 +201,12 @@ def _rephrase_bullets_batch(
         "5. No first-person pronouns. No filler adjectives (passionate, innovative, dynamic).\n"
         "6. Prefer denser, more informative bullets over longer keyword-heavy ones.\n"
         "7. Each bullet must be independently meaningful to a hiring manager scanning the resume.\n\n"
+
+        "CREATIVE RANGE — vary the evidence angle and sentence architecture without changing facts:\n"
+        "  - architecture/design, implementation method, reliability/quality, integration/delivery, "
+        "or user/business value (only when the source states it)\n"
+        "  - avoid repeating the template 'Built X using Y to Z' across the batch\n"
+        "  - use precise technical nouns and specific transitions instead of decorative adjectives\n\n"
 
         "ABSOLUTE PROHIBITIONS — Never invent:\n"
         "  - Percentages, counts, team sizes, latency numbers, revenue figures\n"
@@ -267,7 +274,7 @@ def _rephrase_bullets_batch(
         )
 
     resp = _get_client().chat.completions.create(
-        model=_QUALITY_MODEL,
+        model=model,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": user_msg},
@@ -292,6 +299,7 @@ def _rephrase_bullets_batch(
 
 def _rephrase_project_bullets_batch(
     items: list[tuple[str, str, list[str]]],  # (project_name, original_text, keywords_to_try)
+    model: str = _FAST_MODEL,
 ) -> list[tuple[str, list[str]]]:
     """
     Single Groq call to rephrase project bullets across ALL eligible projects.
@@ -325,6 +333,10 @@ def _rephrase_project_bullets_batch(
         "4. Preserve the original technical stack and outcomes exactly.\n"
         "5. Prefer a denser, more informative bullet over a longer keyword-heavy one.\n"
         "6. Each bullet belongs to the project named in its 'project' field — use that for context only.\n"
+        "7. Give each bullet a distinct evidence angle (architecture, implementation, integration, "
+        "quality/reliability, or grounded user value) and vary sentence structure across the batch.\n"
+        "8. Avoid formulaic repetition such as opening every bullet with 'Built' or repeatedly using "
+        "the pattern 'X using Y to Z'. Creativity means sharper framing of supplied evidence, not new facts.\n"
         "Return ONLY valid JSON: "
         '{"results": [{"revised_text": str, "keywords_added": [str]}]}'
         " — one result per input bullet in the same order."
@@ -339,7 +351,7 @@ def _rephrase_project_bullets_batch(
     )
 
     resp = _get_client().chat.completions.create(
-        model=_FAST_MODEL,
+        model=model,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": user_msg},
@@ -364,6 +376,7 @@ def _generate_summary(
     profile: CandidateProfile,
     jd: JobDescription,
     selected_experiences: list[TailoredExperience],
+    model: str = _QUALITY_MODEL,
 ) -> str:
     """Generate a resume summary using llama-3.3-70b-versatile.
 
@@ -413,7 +426,7 @@ def _generate_summary(
     )
 
     resp = _get_client().chat.completions.create(
-        model=_QUALITY_MODEL,
+        model=model,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": user_msg},
@@ -429,6 +442,7 @@ def _select_and_tailor_experiences(
     jd: JobDescription,
     keyword_integration_budget: list[int],  # mutable counter [remaining]
     keyword_limit: int = 10,
+    model: str = _QUALITY_MODEL,
 ) -> tuple[list[TailoredExperience], str]:
     """Select top experiences and tailor their bullets using a single batch LLM call.
 
@@ -537,6 +551,7 @@ def _select_and_tailor_experiences(
             domain_signals=jd.domain_signals,
             evidence_style=jd.evidence_style,
             summary_context=summary_context,
+            model=model,
         )
     else:
         batch_results, summary = [], ""
@@ -635,9 +650,28 @@ def _project_chars(proj: ProjectEntry) -> int:
     return sum(len(p) for p in parts if p)
 
 
+def _rank_project_candidates(
+    profile: CandidateProfile,
+    relevance_map: ExperienceRelevanceMap,
+) -> list[tuple[ProjectEntry, float]]:
+    """Return projects in relevance order while preserving stable ties."""
+    scores = {
+        entry.entry_index: entry.overall_score
+        for entry in relevance_map.scored_entries
+        if entry.entry_type == "project"
+    }
+    indexed = [
+        (project, scores.get(index, 0.0), index)
+        for index, project in enumerate(profile.projects)
+    ]
+    indexed.sort(key=lambda item: (-item[1], item[2]))
+    return [(project, score) for project, score, _index in indexed]
+
+
 def _generate_extra_project_bullets_batch(
     requests: list[tuple[int, ProjectEntry, int]],  # (proj_index, project, n_new)
     jd: JobDescription,
+    model: str = _FAST_MODEL,
 ) -> dict[int, list[Bullet]]:
     """
     Generate extra grounded bullets for several under-filled projects in ONE call
@@ -666,6 +700,12 @@ def _generate_extra_project_bullets_batch(
         "5. Generate exactly the requested count per project; if you cannot produce a grounded, "
         "distinct bullet, return fewer for that project.\n"
         "6. Keep each project's bullets under its own 'index'.\n"
+        "7. Deliberately vary evidence angles across a project's bullets: architecture/design, "
+        "implementation method, integration, reliability/quality, and grounded user value.\n"
+        "8. Vary action verbs and sentence structures. Avoid repeatedly using 'Built' and avoid "
+        "recycling the formula 'X using Y to Z'.\n"
+        "9. Creativity is editorial: find a sharper way to frame the supplied evidence. It never "
+        "licenses a new fact, implied outcome, technology, metric, scale, or ownership claim.\n"
         "Return ONLY valid JSON: "
         '{"projects": [{"index": int, "bullets": ["bullet text", ...]}]}'
     )
@@ -688,7 +728,7 @@ def _generate_extra_project_bullets_batch(
     )
 
     resp = _get_client().chat.completions.create(
-        model=_FAST_MODEL,
+        model=model,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": user_msg},
@@ -698,6 +738,10 @@ def _generate_extra_project_bullets_batch(
     )
 
     n_by_index = {pi: n for pi, _p, n in requests}
+    source_by_index = {
+        pi: (project.source_text or project.description)
+        for pi, project, _n in requests
+    }
     out: dict[int, list[Bullet]] = {}
     try:
         data = json.loads(resp.choices[0].message.content)
@@ -707,7 +751,7 @@ def _generate_extra_project_bullets_batch(
                 continue
             raw = entry.get("bullets", []) or []
             bullets = [
-                Bullet(text=b.strip(), source_text="generated")
+                Bullet(text=b.strip(), source_text=source_by_index.get(pi, ""))
                 for b in raw[:n_by_index[pi]]
                 if isinstance(b, str) and b.strip()
             ]
@@ -843,6 +887,8 @@ def _tailor_projects(
     jd: JobDescription,
     keyword_limit: int = 4,
     used_keywords: "set[str] | None" = None,
+    project_scores: "dict[int, float] | None" = None,
+    model: str = _FAST_MODEL,
 ) -> tuple[list[ProjectEntry], list[BulletChange]]:
     """
     Lightly tailor project bullets for moderately relevant projects only.
@@ -859,7 +905,7 @@ def _tailor_projects(
         if kw.lower() not in already_used
     ]
 
-    proj_scores: dict[int, float] = {
+    proj_scores = project_scores or {
         e.entry_index: e.overall_score
         for e in relevance_map.scored_entries
         if e.entry_type == "project"
@@ -887,7 +933,7 @@ def _tailor_projects(
             queue.append((i, b_i))
             batch_items.append((proj.name, b.text, proj_kw_assignments.get((i, b_i), [])))
 
-    batch_results = _rephrase_project_bullets_batch(batch_items)
+    batch_results = _rephrase_project_bullets_batch(batch_items, model=model)
     rephrase_map: dict[tuple[int, int], tuple[str, list[str]]] = {}
     for qi, key in enumerate(queue):
         if qi < len(batch_results):
@@ -922,6 +968,7 @@ def _tailor_projects(
             date=proj.date,
             bullets=new_bullets,
             source_text=proj.source_text,
+            relevance_score=proj.relevance_score,
         ))
 
     return tailored_projects, all_changes
@@ -932,6 +979,9 @@ def tailor_resume(
     jd: JobDescription,
     relevance_map: ExperienceRelevanceMap,
     raw_score: int = 100,
+    bullet_model: str = _QUALITY_MODEL,
+    project_model: str = _FAST_MODEL,
+    normalize_output: bool = True,
 ) -> TailoredResume:
     """Build a tailored resume from the profile and relevance scores.
 
@@ -956,12 +1006,15 @@ def tailor_resume(
     tailored_experiences, summary = _select_and_tailor_experiences(
         profile, relevance_map, jd, keyword_budget,
         keyword_limit=keyword_limit,
+        model=bullet_model,
     )
 
     # Fall back to a standalone summary call only if the folded one came back empty
     # (e.g. no experience bullets were rephrased, or the model omitted the field).
     if not summary:
-        summary = _generate_summary(profile, jd, tailored_experiences)
+        summary = _generate_summary(
+            profile, jd, tailored_experiences, model=bullet_model
+        )
 
     # Collect experience bullet changes for the audit trail
     exp_changes: list[BulletChange] = []
@@ -973,22 +1026,39 @@ def tailor_resume(
     for change in exp_changes:
         exp_used_keywords.update(k.lower() for k in change.keywords_added)
 
-    # Include up to 2 projects; add a 3rd only if page budget allows
-    candidate_projects = list(profile.projects[:2])
-    if len(profile.projects) > 2:
+    # Rank before selecting: the project section should contain the work most
+    # relevant to this role, not merely the first projects in the source file.
+    ranked_projects = _rank_project_candidates(profile, relevance_map)
+    selected_projects = ranked_projects[:2]
+    candidate_projects = [
+        project.model_copy(update={"relevance_score": score})
+        for project, score in selected_projects
+    ]
+    project_scores = {
+        local_index: score
+        for local_index, (_project, score) in enumerate(selected_projects)
+    }
+    if len(ranked_projects) > 2:
         used = _estimate_chars(
             summary, tailored_experiences, profile.education,
             profile.skills, candidate_projects, profile.leadership_items, profile.awards,
         )
-        extra = _project_chars(profile.projects[2])
+        third_project, third_score = ranked_projects[2]
+        extra = _project_chars(third_project)
         if (used + extra) <= _PAGE_CAPACITY_CHARS * _PAGE_FILL_HARD_LIMIT:
-            candidate_projects.append(profile.projects[2])
+            project_scores[len(candidate_projects)] = third_score
+            candidate_projects.append(third_project)
+            candidate_projects[-1] = candidate_projects[-1].model_copy(
+                update={"relevance_score": third_score}
+            )
 
     # Tailor project bullets — exclude keywords already used in experience bullets
     projects, proj_changes = _tailor_projects(
         candidate_projects, relevance_map, jd,
         keyword_limit=min(4, keyword_limit),
         used_keywords=exp_used_keywords,
+        project_scores=project_scores,
+        model=project_model,
     )
 
     # ── Fill pass: expand project bullets when page is under soft target ─────
@@ -999,55 +1069,64 @@ def tailor_resume(
         summary, tailored_experiences, profile.education,
         profile.skills, projects, profile.leadership_items, profile.awards,
     )
-    if estimated < _PAGE_CAPACITY_CHARS * _PAGE_FILL_SOFT_TARGET:
-        hard_ceiling = int(_PAGE_CAPACITY_CHARS * _PAGE_FILL_HARD_LIMIT)
-        remaining_budget = hard_ceiling - estimated
+    underfilled = estimated < _PAGE_CAPACITY_CHARS * _PAGE_FILL_SOFT_TARGET
+    # A relevant project gets two evidence-grounded bullets independently of
+    # page fill. If the resume is still sparse, the same single batch call may
+    # request a third bullet. The model may return fewer only when the source
+    # cannot support a distinct, truthful claim.
+    target_counts: dict[int, int] = {}
+    for pi, proj in enumerate(projects):
+        if underfilled:
+            target_counts[pi] = 3
+        elif project_scores.get(pi, 0.0) >= _PROJECT_TAILOR_THRESHOLD:
+            target_counts[pi] = 2
+        else:
+            target_counts[pi] = len(proj.bullets)
 
-        # Opt 2: request extra bullets for every under-filled project in ONE call,
-        # then apply them with the same sequential budget trimming as before.
-        fill_requests = [
-            (pi, proj, 3 - len(proj.bullets))  # max 3 bullets total per project
-            for pi, proj in enumerate(projects)
-            if (3 - len(proj.bullets)) > 0
-        ]
-        generated = (
-            _generate_extra_project_bullets_batch(fill_requests, jd)
-            if fill_requests else {}
+    fill_requests = [
+        (pi, proj, min(3, target_counts[pi]) - len(proj.bullets))
+        for pi, proj in enumerate(projects)
+        if min(3, target_counts[pi]) > len(proj.bullets)
+    ]
+    generated = (
+        _generate_extra_project_bullets_batch(
+            fill_requests, jd, model=project_model
         )
+        if fill_requests else {}
+    )
 
-        expanded: list[ProjectEntry] = []
-        for pi, proj in enumerate(projects):
-            candidates = generated.get(pi, []) if remaining_budget > 0 else []
-            if not candidates:
-                expanded.append(proj)
-                continue
+    hard_ceiling = int(_PAGE_CAPACITY_CHARS * _PAGE_FILL_HARD_LIMIT)
+    remaining_budget = max(0, hard_ceiling - estimated)
+    expanded: list[ProjectEntry] = []
+    generated_changes: list[BulletChange] = []
+    for pi, proj in enumerate(projects):
+        candidates = generated.get(pi, [])
+        required = max(
+            0,
+            2 - len(proj.bullets),
+        ) if project_scores.get(pi, 0.0) >= _PROJECT_TAILOR_THRESHOLD else 0
+        added: list[Bullet] = []
+        for candidate_index, new_bullet in enumerate(candidates):
+            cost = len(new_bullet.text)
+            is_minimum = candidate_index < required
+            if not is_minimum and cost > remaining_budget:
+                break
+            added.append(new_bullet)
+            remaining_budget = max(0, remaining_budget - cost)
+            generated_changes.append(BulletChange(
+                original_text=new_bullet.source_text,
+                revised_text=new_bullet.text,
+                change_reason="project_expansion",
+                keywords_added=[],
+            ))
 
-            added: list[Bullet] = []
-            for nb in candidates:
-                cost = len(nb.text)
-                if remaining_budget - cost < 0:
-                    break
-                added.append(nb)
-                remaining_budget -= cost
+        expanded.append(proj.model_copy(update={"bullets": proj.bullets + added}))
 
-            if added:
-                expanded.append(ProjectEntry(
-                    name=proj.name,
-                    description=proj.description,
-                    technologies=proj.technologies,
-                    url=proj.url,
-                    date=proj.date,
-                    bullets=proj.bullets + added,
-                    source_text=proj.source_text,
-                ))
-            else:
-                expanded.append(proj)
-
-        projects = expanded
+    projects = expanded
     # ─────────────────────────────────────────────────────────────────────────
 
     # Combine all changes for the audit trail
-    all_changes = exp_changes + proj_changes
+    all_changes = exp_changes + proj_changes + generated_changes
 
     # ── Augment skills with newly integrated keywords ────────────────────────
     # Collect every keyword the LLM added across all experience + project bullets,
@@ -1073,10 +1152,13 @@ def tailor_resume(
     # so two of four shipped samples broke reverse-chronological convention.
     # Dates are canonicalized here too, so one document never mixes "Jun 2022"
     # with "June 2022".
-    tailored_experiences = normalize_experiences(tailored_experiences)
-    projects = normalize_projects(projects)
-    education = normalize_education(profile.education)
-    augmented_skills = normalize_skills(augmented_skills)
+    if normalize_output:
+        tailored_experiences = normalize_experiences(tailored_experiences)
+        projects = normalize_projects(projects)
+        education = normalize_education(profile.education)
+        augmented_skills = normalize_skills(augmented_skills)
+    else:
+        education = profile.education
     # ─────────────────────────────────────────────────────────────────────────
 
     # Build full resume text for keyword coverage check.
