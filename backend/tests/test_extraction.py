@@ -6,7 +6,6 @@ These tests mock the Groq API to avoid real API calls.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -17,11 +16,29 @@ from backend.src.models.schemas import (
     JobDescription,
 )
 
-FIXTURES = Path(__file__).parent / "fixtures"
+# Reusable applicant/job samples stay in the root-level, gitignored sample
+# directories. Unit tests keep their small deterministic input inline.
+_PROFILE_TEXT = """Jane Smith
+jane@example.test
 
+Experience
+Senior Software Engineer | Acme Corp | Jan 2022 - Present
+- Built a Kafka pipeline processing 2M events per day with Python.
 
-def _load_fixture(name: str) -> str:
-    return (FIXTURES / name).read_text(encoding="utf-8")
+Education
+B.S. Computer Science | Example University | May 2020
+
+Skills
+Python, FastAPI, Kafka
+"""
+
+_JOB_TEXT = """Senior Backend Engineer
+TechCorp
+
+Build and operate reliable data-platform services. Candidates need four years
+of software engineering experience, Python or Go, Kafka or Kinesis, PostgreSQL,
+Docker, and Kubernetes. AWS and Airflow experience are preferred.
+"""
 
 
 # ---------------------------------------------------------------------------
@@ -84,7 +101,7 @@ class TestCandidateProfileBuilder:
 
     def test_build_profile_structure(self):
         """Profile builder returns a CandidateProfile from a single combined call."""
-        doc = ingest_text(_load_fixture("sample_profile.txt"))
+        doc = ingest_text(_PROFILE_TEXT)
         combined_response = _make_json_response(self._COMBINED_PROFILE)
 
         with patch("backend.src.extraction.candidate_profile_builder._client") as mock_client:
@@ -105,7 +122,7 @@ class TestCandidateProfileBuilder:
 
     def test_build_profile_falls_back_to_two_calls(self):
         """If the combined call returns garbage, fall back to core + supplemental."""
-        doc = ingest_text(_load_fixture("sample_profile.txt"))
+        doc = ingest_text(_PROFILE_TEXT)
 
         bad_combined = _make_json_response({})  # unparseable/empty merged result
         core_response = _make_json_response({
@@ -140,7 +157,7 @@ class TestCandidateProfileBuilder:
 
     def test_empty_extraction_fails_loudly(self):
         """Three empty structured responses must not become a blank success."""
-        doc = ingest_text(_load_fixture("sample_profile.txt"))
+        doc = ingest_text(_PROFILE_TEXT)
         empty = _make_json_response({})
 
         with patch("backend.src.extraction.candidate_profile_builder._client") as mock_client:
@@ -152,7 +169,7 @@ class TestCandidateProfileBuilder:
                 build_candidate_profile(doc)
 
     def test_selected_extraction_model_is_used(self):
-        doc = ingest_text(_load_fixture("sample_profile.txt"))
+        doc = ingest_text(_PROFILE_TEXT)
         combined_response = _make_json_response(self._COMBINED_PROFILE)
 
         with patch("backend.src.extraction.candidate_profile_builder._client") as mock_client:
@@ -172,7 +189,7 @@ class TestJobDescriptionAnalyzer:
 
     def test_analyze_jd_structure(self):
         """JD analyzer returns structured JobDescription."""
-        jd_text = _load_fixture("sample_jd.txt")
+        jd_text = _JOB_TEXT
 
         jd_data = {
             "company_name": "TechCorp",

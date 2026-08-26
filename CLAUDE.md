@@ -12,8 +12,8 @@ cd backend && pip install -e ".[dev]" && cd ..   # Install deps (then return to 
 # which only resolves when the repo root is the working directory. Running from
 # inside backend/ raises ModuleNotFoundError: No module named 'backend'.
 uvicorn backend.src.api.main:app --reload --port 8000  # Run dev server
-pytest backend/tests -v                          # Run all tests
-pytest backend/tests/test_tailoring.py -v        # Run a single test file
+python -m pytest backend/tests -v                # Run all tests
+python -m pytest backend/tests/test_tailoring.py -v  # Run a single test file
 ```
 
 ### Frontend

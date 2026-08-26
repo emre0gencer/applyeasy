@@ -51,8 +51,11 @@ Open http://localhost:5173
 
 ```bash
 # Run from the REPO ROOT (tests import `backend.src.*`)
-pytest backend/tests -v
+python -m pytest backend/tests -v
 ```
+
+For live end-to-end cases, synthetic applicant/job pairs, artifact review, and
+stage-by-stage diagnosis, see [TESTING_DEBUGGING_PIPELINE.md](TESTING_DEBUGGING_PIPELINE.md).
 
 ## Environment Variables
 

@@ -1,16 +1,29 @@
 """Tests for DocumentIngestionEngine."""
 
-from pathlib import Path
-
 import pytest
 
 from backend.src.ingestion.document_ingestion_engine import ingest_text, ingest_file
 
-FIXTURES = Path(__file__).parent / "fixtures"
+
+# Reusable applicant/job samples stay in the root-level, gitignored sample
+# directories. Unit tests keep their small deterministic input inline.
+_PROFILE_TEXT = """Taylor Example
+taylor@example.test
+
+Experience
+Software Engineer | Example Systems | 2022 - Present
+- Built Python APIs and added automated tests.
+
+Education
+B.S. Computer Science | Example University | 2022
+
+Skills
+Python, FastAPI, PostgreSQL
+"""
 
 
 def _load_sample_profile() -> str:
-    return (FIXTURES / "sample_profile.txt").read_text(encoding="utf-8")
+    return _PROFILE_TEXT
 
 
 def test_ingest_text_returns_sections():
