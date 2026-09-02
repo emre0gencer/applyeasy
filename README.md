@@ -8,6 +8,7 @@ An AI-powered resume tailoring app. Upload your profile, paste a job description
 Browser (React 18 + Vite)
   ↕ REST API
 FastAPI Backend
+  ↓ Normalize + editable profile review
   ↓ Background Task
 Pipeline:
   DocumentIngestionEngine → CandidateProfileBuilder → JobDescriptionAnalyzer
@@ -67,7 +68,11 @@ stage-by-stage diagnosis, see [TESTING_DEBUGGING_PIPELINE.md](TESTING_DEBUGGING_
 
 ## Pipeline Steps
 
-1. **extracting_profile** — PDF/text ingestion + LLM extraction → `CandidateProfile`
+Before generation, the upload flow extracts a structured candidate profile,
+flags missing dates/bullets/outcomes, and lets the user correct it. The confirmed
+profile becomes the evidence source used by the generation pipeline.
+
+1. **extracting_profile** — reviewed profile text + LLM extraction → `CandidateProfile`
 2. **analyzing_job** — LLM extraction → `JobDescription`
 3. **scoring_relevance** — sentence-transformers (`all-MiniLM-L6-v2`) cosine similarity → `ExperienceRelevanceMap`
 4. **tailoring_resume** — constrained LLM rephrasing → `TailoredResume`

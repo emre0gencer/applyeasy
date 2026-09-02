@@ -19,6 +19,7 @@ from backend.src.models.schemas import (
     RequirementEntry,
 )
 from backend.src.pipeline.errors import JobAnalysisError
+from backend.src.normalization.keywords import canonicalize_keywords
 
 _client: "Groq | None" = None
 
@@ -100,14 +101,14 @@ def analyze_job_description(
         for r in data.get("requirements", [])
     ]
 
-    keywords = [
+    keywords = canonicalize_keywords([
         KeywordEntry(
             term=k["term"],
             importance=k.get("importance", 1),
             first_appears_in=k.get("first_appears_in", "other"),
         )
         for k in data.get("keywords", [])
-    ]
+    ])
 
     # Pre-populate must_have / preferred lists from the structured requirements
     must_have = [r.text for r in requirements if r.is_required]

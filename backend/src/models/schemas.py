@@ -84,6 +84,15 @@ class CandidateProfile(BaseModel):
     raw_text: str = ""
 
 
+class ProfileGap(BaseModel):
+    """A reviewable issue found while normalizing a candidate profile."""
+
+    code: str
+    path: str
+    message: str
+    severity: str = "warning"
+
+
 # ---------------------------------------------------------------------------
 # Job Description models
 # ---------------------------------------------------------------------------
@@ -258,6 +267,27 @@ class UploadResponse(BaseModel):
     session_id: str
     message: str = "Profile received"
     detected_format: str = ""    # "pdf" | "text"
+
+
+class ProfileNormalizeRequest(BaseModel):
+    tier: str = "standard"
+
+
+class ProfileReviewResponse(BaseModel):
+    session_id: str
+    profile: CandidateProfile
+    gaps: list[ProfileGap] = []
+
+
+class ProfileUpdateRequest(BaseModel):
+    profile: CandidateProfile
+
+
+class ProfileUpdateResponse(BaseModel):
+    session_id: str
+    profile: CandidateProfile
+    gaps: list[ProfileGap] = []
+    message: str = "Profile saved"
 
 
 class GenerateRequest(BaseModel):

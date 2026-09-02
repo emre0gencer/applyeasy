@@ -1,12 +1,13 @@
 import { useCallback, useState } from "react";
-import { StatusResponse } from "./api/client";
+import { CandidateProfile, StatusResponse } from "./api/client";
 import { GeneratingStep } from "./components/GeneratingStep";
 import { JobDescriptionStep } from "./components/JobDescriptionStep";
 import { LandingPage } from "./components/LandingPage";
+import { ProfileReviewStep } from "./components/ProfileReviewStep";
 import { NetworkBackground } from "./components/NetworkBackground";
 import { ResultsStep } from "./components/ResultsStep";
 
-type Step = "landing" | "job" | "generating" | "results";
+type Step = "landing" | "review" | "job" | "generating" | "results";
 
 interface AppState {
   step: Step;
@@ -17,20 +18,27 @@ interface AppState {
   rawText?: string;
   jobDescription?: string;
   includeCoverLetter?: boolean;
+  profile?: CandidateProfile;
 }
 
 const WIZARD_STEPS: Partial<Record<Step, number>> = {
-  job: 1,
-  generating: 2,
-  results: 3,
+  review: 1,
+  job: 2,
+  generating: 3,
+  results: 4,
 };
 
 export default function App() {
   const [state, setState] = useState<AppState>({ step: "landing" });
 
-  const goToJob = useCallback((sessionId: string, rawText: string) => {
+  const goToReview = useCallback((sessionId: string, rawText: string) => {
     window.scrollTo(0, 0);
-    setState({ step: "job", sessionId, rawText });
+    setState({ step: "review", sessionId, rawText });
+  }, []);
+
+  const goToJob = useCallback((profile: CandidateProfile) => {
+    window.scrollTo(0, 0);
+    setState((current) => ({ ...current, step: "job", profile, rawText: profile.raw_text }));
   }, []);
 
   const goToGenerating = useCallback((runId: string, jobDescription: string, includeCoverLetter: boolean) => {
@@ -67,14 +75,17 @@ export default function App() {
               <span style={styles.logoApply}>Apply</span><span style={styles.logoEasy}>Easy</span>
             </h1>
             {stepNum !== undefined && (
-              <span style={styles.stepIndicator}>Step {stepNum} of 3</span>
+              <span style={styles.stepIndicator}>Step {stepNum} of 4</span>
             )}
           </header>
         )}
 
         <main style={state.step === "landing" ? undefined : styles.main}>
           {state.step === "landing" && (
-            <LandingPage onSubmit={goToJob} initialText={state.rawText} />
+            <LandingPage onSubmit={goToReview} initialText={state.rawText} />
+          )}
+          {state.step === "review" && state.sessionId && (
+            <ProfileReviewStep sessionId={state.sessionId} onBack={restart} onNext={goToJob} />
           )}
           {state.step === "job" && state.sessionId && (
             <JobDescriptionStep

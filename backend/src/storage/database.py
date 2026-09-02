@@ -46,6 +46,8 @@ class SessionRecord(Base):
     raw_text = Column(Text, nullable=False)
     source_format = Column(String, default="text")   # "pdf" | "text"
     owner_id = Column(String, nullable=True)          # opaque per-browser owner token
+    normalized_profile = Column(Text, nullable=True) # reviewed CandidateProfile JSON
+    profile_gaps = Column(Text, nullable=True)        # JSON list of review findings
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -83,6 +85,8 @@ def init_db() -> None:
             "ALTER TABLE runs ADD COLUMN raw_suitability_score INTEGER",
             "ALTER TABLE sessions ADD COLUMN owner_id VARCHAR",
             "ALTER TABLE runs ADD COLUMN owner_id VARCHAR",
+            "ALTER TABLE sessions ADD COLUMN normalized_profile TEXT",
+            "ALTER TABLE sessions ADD COLUMN profile_gaps TEXT",
         ]:
             try:
                 conn.execute(text(stmt))
@@ -124,6 +128,26 @@ def create_session_record(
 
 def get_session_record(db: Session, session_id: str) -> Optional[SessionRecord]:
     return db.query(SessionRecord).filter(SessionRecord.session_id == session_id).first()
+
+
+def save_profile_review(
+    db: Session,
+    session_id: str,
+    normalized_profile: str,
+    profile_gaps: str,
+    raw_text: Optional[str] = None,
+) -> Optional[SessionRecord]:
+    record = get_session_record(db, session_id)
+    if not record:
+        return None
+    record.normalized_profile = normalized_profile
+    record.profile_gaps = profile_gaps
+    if raw_text is not None:
+        record.raw_text = raw_text
+        record.source_format = "reviewed_text"
+    db.commit()
+    db.refresh(record)
+    return record
 
 
 def create_run_record(

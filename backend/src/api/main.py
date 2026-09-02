@@ -12,7 +12,7 @@ load_dotenv(Path(__file__).parent.parent.parent / ".env")  # backend/.env
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.src.api.routes import download, generate, status, upload
+from backend.src.api.routes import download, generate, profile, status, upload
 from backend.src.storage.database import init_db
 
 
@@ -44,6 +44,7 @@ app.add_middleware(
 
 
 app.include_router(upload.router, prefix="/api")
+app.include_router(profile.router, prefix="/api")
 app.include_router(generate.router, prefix="/api")
 app.include_router(status.router, prefix="/api")
 app.include_router(download.router, prefix="/api")

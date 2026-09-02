@@ -56,10 +56,12 @@ Seven sequential steps, each updating `RunRecord.progress_step` in SQLite:
 ### Frontend State Machine (`frontend/src/App.tsx`)
 
 ```
-landing → job → generating → results
+landing → review → job → generating → results
 ```
 
-- **LandingPage**: uploads profile, calls `goToJob(sessionId, rawText)`
+- **LandingPage**: uploads profile, then opens `ProfileReviewStep`
+- **ProfileReviewStep**: normalizes the browser-owned session, surfaces structured
+  gaps, and saves user corrections as the canonical source text
 - **JobDescriptionStep**: captures JD, calls `goToGenerating(runId, jobDescription)`
 - **GeneratingStep**: polls `/api/status` every ~1–2 s, calls `goToResults(status)` on completion
 - **ResultsStep**: download links + `ChangeSummaryPanel` (audit trail of every bullet change)

@@ -5,7 +5,7 @@
 items are folded into Track D below).
 
 **Created:** 2026-08-25
-**Last updated:** 2026-08-25 — Phase 2 complete; project-depth and creative-range policy added
+**Last updated:** 2026-09-02 — Phase 3 complete; profile review and keyword canonicalization delivered
 **Status legend:** ☐ open · ◐ in progress · ☑ done
 
 ---
@@ -131,20 +131,20 @@ emit a PDF with relevance-ordered entries or mixed date formats.
   **automatic repair is deferred to B5**. Regex-rewriting the prose here would
   trade a convention defect for a grammar defect — an LLM should do the rewrite.
 
-## Track B — Pro pipeline  — ◐ PHASE 2 COMPLETE 2026-08-25
+## Track B — Pro pipeline  — ◐ PHASE 3 COMPLETE 2026-09-02
 
 - ☑ **B1. `PipelineProfile`** (`backend/src/pipeline/profiles.py`) — per-run
   config: model per stage, repair loop on/off, normalization on/off, cover
   letter on/off, variant count. `standard` and `pro` presets. Threaded from
   `GenerateRequest.tier` → API validation → `run_pipeline()` → extraction, JD
   analysis, resume rewriting, project generation, normalization, and repair.
-- ☐ **B2. Input normalization pass** — raw text → canonical profile document,
+- ☑ **B2. Input normalization pass** — raw text → canonical profile document,
   with explicit gap detection (missing dates, bullet-less roles, outcome-less
   bullets) surfaced as structured findings rather than silently absorbed.
-- ☐ **B3. Review screen** — frontend step between upload and JD entry showing the
+- ☑ **B3. Review screen** — frontend step between upload and JD entry showing the
   extracted profile as editable structured fields, with gaps flagged. Corrections
   feed back into the session before generation.
-- ☐ **B4. 70B extraction + JD analysis** under the Pro profile, with
+- ☑ **B4. 70B extraction + JD analysis** under the Pro profile, with
   **keyword canonicalization** (collapse "React"/"React.js"/"ReactJS" to one
   canonical term) so coverage metrics stop double-counting.
 - ☑ **B5. Repair loop** — after `validate()`, route repairable flags (verb
@@ -264,6 +264,11 @@ five defect classes, and gives the repair loop something to act on.
 **Phase 2 — ☑ complete:** B1 → B6 → B5 (profile plumbing, honest failures,
 one complaint-directed repair pass), plus the new project-depth and
 creative-range decisions above.
-**Phase 3 — next:** B2 → B3 (normalization + review screen) and B4.
-**Phase 4:** Track C (page fit), then B7 → B8 → B9.
+**Phase 3 — ☑ complete:** B2 → B3 provides an ownership-protected structured
+review API and four-step frontend flow; user corrections are serialized into a
+canonical evidence document before generation. B4's Pro 70B model routing was
+already delivered with B1; keyword aliases are now canonicalized and deduped
+before matching and coverage scoring. Verified with 124 backend tests and a
+frontend production build on 2026-09-02.
+**Phase 4 — next:** Track C (page fit), then B7 → B8 → B9.
 **Ongoing:** Track D, prioritising D1 and D2.

@@ -8,6 +8,84 @@ export interface UploadResponse {
   detected_format: string;
 }
 
+export interface Bullet {
+  text: string;
+  source_text: string;
+  relevance_scores?: Record<string, number>;
+}
+
+export interface ExperienceEntry {
+  company: string;
+  role_title: string;
+  start_date: string;
+  end_date?: string;
+  location?: string;
+  bullets: Bullet[];
+  source_text: string;
+}
+
+export interface EducationEntry {
+  institution: string;
+  degree?: string;
+  field_of_study?: string;
+  graduation_date?: string;
+  gpa?: string;
+  honors: string[];
+  coursework?: string;
+  source_text: string;
+}
+
+export interface ProjectEntry {
+  name: string;
+  description: string;
+  technologies: string[];
+  url?: string;
+  date?: string;
+  bullets: Bullet[];
+  source_text: string;
+  relevance_score?: number;
+}
+
+export interface Skill {
+  name: string;
+  category?: string;
+  source_text: string;
+}
+
+export interface CandidateProfile {
+  profile_id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  linkedin?: string;
+  github?: string;
+  location?: string;
+  summary?: string;
+  experiences: ExperienceEntry[];
+  education: EducationEntry[];
+  projects: ProjectEntry[];
+  skills: Skill[];
+  awards: Array<{ title: string; issuer?: string; date?: string; description?: string; source_text: string }>;
+  leadership_items: string[];
+  source_documents: string[];
+  extraction_confidence: number;
+  raw_text: string;
+}
+
+export interface ProfileGap {
+  code: string;
+  path: string;
+  message: string;
+  severity: "info" | "warning" | "error";
+}
+
+export interface ProfileReviewResponse {
+  session_id: string;
+  profile: CandidateProfile;
+  gaps: ProfileGap[];
+  message?: string;
+}
+
 export interface GenerateResponse {
   run_id: string;
   message: string;
@@ -54,6 +132,32 @@ export async function uploadText(text: string): Promise<UploadResponse> {
   formData.append("text", text);
   const res = await fetch(`${BASE}/upload`, { method: "POST", body: formData, credentials: "include" });
   return handleResponse<UploadResponse>(res);
+}
+
+export async function normalizeProfile(
+  sessionId: string,
+  tier: "standard" | "pro" = "standard"
+): Promise<ProfileReviewResponse> {
+  const res = await fetch(`${BASE}/profile/${sessionId}/normalize`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ tier }),
+  });
+  return handleResponse<ProfileReviewResponse>(res);
+}
+
+export async function saveProfile(
+  sessionId: string,
+  profile: CandidateProfile
+): Promise<ProfileReviewResponse> {
+  const res = await fetch(`${BASE}/profile/${sessionId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ profile }),
+  });
+  return handleResponse<ProfileReviewResponse>(res);
 }
 
 export async function startGeneration(
